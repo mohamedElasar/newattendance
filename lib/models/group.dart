@@ -8,8 +8,8 @@ class GroupModel {
   YearModel? year;
   TeacherModel? teacher;
   SubjectModel? subject;
-  String? day;
-  String? time;
+  List<dynamic>? day;
+  List<dynamic>? time;
   bool? choosen;
 
   GroupModel(

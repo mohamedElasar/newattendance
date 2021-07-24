@@ -1,4 +1,8 @@
 import 'package:attendance/managers/App_State_manager.dart';
+import 'package:attendance/managers/group_manager.dart';
+import 'package:attendance/managers/subject_manager.dart';
+import 'package:attendance/managers/teacher_manager.dart';
+import 'package:attendance/managers/year_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,16 +20,639 @@ class Choices extends StatefulWidget {
   _ChoicesState createState() => _ChoicesState();
 }
 
-List<String> years_levels = ['الاول الثانوي', 'الثاني الثانوي'];
-List<String> subjects = ['اللغه العربيه', 'الرياضيات'];
-List<String> teachers = ['احمد محمد', 'عبد المعز'];
-List<String> groups = ['سنترالياسمين  1:30', 'سنتر المندره 2:30'];
-var year_level = null;
-var subject = null;
-var teacher = null;
-var group = null;
+late String year_id_selected;
+String yearname = 'السنه الدراسيه';
+late String subjectId_selected;
+String subjectname = 'الماده الدراسيه';
+late String teacher_id_selected;
+String teachername = 'المدرس';
+late String group_id_selected;
+String group_name = 'المجموعه';
 
 class _ChoicesState extends State<Choices> {
+  ScrollController _sc1 = new ScrollController();
+  ScrollController _sc2 = new ScrollController();
+  ScrollController _sc3 = new ScrollController();
+  ScrollController _sc4 = new ScrollController();
+  void dispose() {
+    _sc1.dispose();
+    _sc2.dispose();
+    _sc3.dispose();
+
+    super.dispose();
+  }
+
+  bool _isloadingyears = true;
+  bool _isloadingsubjects = false;
+  bool _isloadingteachers = false;
+  bool _isloadinggroups = false;
+  bool _isinit = true;
+  @override
+  void didChangeDependencies() async {
+    if (_isinit == true) {
+      Provider.of<YearManager>(context, listen: false).resetlist();
+      await Provider.of<YearManager>(context, listen: false)
+          .getMoreData()
+          .then((value) {
+        setState(() {
+          _isloadingyears = false;
+        });
+      });
+    }
+    _isinit = false;
+    super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    // Future.delayed(Duration.zero, () async {
+
+    // });
+    Provider.of<GroupManager>(context, listen: false).resetlist();
+    Provider.of<TeacherManager>(context, listen: false).resetlist();
+    Provider.of<YearManager>(context, listen: false).resetlist();
+    Provider.of<SubjectManager>(context, listen: false).resetlist();
+    yearname = 'السنه الدراسيه';
+    subjectname = 'الماده الدراسيه';
+    teachername = 'المدرس';
+    group_name = 'المجموعه';
+    _sc1.addListener(
+      () {
+        if (_sc1.position.pixels == _sc1.position.maxScrollExtent) {
+          Provider.of<YearManager>(context, listen: false).getMoreData();
+        }
+      },
+    );
+    _sc2.addListener(
+      () {
+        if (_sc2.position.pixels == _sc2.position.maxScrollExtent) {
+          Provider.of<SubjectManager>(context, listen: false).getMoreData();
+        }
+      },
+    );
+    _sc3.addListener(
+      () {
+        if (_sc3.position.pixels == _sc2.position.maxScrollExtent) {
+          Provider.of<TeacherManager>(context, listen: false).getMoreData();
+        }
+      },
+    );
+    _sc4.addListener(
+      () {
+        if (_sc4.position.pixels == _sc4.position.maxScrollExtent) {
+          Provider.of<GroupManager>(context, listen: false).getMoreData();
+        }
+      },
+    );
+    super.initState();
+  }
+
+  void _modalBottomSheetMenusubject(BuildContext context) {
+    FocusScope.of(context).unfocus();
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+            height: 250.0,
+            color: Colors.transparent,
+            child: Column(
+              children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: kbackgroundColor1,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'الماده الدراسيه',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GE-bold',
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20.0),
+                            topRight: Radius.circular(20.0))),
+                    child: Consumer<SubjectManager>(
+                      builder: (_, subjectmanager, child) {
+                        if (subjectmanager.subjects!.isEmpty) {
+                          if (subjectmanager.loading) {
+                            return Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: CircularProgressIndicator(),
+                            ));
+                          } else if (subjectmanager.error) {
+                            return Center(
+                                child: InkWell(
+                              onTap: () {
+                                subjectmanager.setloading(true);
+                                subjectmanager.seterror(false);
+                                Provider.of<SubjectManager>(context,
+                                        listen: false)
+                                    .getMoreData();
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Text("error please tap to try again"),
+                              ),
+                            ));
+                          }
+                        } else {
+                          return ListView.builder(
+                            controller: _sc2,
+                            itemCount: subjectmanager.subjects!.length +
+                                (subjectmanager.hasmore ? 1 : 0),
+                            itemBuilder: (BuildContext ctxt, int index) {
+                              if (index == subjectmanager.subjects!.length) {
+                                if (subjectmanager.error) {
+                                  return Center(
+                                      child: InkWell(
+                                    onTap: () {
+                                      subjectmanager.setloading(true);
+                                      subjectmanager.seterror(false);
+                                      Provider.of<SubjectManager>(context,
+                                              listen: false)
+                                          .getMoreData();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child:
+                                          Text("error please tap to try again"),
+                                    ),
+                                  ));
+                                } else {
+                                  return Center(
+                                      child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: CircularProgressIndicator(),
+                                  ));
+                                }
+                              }
+
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    subjectId_selected = subjectmanager
+                                        .subjects![index].id
+                                        .toString();
+                                    subjectname =
+                                        subjectmanager.subjects![index].name!;
+                                    subject_level = true;
+                                    teacher_level = false;
+                                    _isloadingteachers = true;
+                                    teachername = 'المدرس';
+                                    group_name = 'المجموعه';
+                                  });
+                                  Provider.of<AppStateManager>(context,
+                                          listen: false)
+                                      .setHomeOptions(false);
+
+                                  Provider.of<TeacherManager>(context,
+                                          listen: false)
+                                      .getMoreData()
+                                      .then((value) {
+                                    setState(() {
+                                      _isloadingteachers = false;
+                                    });
+                                  }).then((value) => Navigator.pop(context));
+                                },
+                                child: ListTile(
+                                  title: Text(
+                                      subjectmanager.subjects![index].name!),
+                                ),
+                              );
+                            },
+                          );
+                        }
+                        return Container();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void _modalBottomSheetMenuyear(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+            height: 250.0,
+            color: Colors.transparent,
+            child: Column(
+              children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: kbuttonColor3,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'السنه الدراسيه',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GE-bold',
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20.0),
+                            topRight: Radius.circular(20.0))),
+                    child: Consumer<YearManager>(
+                      builder: (_, yearmanager, child) {
+                        if (yearmanager.years.isEmpty) {
+                          if (yearmanager.loading) {
+                            return Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: CircularProgressIndicator(),
+                            ));
+                          } else if (yearmanager.error) {
+                            return Center(
+                                child: InkWell(
+                              onTap: () {
+                                yearmanager.setloading(true);
+                                yearmanager.seterror(false);
+                                Provider.of<YearManager>(context, listen: false)
+                                    .getMoreData();
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Text("error please tap to try again"),
+                              ),
+                            ));
+                          }
+                        } else {
+                          return ListView.builder(
+                            controller: _sc1,
+                            itemCount: yearmanager.years.length +
+                                (yearmanager.hasmore ? 1 : 0),
+                            itemBuilder: (BuildContext ctxt, int index) {
+                              if (index == yearmanager.years.length) {
+                                if (yearmanager.error) {
+                                  return Center(
+                                      child: InkWell(
+                                    onTap: () {
+                                      yearmanager.setloading(true);
+                                      yearmanager.seterror(false);
+                                      Provider.of<YearManager>(context,
+                                              listen: false)
+                                          .getMoreData();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child:
+                                          Text("error please tap to try again"),
+                                    ),
+                                  ));
+                                } else {
+                                  return Center(
+                                      child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: CircularProgressIndicator(),
+                                  ));
+                                }
+                              }
+
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    year_id_selected =
+                                        yearmanager.years[index].id.toString();
+                                    yearname = yearmanager.years[index].name!;
+                                    year_level = true;
+                                    subject_level = false;
+                                    teacher_level = false;
+                                    _isloadingsubjects = true;
+                                    subjectname = 'الماده الدراسيه';
+                                    teachername = 'المدرس';
+                                    group_name = 'المجموعه';
+                                  });
+                                  Provider.of<AppStateManager>(context,
+                                          listen: false)
+                                      .setHomeOptions(false);
+
+                                  Provider.of<SubjectManager>(context,
+                                          listen: false)
+                                      .getMoreData()
+                                      .then((value) {
+                                    setState(() {
+                                      _isloadingsubjects = false;
+                                    });
+                                  }).then((value) => Navigator.pop(context));
+                                },
+                                child: ListTile(
+                                  title: Text(yearmanager.years[index].name!),
+                                ),
+                              );
+                            },
+                          );
+                        }
+                        return Container();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void _modalBottomSheetMenuteacher(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+            height: 250.0,
+            color: Colors.transparent,
+            child: Column(
+              children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: kbackgroundColor1,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'المدرس',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GE-bold',
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20.0),
+                            topRight: Radius.circular(20.0))),
+                    child: Consumer<TeacherManager>(
+                      builder: (_, teachermanager, child) {
+                        if (teachermanager.teachers.isEmpty) {
+                          if (teachermanager.loading) {
+                            return Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: CircularProgressIndicator(),
+                            ));
+                          } else if (teachermanager.error) {
+                            return Center(
+                                child: InkWell(
+                              onTap: () {
+                                teachermanager.setloading(true);
+                                teachermanager.seterror(false);
+                                Provider.of<TeacherManager>(context,
+                                        listen: false)
+                                    .getMoreData();
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Text("error please tap to try again"),
+                              ),
+                            ));
+                          }
+                        } else {
+                          return ListView.builder(
+                            controller: _sc3,
+                            itemCount: teachermanager.teachers.length +
+                                (teachermanager.hasmore ? 1 : 0),
+                            itemBuilder: (BuildContext ctxt, int index) {
+                              if (index == teachermanager.teachers.length) {
+                                if (teachermanager.error) {
+                                  return Center(
+                                      child: InkWell(
+                                    onTap: () {
+                                      teachermanager.setloading(true);
+                                      teachermanager.seterror(false);
+                                      Provider.of<TeacherManager>(context,
+                                              listen: false)
+                                          .getMoreData();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child:
+                                          Text("error please tap to try again"),
+                                    ),
+                                  ));
+                                } else {
+                                  return Center(
+                                      child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: CircularProgressIndicator(),
+                                  ));
+                                }
+                              }
+
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    teacher_id_selected = teachermanager
+                                        .teachers[index].id
+                                        .toString();
+                                    teachername =
+                                        teachermanager.teachers[index].name!;
+                                    teacher_level = true;
+                                    _isloadinggroups = true;
+
+                                    group_name = 'المجموعه';
+                                  });
+                                  Provider.of<AppStateManager>(context,
+                                          listen: false)
+                                      .setHomeOptions(false);
+                                  Provider.of<GroupManager>(context,
+                                          listen: false)
+                                      .getMoreData()
+                                      .then((value) {
+                                    setState(() {
+                                      _isloadinggroups = false;
+                                    });
+                                  }).then((value) => Navigator.pop(context));
+                                },
+                                child: ListTile(
+                                  title: Text(
+                                      teachermanager.teachers[index].name!),
+                                ),
+                              );
+                            },
+                          );
+                        }
+                        return Container();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void _modalBottomSheetMenugroup(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (builder) {
+        return Container(
+          height: 250.0,
+          color: Colors.transparent,
+          child: Column(
+            children: [
+              Container(
+                height: 40,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: kbackgroundColor3,
+                ),
+                child: Center(
+                  child: Text(
+                    'المجموعات',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'GE-bold',
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0))),
+                  child: Consumer<GroupManager>(
+                    builder: (_, groupmanager, child) {
+                      if (groupmanager.groups.isEmpty) {
+                        if (groupmanager.loading) {
+                          print(groupmanager.loading);
+                          return Center(
+                              child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: CircularProgressIndicator(),
+                          ));
+                        } else if (groupmanager.error) {
+                          return Center(
+                              child: InkWell(
+                            onTap: () {
+                              groupmanager.setloading(true);
+                              groupmanager.seterror(false);
+                              Provider.of<GroupManager>(context, listen: false)
+                                  .getMoreData();
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Text("error please tap to try again"),
+                            ),
+                          ));
+                        }
+                      } else {
+                        return Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                controller: _sc4,
+                                itemCount: groupmanager.groups.length +
+                                    (groupmanager.hasmore ? 1 : 0),
+                                itemBuilder: (BuildContext ctxt, int index) {
+                                  if (index == groupmanager.groups.length) {
+                                    if (groupmanager.error) {
+                                      print('2');
+
+                                      return Center(
+                                          child: InkWell(
+                                        onTap: () {
+                                          groupmanager.setloading(true);
+                                          groupmanager.seterror(false);
+                                          Provider.of<GroupManager>(context,
+                                                  listen: false)
+                                              .getMoreData();
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Text(
+                                              "error please tap to try again"),
+                                        ),
+                                      ));
+                                    } else {
+                                      print('1');
+                                      return Center(
+                                          child: Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: CircularProgressIndicator(),
+                                      ));
+                                    }
+                                  }
+
+                                  return GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        group_id_selected = groupmanager
+                                            .groups[index].id
+                                            .toString();
+                                        group_name =
+                                            groupmanager.groups[index].name!;
+                                      });
+                                      Provider.of<AppStateManager>(context,
+                                              listen: false)
+                                          .setHomeOptions(true);
+                                      Navigator.pop(context);
+                                    },
+                                    child: ListTile(
+                                      title: Text(
+                                          groupmanager.groups[index].name!),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                          ],
+                        );
+                      }
+                      return Container();
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  List<String> years_levels = [];
+  List<String> subjects = [];
+  List<String> teachers = [];
+  List<String> groups = [];
+  var year_level = false;
+  var subject_level = false;
+  var teacher_level = false;
+  var group = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,39 +664,22 @@ class _ChoicesState extends State<Choices> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Choice_container(
-                  hinttext: 'السنه الدراسيه',
+                  hinttext: yearname,
                   color: kbuttonColor3,
                   items: years_levels,
                   size: widget.size,
-                  value: year_level,
-                  fnc: (newval) {
-                    setState(() {
-                      year_level = newval;
-                      Provider.of<AppStateManager>(context, listen: false)
-                          .setHomeOptions(false);
-                      subject = null;
-                      teacher = null;
-                      group = null;
-                    });
-                  },
+                  fnc: () => _modalBottomSheetMenuyear(context),
+                  loading: _isloadingyears,
                   active: true,
                 ),
                 Choice_container(
-                  hinttext: 'الماده الدراسيه',
+                  hinttext: subjectname,
                   color: kbackgroundColor1,
                   items: subjects,
                   size: widget.size,
-                  value: subject,
-                  fnc: (newval) {
-                    setState(() {
-                      subject = newval;
-                      Provider.of<AppStateManager>(context, listen: false)
-                          .setHomeOptions(false);
-                      teacher = null;
-                      group = null;
-                    });
-                  },
-                  active: year_level != null,
+                  fnc: () => _modalBottomSheetMenusubject(context),
+                  active: year_level == true,
+                  loading: _isloadingsubjects,
                 ),
               ],
             ),
@@ -79,35 +689,39 @@ class _ChoicesState extends State<Choices> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Choice_container(
-                  hinttext: 'المدرس',
+                  hinttext: teachername,
                   color: kbackgroundColor1,
                   items: teachers,
                   size: widget.size,
-                  value: teacher,
-                  fnc: (newval) {
-                    setState(() {
-                      teacher = newval;
-                      Provider.of<AppStateManager>(context, listen: false)
-                          .setHomeOptions(false);
-                      group = null;
-                    });
-                  },
-                  active: subject != null,
+                  // value: teacher,
+                  fnc: () => _modalBottomSheetMenuteacher(context),
+                  //  (newval) {
+                  //   setState(() {
+                  //     teacher = newval;
+                  //     Provider.of<AppStateManager>(context, listen: false)
+                  //         .setHomeOptions(false);
+                  //     group = null;
+                  //   });
+                  // },
+                  active: subject_level == true,
+                  loading: _isloadingteachers,
                 ),
                 Choice_container(
-                  hinttext: 'المجموعه',
+                  hinttext: group_name,
                   color: kbackgroundColor3,
                   items: groups,
                   size: widget.size,
-                  value: group,
-                  fnc: (newval) {
-                    setState(() {
-                      group = newval;
-                      Provider.of<AppStateManager>(context, listen: false)
-                          .setHomeOptions(true);
-                    });
-                  },
-                  active: teacher != null,
+                  // value: group,
+                  fnc: () => _modalBottomSheetMenugroup(context),
+                  //  (newval) {
+                  //   setState(() {
+                  //     group = newval;
+                  //     Provider.of<AppStateManager>(context, listen: false)
+                  //         .setHomeOptions(true);
+                  //   });
+                  // },
+                  active: teacher_level == true,
+                  loading: _isloadinggroups,
                 ),
               ],
             ),
@@ -196,56 +810,80 @@ class Choice_container extends StatelessWidget {
       required this.size,
       required this.color,
       required this.items,
-      required this.value,
+      // required this.value,
       required this.fnc,
       required this.hinttext,
-      required this.active})
+      required this.active,
+      this.loading = false})
       : super(key: key);
   final String hinttext;
   final Size size;
   final Color color;
   final List<String> items;
-  final String value;
-  final void Function(dynamic) fnc;
+  // final String value;
+  final Function() fnc;
   final bool active;
+  final bool? loading;
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: EdgeInsets.only(right: 6),
-        margin: EdgeInsets.all(1),
-        alignment: Alignment.center,
-        height: size.height * .6 * .16,
-        width: size.width * .45,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: DropdownButton(
-          // disabledHint: Text('disabled'),
-          isExpanded: true,
-          hint: Text(
-            hinttext,
-            style: TextStyle(
-              fontFamily: 'AraHamah1964B-Bold',
-              fontSize: 30,
-              color: active ? Colors.black : Colors.black26,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          value: value,
-          onChanged: active ? fnc : null,
-          items: items
-              .map((e) => DropdownMenuItem(
-                    child: Text(
-                      e,
+      padding: EdgeInsets.only(right: 6),
+      margin: EdgeInsets.all(1),
+      alignment: Alignment.center,
+      height: size.height * .6 * .16,
+      width: size.width * .45,
+      decoration: BoxDecoration(
+        color: active ? color : color.withOpacity(.5),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: InkWell(
+        onTap: active ? () => fnc() : null,
+        child: Container(
+          child: Row(
+            children: [
+              loading!
+                  ? CircularProgressIndicator()
+                  : Text(
+                      hinttext,
                       style: TextStyle(
-                          fontFamily: 'AraHamah1964B-Bold', fontSize: 30),
-                      overflow: TextOverflow.ellipsis,
+                          fontFamily: 'AraHamah1964B-Bold',
+                          fontSize: 30,
+                          color: active ? Colors.black : Colors.black26),
                     ),
-                    value: e,
-                  ))
-              .toList(),
-        ));
+              Spacer(),
+              Icon(Icons.keyboard_arrow_down)
+            ],
+          ),
+        ),
+      ),
+
+      //  DropdownButton(
+      //   // disabledHint: Text('disabled'),
+      //   isExpanded: true,
+      //   hint: Text(
+      //     hinttext,
+      //     style: TextStyle(
+      //       fontFamily: 'AraHamah1964B-Bold',
+      //       fontSize: 30,
+      //       color: active ? Colors.black : Colors.black26,
+      //     ),
+      //     overflow: TextOverflow.ellipsis,
+      //   ),
+      //   value: value,
+      //   onChanged: active ? fnc : null,
+      //   items: items
+      //       .map((e) => DropdownMenuItem(
+      //             child: Text(
+      //               e,
+      //               style: TextStyle(
+      //                   fontFamily: 'AraHamah1964B-Bold', fontSize: 30),
+      //               overflow: TextOverflow.ellipsis,
+      //             ),
+      //             value: e,
+      //           ))
+      //       .toList(),
+      // ),
+    );
   }
 }
 

@@ -446,7 +446,7 @@ class _group_formState extends State<group_form> {
                   ),
                   child: Center(
                     child: Text(
-                      'المرحله الدراسيه',
+                      'السنه الدراسيه',
                       style: TextStyle(
                         fontSize: 20,
                         fontFamily: 'GE-bold',
