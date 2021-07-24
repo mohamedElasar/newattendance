@@ -6,7 +6,6 @@ import 'package:attendance/models/city.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_select/smart_select.dart';
 
 import '../../../constants.dart';
 
@@ -302,20 +301,21 @@ class _Register_FormState extends State<Register_Form> {
                           topLeft: Radius.circular(20.0),
                           topRight: Radius.circular(20.0))),
                   child: Consumer<GroupManager>(
-                    builder: (_, yearmanager, child) {
-                      if (yearmanager.groups.isEmpty) {
-                        if (yearmanager.loading) {
+                    builder: (_, groupmanager, child) {
+                      if (groupmanager.groups.isEmpty) {
+                        if (groupmanager.loading) {
+                          print(groupmanager.loading);
                           return Center(
                               child: Padding(
                             padding: const EdgeInsets.all(8),
                             child: CircularProgressIndicator(),
                           ));
-                        } else if (yearmanager.error) {
+                        } else if (groupmanager.error) {
                           return Center(
                               child: InkWell(
                             onTap: () {
-                              yearmanager.setloading(true);
-                              yearmanager.seterror(false);
+                              groupmanager.setloading(true);
+                              groupmanager.seterror(false);
                               Provider.of<GroupManager>(context, listen: false)
                                   .getMoreData();
                             },
@@ -331,16 +331,18 @@ class _Register_FormState extends State<Register_Form> {
                             Expanded(
                               child: ListView.builder(
                                 controller: _sc2,
-                                itemCount: yearmanager.groups.length +
-                                    (yearmanager.hasmore ? 1 : 0),
+                                itemCount: groupmanager.groups.length +
+                                    (groupmanager.hasmore ? 1 : 0),
                                 itemBuilder: (BuildContext ctxt, int index) {
-                                  if (index == yearmanager.groups.length) {
-                                    if (yearmanager.error) {
+                                  if (index == groupmanager.groups.length) {
+                                    if (groupmanager.error) {
+                                      print('2');
+
                                       return Center(
                                           child: InkWell(
                                         onTap: () {
-                                          yearmanager.setloading(true);
-                                          yearmanager.seterror(false);
+                                          groupmanager.setloading(true);
+                                          groupmanager.seterror(false);
                                           Provider.of<GroupManager>(context,
                                                   listen: false)
                                               .getMoreData();
@@ -352,6 +354,7 @@ class _Register_FormState extends State<Register_Form> {
                                         ),
                                       ));
                                     } else {
+                                      print('1');
                                       return Center(
                                           child: Padding(
                                         padding: const EdgeInsets.all(8),
@@ -365,18 +368,18 @@ class _Register_FormState extends State<Register_Form> {
                                         StateSetter checkboxstate) {
                                       return ListTile(
                                         title: Text(
-                                            yearmanager.groups[index].name!),
+                                            groupmanager.groups[index].name!),
                                         leading: Checkbox(
                                           onChanged: (value) {
                                             checkboxstate(() {
-                                              yearmanager
+                                              groupmanager
                                                       .groups[index].choosen =
-                                                  !yearmanager
+                                                  !groupmanager
                                                       .groups[index].choosen!;
                                             });
                                           },
-                                          value:
-                                              yearmanager.groups[index].choosen,
+                                          value: groupmanager
+                                              .groups[index].choosen,
                                         ),
                                       );
                                     },

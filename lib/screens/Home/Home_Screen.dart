@@ -33,17 +33,27 @@ class Home_Screen extends StatelessWidget {
               arrowback: false,
             ),
             Options(size: size),
-            SizedBox(height: 10),
-            Choices(size: size),
-            // build_chip_container_down(null, 'مجموعه الحضور'),
-            SizedBox(
-              height: 10,
-            ),
-            Consumer<AppStateManager>(
-              builder: (context, appstatemanager, child) => GestureDetector(
-                onTap: appstatemanager.homeOptions ? () {} : null,
-                child: Scan_button(
-                  active: appstatemanager.homeOptions,
+            Container(
+              height: size.height * .7,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Choices(size: size),
+                    // build_chip_container_down(null, 'مجموعه الحضور'),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Consumer<AppStateManager>(
+                      builder: (context, appstatemanager, child) =>
+                          GestureDetector(
+                        onTap: appstatemanager.homeOptions ? () {} : null,
+                        child: Scan_button(
+                          active: appstatemanager.homeOptions,
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             )

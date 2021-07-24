@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:attendance/helper/httpexception.dart';
 
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/models/group.dart';
@@ -46,8 +47,8 @@ class GroupManager extends ChangeNotifier {
           'year_id': year,
           'subject_id': subject,
           'teacher_id': teacher,
-          'day': day,
-          'time': time
+          'day[]': day,
+          'time[]': time
         },
         headers: {
           'Accept': 'application/json',
@@ -59,9 +60,12 @@ class GroupManager extends ChangeNotifier {
 
       // if (response.statusCode == 200) {}
       // add exception
-
+      if (responseData['errors'] != null) {
+        List<String> errors = [];
+        for (var value in responseData['errors'].values) errors.add(value[0]);
+        throw HttpException(errors.join('  '));
+      }
     } catch (error) {
-      print('object');
       throw (error);
     }
 
@@ -83,7 +87,7 @@ class GroupManager extends ChangeNotifier {
       List<dynamic> stagesList = responseData['data'];
       var list = stagesList.map((data) => GroupModel.fromJson(data)).toList();
       _groups = list;
-
+      // _loading = false;
       // add exception
 
     } catch (error) {

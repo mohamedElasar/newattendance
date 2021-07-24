@@ -1,11 +1,12 @@
 import 'package:attendance/constants.dart';
+import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_select/smart_select.dart';
 
 class group_form extends StatefulWidget {
   const group_form({
@@ -21,31 +22,129 @@ class group_form extends StatefulWidget {
 
 class _group_formState extends State<group_form> {
   final GlobalKey<FormState> _formKey = GlobalKey();
-
-  void _submit() {
+  FocusNode fnode = FocusNode();
+  void _submit() async {
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
-      print('ddd');
       return;
     }
-    if (_register_data['subject'] == null ||
-        _register_data['teacher'] == null ||
-        _register_data['year_level'] == null) {
-      print('asdasd');
+    if (subjectname == 'الماده الدراسيه' ||
+        teachername == 'المدرس' ||
+        yearname == 'السنه الدراسيه') {
+      _showErrorDialog('من فضلك استكمل بيانات المجموعه', 'حدث خطا');
       return;
+    }
+    var _newlist = _data.where((e) => e != null).toList();
+    List _newnewlist = [];
+    _newlist.forEach((e) {
+      var _newnewlist = _newlist;
+      if (e == 'سبت')
+        _newnewlist.asMap().forEach((index, value) {
+          if (value == e) _newnewlist[index] = 'Saturday';
+        });
+      if (e == 'أحد')
+        _newnewlist.asMap().forEach((index, value) {
+          if (value == e) _newnewlist[index] = 'Sunday';
+        });
+      if (e == 'اثنين')
+        _newnewlist.asMap().forEach((index, value) {
+          if (value == e) _newnewlist[index] = 'Monday';
+        });
+      if (e == 'ثلاثاء')
+        _newnewlist.asMap().forEach((index, value) {
+          if (value == e) _newnewlist[index] = 'Tuesday';
+        });
+      if (e == 'أربعاء')
+        _newnewlist.asMap().forEach((index, value) {
+          if (value == e) _newnewlist[index] = 'Wednesday';
+        });
+      if (e == 'خميس')
+        _newnewlist.asMap().forEach((index, value) {
+          if (value == e) _newnewlist[index] = 'Thursday';
+        });
+      if (e == 'جمعه')
+        _newnewlist.asMap().forEach((index, value) {
+          if (value == e) _newnewlist[index] = 'Friday';
+        });
+    });
+    // print(_newnewlist);
+
+    if (_newlist.isEmpty) {
+      _showErrorDialog('من فضلك أضف مواعيد المجموعه', 'حدث خطا');
+
+      return;
+    }
+    List inds = [];
+
+    _data.asMap().forEach((index, value) {
+      if (value != null) {
+        inds.add(index);
+      }
+    });
+    List<TimeOfDay> _newtimes = [];
+    List newtimes = [];
+    _times.asMap().forEach((index, value) {
+      if (index != 0) {
+        newtimes.add(value);
+      }
+    });
+    newtimes.asMap().forEach((index, value) {
+      inds.forEach((element) {
+        if (index == element) {
+          _newtimes.add(value);
+        }
+      });
+    });
+
+    print(_newlist.join(',')); // list of days (good)
+
+    String formatTimeOfDay(TimeOfDay tod) {
+      final now = new DateTime.now();
+      final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+      final format = DateFormat('hh:mm'); //"6:00 AM"
+      return format.format(dt);
     }
 
+    List<String> _finaltimes = [];
+    _newtimes.forEach((t) {
+      _finaltimes.add(formatTimeOfDay(t));
+    });
+    print(_finaltimes.join(','));
+
+    // print(formatTimeOfDay(TimeOfDay.now()));
     setState(() {
       _isLoading = true;
     });
-
-    Provider.of<GroupManager>(context, listen: false).add_group(
-        nameController.text,
-        year_id_selected,
-        subjectId_selected,
-        teacher_id_selected,
-        'Sunday',
-        '11:00');
+    try {
+      await Provider.of<GroupManager>(context, listen: false)
+          .add_group(nameController.text, year_id_selected, subjectId_selected,
+              teacher_id_selected, _newlist.join(','), _finaltimes.join(','))
+          .then((_) {
+            nameController.text = '';
+            subjectname = 'الماده الدراسيه';
+            teachername = 'المدرس';
+            yearname = 'السنه الدراسيه';
+          })
+          .then((value) => setState(() {
+                _isLoading = false;
+              }))
+          .then(
+            (_) => ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.green[300],
+                content: Text(
+                  'تم اضافه المجموعه بنجاح',
+                  style: TextStyle(fontFamily: 'GE-medium'),
+                ),
+                duration: Duration(seconds: 3),
+              ),
+            ),
+          );
+    } on HttpException catch (error) {
+      _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
+    } catch (error) {
+      _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
+    }
     setState(() {
       _isLoading = false;
     });
@@ -71,7 +170,7 @@ class _group_formState extends State<group_form> {
     'خميس',
     'جمعه',
   ];
-  List<dynamic> _times = [
+  List<TimeOfDay> _times = [
     TimeOfDay.now(),
     TimeOfDay.now(),
     TimeOfDay.now(),
@@ -91,7 +190,7 @@ class _group_formState extends State<group_form> {
     );
     if (newTime != null) {
       setState(() {
-        _times[e - 1] = newTime;
+        _times[e] = newTime;
       });
     }
   }
@@ -120,6 +219,38 @@ class _group_formState extends State<group_form> {
       setState(() {
         selectedDate = picked;
       });
+  }
+
+  void _showErrorDialog(String message, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          title,
+          style: TextStyle(fontFamily: 'GE-Bold'),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(fontFamily: 'AraHamah1964R-Bold'),
+        ),
+        actions: <Widget>[
+          Center(
+            child: TextButton(
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(kbuttonColor2)),
+              // color: kbackgroundColor1,
+              child: Text(
+                'حسنا',
+                style: TextStyle(fontFamily: 'GE-medium', color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(ctx).pop();
+              },
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -177,6 +308,7 @@ class _group_formState extends State<group_form> {
   ScrollController _sc3 = new ScrollController();
 
   void _modalBottomSheetMenu(BuildContext context) {
+    FocusScope.of(context).unfocus();
     showModalBottomSheet(
         context: context,
         builder: (builder) {
@@ -210,7 +342,7 @@ class _group_formState extends State<group_form> {
                             topRight: Radius.circular(20.0))),
                     child: Consumer<SubjectManager>(
                       builder: (_, subjectmanager, child) {
-                        if (subjectmanager.subjects.isEmpty) {
+                        if (subjectmanager.subjects!.isEmpty) {
                           if (subjectmanager.loading) {
                             return Center(
                                 child: Padding(
@@ -236,10 +368,10 @@ class _group_formState extends State<group_form> {
                         } else {
                           return ListView.builder(
                             controller: _sc,
-                            itemCount: subjectmanager.subjects.length +
+                            itemCount: subjectmanager.subjects!.length +
                                 (subjectmanager.hasmore ? 1 : 0),
                             itemBuilder: (BuildContext ctxt, int index) {
-                              if (index == subjectmanager.subjects.length) {
+                              if (index == subjectmanager.subjects!.length) {
                                 if (subjectmanager.error) {
                                   return Center(
                                       child: InkWell(
@@ -269,16 +401,16 @@ class _group_formState extends State<group_form> {
                                 onTap: () {
                                   setState(() {
                                     subjectId_selected = subjectmanager
-                                        .subjects[index].id
+                                        .subjects![index].id
                                         .toString();
                                     subjectname =
-                                        subjectmanager.subjects[index].name!;
+                                        subjectmanager.subjects![index].name!;
                                   });
                                   Navigator.pop(context);
                                 },
                                 child: ListTile(
                                   title: Text(
-                                      subjectmanager.subjects[index].name!),
+                                      subjectmanager.subjects![index].name!),
                                 ),
                               );
                             },
@@ -296,6 +428,8 @@ class _group_formState extends State<group_form> {
   }
 
   void _modalBottomSheetMenu2(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
     showModalBottomSheet(
         context: context,
         builder: (builder) {
@@ -411,6 +545,8 @@ class _group_formState extends State<group_form> {
   }
 
   void _modalBottomSheetMenu3(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
     showModalBottomSheet(
         context: context,
         builder: (builder) {
@@ -543,7 +679,7 @@ class _group_formState extends State<group_form> {
               child: Column(
                 children: [
                   Container(
-                    height: widget.size.height * .3,
+                    height: widget.size.height * .4,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -645,199 +781,208 @@ class _group_formState extends State<group_form> {
                   SizedBox(
                     height: 10,
                   ),
-                  Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        // Text("${selectedDate.toLocal()}".split(' ')[0]),
-                        // SizedBox(height: 20.0,),
-                        RaisedButton(
-                          onPressed: () => _submit(),
-                          //  _selectDate(context),
-                          child: Text('From .. To'),
-                          color: Colors.white,
-                        ),
-                      ],
-                    ),
-                  ),
                   SizedBox(
                     height: 10,
                   ),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (days.length < 7) {
-                                days.add(count);
-                                count++;
-                                print(_data);
-                                print(_times);
-                              }
-                            });
-                          },
-                          child: Center(
-                            child: Container(
-                              width: widget.size.width * .4,
-                              height: 25,
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  color: kbackgroundColor1,
-                                  borderRadius: BorderRadius.circular(15)),
-                              child: Align(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Text(
-                                      'اضافه موعد',
-                                      style: TextStyle(fontFamily: 'GE-medium'),
-                                    ),
-                                    Icon(Icons.add)
-                                  ],
+                  Container(
+                    height: widget.size.height * .4,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (days.length < 7) {
+                                  days.add(count);
+                                  count++;
+                                  print(_data);
+                                  print(_times);
+                                }
+                              });
+                            },
+                            child: Center(
+                              child: Container(
+                                width: widget.size.width * .4,
+                                height: 25,
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    color: kbuttonColor2.withOpacity(.7),
+                                    borderRadius: BorderRadius.circular(15)),
+                                child: Align(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Text(
+                                        'اضافه موعد',
+                                        style:
+                                            TextStyle(fontFamily: 'GE-medium'),
+                                      ),
+                                      Icon(Icons.add)
+                                    ],
+                                  ),
+                                  alignment: Alignment.center,
                                 ),
-                                alignment: Alignment.center,
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Dismissible(
-                          background: Container(
-                            // color: Colors.red,
-                            child: Icon(
-                              Icons.delete,
-                              color: Colors.red[400],
-                              size: 30,
-                            ),
+                          SizedBox(
+                            height: 20,
                           ),
-                          key: UniqueKey(),
-                          onDismissed: (DismissDirection direction) {
-                            setState(() {
-                              _data = [
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                              ];
-                              count = 1;
-                              days = [];
-                              _times = [
-                                TimeOfDay.now(),
-                                TimeOfDay.now(),
-                                TimeOfDay.now(),
-                                TimeOfDay.now(),
-                                TimeOfDay.now(),
-                                TimeOfDay.now(),
-                                TimeOfDay.now(),
-                                TimeOfDay.now(),
-                              ];
-                            });
-                          },
-                          child: Container(
-                            height: widget.size.height * .4,
-                            child: ListView(
-                                children: days
-                                    .map(
-                                      (e) => Center(
-                                        child: Container(
-                                          width: widget.size.width * .9,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Center(
-                                                child: Container(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  width: widget.size.width /
-                                                      3 *
-                                                      .9,
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 20),
-                                                  height: 40,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    // borderRadius:
-                                                    //     BorderRadius.circular(20),
-                                                    border: Border.all(
-                                                        color: Colors.grey),
-                                                  ),
+                          Dismissible(
+                            background: Container(
+                              // color: Colors.red,
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.red[400],
+                                size: 30,
+                              ),
+                            ),
+                            key: UniqueKey(),
+                            onDismissed: (DismissDirection direction) {
+                              setState(() {
+                                _data = [
+                                  null,
+                                  null,
+                                  null,
+                                  null,
+                                  null,
+                                  null,
+                                  null,
+                                  null,
+                                ];
+                                count = 1;
+                                days = [];
+                                _times = [
+                                  TimeOfDay.now(),
+                                  TimeOfDay.now(),
+                                  TimeOfDay.now(),
+                                  TimeOfDay.now(),
+                                  TimeOfDay.now(),
+                                  TimeOfDay.now(),
+                                  TimeOfDay.now(),
+                                  TimeOfDay.now(),
+                                ];
+                              });
+                            },
+                            child: Container(
+                              height: widget.size.height * .4,
+                              child: ListView(
+                                  children: days
+                                      .map(
+                                        (e) => Center(
+                                          child: Container(
+                                            width: widget.size.width * .9,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Center(
                                                   child: Container(
-                                                    child:
-                                                        DropdownButtonHideUnderline(
-                                                      child: DropdownButton(
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'GE-medium',
-                                                            color:
-                                                                Colors.black),
-                                                        value: _data[e - 1],
-                                                        hint: Text('اليوم'),
-                                                        isExpanded: true,
-                                                        iconSize: 30,
-                                                        onChanged: (newval) {
-                                                          setState(() {
-                                                            _data[e - 1] =
-                                                                newval
-                                                                    .toString();
-                                                          });
-                                                        },
-                                                        icon: Icon(Icons
-                                                            .keyboard_arrow_down),
-                                                        items: weekdays
-                                                            .map((item) =>
-                                                                DropdownMenuItem(
-                                                                  child: Text(
-                                                                      item),
-                                                                  value: item,
-                                                                ))
-                                                            .toList(),
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    width: widget.size.width /
+                                                        3 *
+                                                        .9,
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 20),
+                                                    height: 40,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      // borderRadius:
+                                                      //     BorderRadius.circular(20),
+                                                      border: Border.all(
+                                                          color: Colors.grey),
+                                                    ),
+                                                    child: Container(
+                                                      child:
+                                                          DropdownButtonHideUnderline(
+                                                        child: DropdownButton(
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'GE-medium',
+                                                              color:
+                                                                  Colors.black),
+                                                          value: _data[e - 1],
+                                                          hint: Text('اليوم'),
+                                                          isExpanded: true,
+                                                          iconSize: 30,
+                                                          onChanged: (newval) {
+                                                            setState(() {
+                                                              _data[
+                                                                  e -
+                                                                      1] = newval
+                                                                  .toString();
+                                                            });
+                                                          },
+                                                          icon: Icon(Icons
+                                                              .keyboard_arrow_down),
+                                                          items: weekdays
+                                                              .map((item) =>
+                                                                  DropdownMenuItem(
+                                                                    child: Text(
+                                                                        item),
+                                                                    value: item,
+                                                                  ))
+                                                              .toList(),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: () => _selectTime(e),
-                                                child: Container(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  width: widget.size.width /
-                                                      3 *
-                                                      .9,
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 20),
-                                                  height: 40,
-                                                  decoration: BoxDecoration(
-                                                    color: kbackgroundColor3,
-                                                    border: Border.all(
-                                                        color: Colors.grey),
-                                                  ),
-                                                  child: Text(
-                                                    '${_times[e].format(context)}',
-                                                    style: TextStyle(
-                                                        fontFamily: 'GE-medium',
-                                                        color: Colors.black54),
+                                                GestureDetector(
+                                                  onTap: () => _selectTime(e),
+                                                  child: Container(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    width: widget.size.width /
+                                                        3 *
+                                                        .9,
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 20),
+                                                    height: 40,
+                                                    decoration: BoxDecoration(
+                                                      color: kbackgroundColor3,
+                                                      border: Border.all(
+                                                          color: Colors.grey),
+                                                    ),
+                                                    child: Text(
+                                                      '${_times[e].format(context)}',
+                                                      style: TextStyle(
+                                                          fontFamily:
+                                                              'GE-medium',
+                                                          color:
+                                                              Colors.black54),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    )
-                                    .toList()),
-                          ),
-                        )
-                      ],
+                                      )
+                                      .toList()),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: widget.size.width * .9,
+                    child: TextButton(
+                      style: ButtonStyle(
+                          elevation: MaterialStateProperty.all(2),
+                          backgroundColor:
+                              MaterialStateProperty.all(kbuttonColor2)),
+                      onPressed: _submit,
+                      child: Text(
+                        'تسجيل',
+                        style: TextStyle(
+                            fontFamily: 'GE-Bold', color: Colors.black),
+                      ),
                     ),
                   ),
                 ],
@@ -858,7 +1003,7 @@ class _group_formState extends State<group_form> {
         alignment: Alignment.centerRight,
         width: small ? widget.size.width * .9 / 2 : widget.size.width * .9,
         padding: EdgeInsets.symmetric(horizontal: 20),
-        height: 40,
+        height: 55,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -866,6 +1011,7 @@ class _group_formState extends State<group_form> {
         ),
         child: Container(
           child: TextFormField(
+            // focusNode: fnode,
             onSaved: (value) {
               _register_data[item] = value!;
             },

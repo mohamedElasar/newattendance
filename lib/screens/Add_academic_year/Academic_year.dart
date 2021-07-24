@@ -10,10 +10,8 @@ import 'package:attendance/screens/degrees/components/Degrees_top.dart';
 import 'package:attendance/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_select/smart_select.dart';
 import '../../constants.dart';
 
-import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'components/Academic_Top_Page.dart';
 import 'components/default_form_field.dart';
 
@@ -348,20 +346,52 @@ class _Add_academic_yearState extends State<Add_academic_year> {
                                   }
 
                                   return Dismissible(
+                                    background: Container(
+                                      color: Colors.red,
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Icon(
+                                            Icons.delete,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                     key: Key(
                                         yearmanager.years[index].id.toString()),
-                                    onDismissed: (DismissDirection) {
-                                      setState(() {
-                                        // litems.removeAt(Index);
-                                      });
+                                    onDismissed: (DismissDirection) async {
+                                      try {
+                                        String? subname =
+                                            yearmanager.years[index].name;
+                                        await Provider.of<YearManager>(context,
+                                                listen: false)
+                                            .deleteyear(yearmanager
+                                                .years[index].id
+                                                .toString());
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                backgroundColor: Colors.black45,
+                                                content: Text(
+                                                  'تم مسح $subname',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontFamily: 'GE-medium'),
+                                                )));
+                                      } on HttpException catch (error) {
+                                        _showErrorDialog(error.toString());
+                                      } catch (e) {
+                                        _showErrorDialog('حاول مره اخري');
+                                      }
                                     },
                                     child: ListTile(
-                                      title:
-                                          Text(yearmanager.years[index].name!),
-                                      leading: Text(
+                                      title: Text(
                                           //.stage.name
                                           yearmanager
                                               .years[index].stage!.name!),
+                                      leading:
+                                          Text(yearmanager.years[index].name!),
                                     ),
                                   );
                                 },

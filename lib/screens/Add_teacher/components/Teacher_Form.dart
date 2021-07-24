@@ -7,7 +7,6 @@ import 'package:attendance/screens/Admin_Login/components/Page_Title.dart';
 import 'package:attendance/screens/Home/components/choices.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_select/smart_select.dart';
 
 import '../../../constants.dart';
 
@@ -290,7 +289,7 @@ class _Teacher_FormState extends State<Teacher_Form> {
                             topRight: Radius.circular(20.0))),
                     child: Consumer<SubjectManager>(
                       builder: (_, subjectmanager, child) {
-                        if (subjectmanager.subjects.isEmpty) {
+                        if (subjectmanager.subjects!.isEmpty) {
                           if (subjectmanager.loading) {
                             return Center(
                                 child: Padding(
@@ -316,10 +315,10 @@ class _Teacher_FormState extends State<Teacher_Form> {
                         } else {
                           return ListView.builder(
                             controller: _sc,
-                            itemCount: subjectmanager.subjects.length +
+                            itemCount: subjectmanager.subjects!.length +
                                 (subjectmanager.hasmore ? 1 : 0),
                             itemBuilder: (BuildContext ctxt, int index) {
-                              if (index == subjectmanager.subjects.length) {
+                              if (index == subjectmanager.subjects!.length) {
                                 if (subjectmanager.error) {
                                   return Center(
                                       child: InkWell(
@@ -349,16 +348,16 @@ class _Teacher_FormState extends State<Teacher_Form> {
                                 onTap: () {
                                   setState(() {
                                     subjectId_selected = subjectmanager
-                                        .subjects[index].id
+                                        .subjects![index].id
                                         .toString();
                                     subjectname =
-                                        subjectmanager.subjects[index].name!;
+                                        subjectmanager.subjects![index].name!;
                                   });
                                   Navigator.pop(context);
                                 },
                                 child: ListTile(
                                   title: Text(
-                                      subjectmanager.subjects[index].name!),
+                                      subjectmanager.subjects![index].name!),
                                 ),
                               );
                             },

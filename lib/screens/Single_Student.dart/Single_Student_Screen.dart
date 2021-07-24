@@ -5,8 +5,6 @@ import 'package:attendance/screens/Students/components/Students_Top_Page.dart';
 import 'package:flutter/material.dart';
 import '../../constants.dart';
 
-import 'package:data_table_2/data_table_2.dart';
-
 import 'components/student_details.dart';
 import 'components/student_pic_name.dart';
 

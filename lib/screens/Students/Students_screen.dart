@@ -6,7 +6,6 @@ import '../../constants.dart';
 import 'components/Filter_Container.dart';
 import 'components/Students_Top_Page.dart';
 import 'components/Students_page_title.dart';
-import 'package:data_table_2/data_table_2.dart';
 
 import 'components/table/Row_builder.dart';
 import 'components/table/table_head.dart';

@@ -8,6 +8,7 @@ import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/screens/Add_academic_year/Academic_year.dart';
 import 'package:attendance/screens/Add_teacher/Add_Teacher_Screen.dart';
 import 'package:attendance/screens/Student_register/Student_register_screen.dart';
+import 'package:attendance/screens/degrees/Degrees_Screen.dart';
 
 import 'package:attendance/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +64,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<Auth_manager, SubjectManager>(
           create: (ctx) => SubjectManager(),
           update: (ctx, auth, prevstage) => prevstage!
-            ..receiveToken(auth, prevstage == null ? [] : prevstage.subjects),
+            ..receiveToken(auth, prevstage == null ? [] : prevstage.subjects!),
         ),
         ChangeNotifierProxyProvider<Auth_manager, TeacherManager>(
           create: (ctx) => TeacherManager(),

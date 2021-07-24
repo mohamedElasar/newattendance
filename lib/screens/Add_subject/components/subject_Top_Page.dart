@@ -1,4 +1,6 @@
+import 'package:attendance/managers/App_State_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Subject_Top_Page extends StatelessWidget {
   const Subject_Top_Page({Key? key, required this.size}) : super(key: key);
@@ -30,9 +32,18 @@ class Subject_Top_Page extends StatelessWidget {
               ),
             ),
           ),
-          Icon(
-            Icons.arrow_right_outlined,
-          ),
+          InkWell(
+            onTap: () {
+              Provider.of<AppStateManager>(context, listen: false).go_to_Home();
+            },
+            child: RotatedBox(
+              quarterTurns: 2,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+              ),
+            ),
+          )
         ],
       ),
     );

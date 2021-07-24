@@ -1,4 +1,6 @@
+import 'package:attendance/managers/App_State_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Academic_Top_Page extends StatelessWidget {
   const Academic_Top_Page({Key? key, required this.size}) : super(key: key);
@@ -24,9 +26,18 @@ class Academic_Top_Page extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 fontFamily: 'AraHamah1964B-Bold'),
           ),
-          Icon(
-            Icons.arrow_right_outlined,
-          ),
+          InkWell(
+            onTap: () {
+              Provider.of<AppStateManager>(context, listen: false).go_to_Home();
+            },
+            child: RotatedBox(
+              quarterTurns: 2,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+              ),
+            ),
+          )
         ],
       ),
     );
