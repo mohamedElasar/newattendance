@@ -41,6 +41,7 @@ class _Register_FormState extends State<Register_Form> {
     setState(() {
       _isLoading = true;
     });
+    print(_groups_id.join(','));
     try {
       await Provider.of<StudentManager>(context, listen: false)
           .add_student(

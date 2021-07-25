@@ -69,7 +69,7 @@ class AppRouter extends RouterDelegate
         if (authmanager.isLoggedIn && appStateManager.groupRegister)
           Add_group_screen.page(),
         if (authmanager.isLoggedIn && appStateManager.communicateStudents)
-          Students_Screen.page(),
+          Students_Screen.page(group_id: appStateManager.groupIdSelected),
         if (authmanager.isLoggedIn && appStateManager.dataStudents)
           Filter_Screen_6.page(),
         if (authmanager.isLoggedIn && appStateManager.lessonModify)

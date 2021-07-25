@@ -1,11 +1,13 @@
 import 'package:attendance/managers/App_State_manager.dart';
+import 'package:attendance/managers/Student_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Rows_Builder extends StatefulWidget {
+  final groupId;
   final size;
 
-  Rows_Builder({Key? key, this.size}) : super(key: key);
+  Rows_Builder({Key? key, this.size, this.groupId}) : super(key: key);
 
   @override
   _Rows_BuilderState createState() => _Rows_BuilderState();
@@ -14,6 +16,17 @@ class Rows_Builder extends StatefulWidget {
 class _Rows_BuilderState extends State<Rows_Builder> {
   List<dynamic> mylist = [
     [false, 'A', 'B', 'C'],
+    [false, 'D', 'E', 'F'],
+    [false, 'D', 'E', 'F'],
+    [false, 'D', 'E', 'F'],
+    [false, 'D', 'E', 'F'],
+    [false, 'D', 'E', 'F'],
+    [false, 'D', 'E', 'F'],
+    [false, 'D', 'E', 'F'],
+    [false, 'D', 'E', 'F'],
+    [false, 'D', 'E', 'F'],
+    [false, 'D', 'E', 'F'],
+    [false, 'D', 'E', 'F'],
     [false, 'D', 'E', 'F'],
     [false, 'D', 'E', 'F'],
     [false, 'D', 'E', 'F'],
@@ -30,27 +43,61 @@ class _Rows_BuilderState extends State<Rows_Builder> {
         .goToSingleStudent(true);
   }
 
+  bool _isLoading = true;
+  ScrollController _sc = new ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      Provider.of<StudentManager>(context, listen: false).resetlist();
+      Provider.of<StudentManager>(context, listen: false)
+          .getMoreDatafiltered(widget.groupId)
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+      _sc.addListener(() {
+        if (_sc.position.pixels == _sc.position.maxScrollExtent) {
+          Provider.of<StudentManager>(context, listen: false)
+              .getMoreDatafiltered(widget.groupId);
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     print(mylist);
     return Expanded(
-      child: ListView.builder(
-        itemCount: mylist.length,
-        itemBuilder: (BuildContext context, int index) {
-          return GestureDetector(
-            child: TABLE_ROW(
-              size: widget.size,
-              name: mylist[index][1],
-              id: mylist[index][2],
-              mobile: mylist[index][3],
-              check: mylist[index][0],
-              myfnc: () => _myfunction(index),
-              tapFnc: () => _tapFnc(),
-            ),
-          );
-        },
-      ),
-    );
+        child: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Consumer<StudentManager>(
+                builder: (builder, studentmanager, child) => ListView.builder(
+                  controller: _sc,
+                  itemCount: studentmanager.students.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      child: TABLE_ROW(
+                          size: widget.size,
+                          name: studentmanager.students[index].name!,
+                          id: studentmanager.students[index].code!.name
+                              .toString(),
+                          mobile: studentmanager.students[index].phone!,
+                          check: studentmanager.students[index].choosen!,
+                          myfnc: () {
+                            studentmanager.students[index].choosen =
+                                !studentmanager.students[index].choosen!;
+                            setState(() {});
+                          },
+                          tapFnc: () => _tapFnc()),
+                    );
+                  },
+                ),
+              ));
   }
 }
 

@@ -119,7 +119,7 @@ class SubjectManager extends ChangeNotifier {
         "page": _pageNumber.toString(),
       });
       //
-      print(url);
+      // print(url);
       var response = await http.get(
         url,
         headers: {

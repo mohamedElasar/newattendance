@@ -99,7 +99,7 @@ class _ChoicesState extends State<Choices> {
     );
     _sc3.addListener(
       () {
-        if (_sc3.position.pixels == _sc2.position.maxScrollExtent) {
+        if (_sc3.position.pixels == _sc3.position.maxScrollExtent) {
           Provider.of<TeacherManager>(context, listen: false)
               .getMoreDatafiltered(year_id_selected, subjectId_selected);
         }
@@ -644,6 +644,11 @@ class _ChoicesState extends State<Choices> {
 
                                   return GestureDetector(
                                     onTap: () {
+                                      Provider.of<AppStateManager>(context,
+                                              listen: false)
+                                          .setgroupID(groupmanager
+                                              .groups[index].id
+                                              .toString());
                                       setState(() {
                                         group_id_selected = groupmanager
                                             .groups[index].id

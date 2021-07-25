@@ -42,6 +42,14 @@ class AppStateManager extends ChangeNotifier {
   bool get singleStudentAttend => _single_student_attend;
   // students page .. end
 
+  String _group_id_selected = '';
+  String get groupIdSelected => _group_id_selected;
+
+  void setgroupID(String value) {
+    _group_id_selected = value;
+    notifyListeners();
+  }
+
   void setHomeOptions(bool value) {
     _home_options = value;
     notifyListeners();

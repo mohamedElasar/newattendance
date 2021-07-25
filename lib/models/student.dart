@@ -21,27 +21,31 @@ class StudentModel {
   String? secondLanguage;
   String? discount;
   Code? code;
+  bool? choosen;
 
-  StudentModel(
-      {this.id,
-      this.name,
-      this.email,
-      this.phone,
-      this.school,
-      this.note,
-      this.city,
-      this.groups,
-      this.parent,
-      this.relationType,
-      this.parentPhone,
-      this.parentWhatsapp,
-      this.gender,
-      this.studyType,
-      this.secondLanguage,
-      this.discount,
-      this.code});
+  StudentModel({
+    this.id,
+    this.name,
+    this.email,
+    this.phone,
+    this.school,
+    this.note,
+    this.city,
+    this.groups,
+    this.parent,
+    this.relationType,
+    this.parentPhone,
+    this.parentWhatsapp,
+    this.gender,
+    this.studyType,
+    this.secondLanguage,
+    this.discount,
+    this.code,
+    this.choosen = false,
+  });
 
   StudentModel.fromJson(Map<String, dynamic> json) {
+    choosen = false;
     id = json['id'];
     name = json['name'];
     email = json['email'];

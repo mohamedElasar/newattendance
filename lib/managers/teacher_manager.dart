@@ -62,7 +62,7 @@ class TeacherManager extends ChangeNotifier {
           'experience': experience,
           'note': note,
           'subject_id': subject,
-          'years[]': years,
+          'years': years,
           'city_id': cityId,
         },
         headers: {
@@ -150,8 +150,8 @@ class TeacherManager extends ChangeNotifier {
         "subject_id": filter2,
         "page": _pageNumber.toString(),
       });
-      print(url);
-      print(_pageNumber);
+      // print(url);
+      // print(_pageNumber);
       //
       print(url);
       var response = await http.get(

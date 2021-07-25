@@ -11,17 +11,26 @@ import 'components/table/Row_builder.dart';
 import 'components/table/table_head.dart';
 
 class Students_Screen extends StatelessWidget {
-  static MaterialPage page() {
+  final String? groupid;
+  static MaterialPage page({
+    required String group_id,
+  }) {
     return MaterialPage(
       name: Attendance_Screens.data_students,
       key: ValueKey(Attendance_Screens.data_students),
-      child: const Students_Screen(),
+      child: Students_Screen(
+        groupid: group_id,
+      ),
     );
   }
 
-  const Students_Screen({Key? key}) : super(key: key);
+  const Students_Screen({
+    Key? key,
+    this.groupid,
+  }) : super(key: key);
 
   Widget build(BuildContext context) {
+    print(groupid);
     final size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
@@ -36,7 +45,7 @@ class Students_Screen extends StatelessWidget {
               child: Column(
                 children: [
                   TABLE_HEAD(size: size),
-                  Rows_Builder(size: size),
+                  Rows_Builder(groupId: groupid, size: size),
                 ],
               ),
             ),
