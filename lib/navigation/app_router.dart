@@ -1,5 +1,10 @@
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Auth_manager.dart';
+import 'package:attendance/managers/cities_manager.dart';
+import 'package:attendance/managers/group_manager.dart';
+import 'package:attendance/managers/subject_manager.dart';
+import 'package:attendance/managers/teacher_manager.dart';
+import 'package:attendance/managers/year_manager.dart';
 import 'package:attendance/screens/Add_academic_year/Academic_year.dart';
 import 'package:attendance/screens/Add_group/Add_group_Screen.dart';
 import 'package:attendance/screens/Add_subject/Academic_subject.dart';
@@ -21,9 +26,19 @@ class AppRouter extends RouterDelegate
   final GlobalKey<NavigatorState> navigatorKey;
 
   final AppStateManager appStateManager;
+  final CitiesManager citiesManager;
+  final SubjectManager subjectManager;
+  final TeacherManager teachermanager;
+  final YearManager yearManager;
+  final GroupManager groupManager;
   final Auth_manager authmanager;
 
   AppRouter({
+    required this.citiesManager,
+    required this.subjectManager,
+    required this.teachermanager,
+    required this.yearManager,
+    required this.groupManager,
     required this.appStateManager,
     required this.authmanager,
   }) : navigatorKey = GlobalKey<NavigatorState>() {
@@ -88,6 +103,12 @@ class AppRouter extends RouterDelegate
         route.settings.name == Attendance_Screens.subjects_add ||
         route.settings.name == Attendance_Screens.years_add ||
         route.settings.name == Attendance_Screens.teacher_registerpath) {
+      yearManager.resetlist();
+      groupManager.resetlist();
+      teachermanager.resetlist();
+      subjectManager.resetlist();
+      // appStateManager.setHomeOptions(false);
+      yearManager.getMoreData();
       appStateManager.go_to_Home();
     }
     if (route.settings.name == Attendance_Screens.single_student) {

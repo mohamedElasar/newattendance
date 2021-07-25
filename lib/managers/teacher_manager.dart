@@ -142,12 +142,52 @@ class TeacherManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> getMoreDatafiltered(String filter1, String filter2) async {
+    // print(_pageNumber);
+    try {
+      var url = Uri.https('development.mrsaidmostafa.com', '/api/teachers', {
+        "year_id": filter1,
+        "subject_id": filter2,
+        "page": _pageNumber.toString(),
+      });
+      print(url);
+      print(_pageNumber);
+      //
+      print(url);
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+
+      final responseData = json.decode(response.body);
+
+      List<dynamic> teachersList = responseData['data'];
+      var fetchedsubjects =
+          teachersList.map((data) => TeacherModel.fromJson(data)).toList();
+      _hasMore = fetchedsubjects.length == _defaultPerPageCount;
+      _loading = false;
+      _pageNumber = _pageNumber + 1;
+
+      _teachers.addAll(fetchedsubjects);
+    } catch (e) {
+      _loading = false;
+      _error = true;
+      notifyListeners();
+    }
+
+    notifyListeners();
+  }
+
   void resetlist() {
     _teachers = [];
     _loading = true;
     _pageNumber = 1;
     _error = false;
     _loading = true;
+    notifyListeners();
   }
 
   void setloading(bool value) {

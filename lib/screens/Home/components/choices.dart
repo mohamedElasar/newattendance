@@ -50,6 +50,28 @@ class _ChoicesState extends State<Choices> {
   @override
   void didChangeDependencies() async {
     if (_isinit == true) {
+      // Provider.of<GroupManager>(context, listen: false).resetlist();
+      // Provider.of<TeacherManager>(context, listen: false).resetlist();
+      // // Provider.of<YearManager>(context, listen: false).resetlist();
+      // Provider.of<SubjectManager>(context, listen: false).resetlist();
+      // Provider.of<YearManager>(context, listen: false).resetlist();
+
+    }
+    _isinit = false;
+    super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero, () async {
+      yearname = 'السنه الدراسيه';
+      subjectname = 'الماده الدراسيه';
+      teachername = 'المدرس';
+      group_name = 'المجموعه';
+      Provider.of<GroupManager>(context, listen: false).resetlist();
+      Provider.of<TeacherManager>(context, listen: false).resetlist();
+      // Provider.of<YearManager>(context, listen: false).resetlist();
+      Provider.of<SubjectManager>(context, listen: false).resetlist();
       Provider.of<YearManager>(context, listen: false).resetlist();
       await Provider.of<YearManager>(context, listen: false)
           .getMoreData()
@@ -58,24 +80,8 @@ class _ChoicesState extends State<Choices> {
           _isloadingyears = false;
         });
       });
-    }
-    _isinit = false;
-    super.didChangeDependencies();
-  }
+    });
 
-  @override
-  void initState() {
-    // Future.delayed(Duration.zero, () async {
-
-    // });
-    Provider.of<GroupManager>(context, listen: false).resetlist();
-    Provider.of<TeacherManager>(context, listen: false).resetlist();
-    Provider.of<YearManager>(context, listen: false).resetlist();
-    Provider.of<SubjectManager>(context, listen: false).resetlist();
-    yearname = 'السنه الدراسيه';
-    subjectname = 'الماده الدراسيه';
-    teachername = 'المدرس';
-    group_name = 'المجموعه';
     _sc1.addListener(
       () {
         if (_sc1.position.pixels == _sc1.position.maxScrollExtent) {
@@ -86,21 +92,24 @@ class _ChoicesState extends State<Choices> {
     _sc2.addListener(
       () {
         if (_sc2.position.pixels == _sc2.position.maxScrollExtent) {
-          Provider.of<SubjectManager>(context, listen: false).getMoreData();
+          Provider.of<SubjectManager>(context, listen: false)
+              .getMoreDatafiltered(year_id_selected.toString());
         }
       },
     );
     _sc3.addListener(
       () {
         if (_sc3.position.pixels == _sc2.position.maxScrollExtent) {
-          Provider.of<TeacherManager>(context, listen: false).getMoreData();
+          Provider.of<TeacherManager>(context, listen: false)
+              .getMoreDatafiltered(year_id_selected, subjectId_selected);
         }
       },
     );
     _sc4.addListener(
       () {
         if (_sc4.position.pixels == _sc4.position.maxScrollExtent) {
-          Provider.of<GroupManager>(context, listen: false).getMoreData();
+          Provider.of<GroupManager>(context, listen: false).getMoreDatafiltered(
+              year_id_selected, subjectId_selected, teacher_id_selected);
         }
       },
     );
@@ -157,7 +166,8 @@ class _ChoicesState extends State<Choices> {
                                 subjectmanager.seterror(false);
                                 Provider.of<SubjectManager>(context,
                                         listen: false)
-                                    .getMoreData();
+                                    .getMoreDatafiltered(
+                                        year_id_selected.toString());
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(16),
@@ -180,7 +190,8 @@ class _ChoicesState extends State<Choices> {
                                       subjectmanager.seterror(false);
                                       Provider.of<SubjectManager>(context,
                                               listen: false)
-                                          .getMoreData();
+                                          .getMoreDatafiltered(
+                                              year_id_selected.toString());
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.all(16),
@@ -198,7 +209,10 @@ class _ChoicesState extends State<Choices> {
                               }
 
                               return GestureDetector(
-                                onTap: () {
+                                onTap: () async {
+                                  Provider.of<TeacherManager>(context,
+                                          listen: false)
+                                      .resetlist();
                                   setState(() {
                                     subjectId_selected = subjectmanager
                                         .subjects![index].id
@@ -215,14 +229,16 @@ class _ChoicesState extends State<Choices> {
                                           listen: false)
                                       .setHomeOptions(false);
 
-                                  Provider.of<TeacherManager>(context,
+                                  await Provider.of<TeacherManager>(context,
                                           listen: false)
-                                      .getMoreData()
+                                      .getMoreDatafiltered(
+                                          year_id_selected, subjectId_selected)
+                                      .then((value) => Navigator.pop(context))
                                       .then((value) {
                                     setState(() {
                                       _isloadingteachers = false;
                                     });
-                                  }).then((value) => Navigator.pop(context));
+                                  });
                                 },
                                 child: ListTile(
                                   title: Text(
@@ -334,7 +350,10 @@ class _ChoicesState extends State<Choices> {
                               }
 
                               return GestureDetector(
-                                onTap: () {
+                                onTap: () async {
+                                  Provider.of<SubjectManager>(context,
+                                          listen: false)
+                                      .resetlist();
                                   setState(() {
                                     year_id_selected =
                                         yearmanager.years[index].id.toString();
@@ -351,14 +370,16 @@ class _ChoicesState extends State<Choices> {
                                           listen: false)
                                       .setHomeOptions(false);
 
-                                  Provider.of<SubjectManager>(context,
+                                  await Provider.of<SubjectManager>(context,
                                           listen: false)
-                                      .getMoreData()
+                                      .getMoreDatafiltered(
+                                          year_id_selected.toString())
+                                      .then((value) => Navigator.pop(context))
                                       .then((value) {
                                     setState(() {
                                       _isloadingsubjects = false;
                                     });
-                                  }).then((value) => Navigator.pop(context));
+                                  });
                                 },
                                 child: ListTile(
                                   title: Text(yearmanager.years[index].name!),
@@ -429,7 +450,8 @@ class _ChoicesState extends State<Choices> {
                                 teachermanager.seterror(false);
                                 Provider.of<TeacherManager>(context,
                                         listen: false)
-                                    .getMoreData();
+                                    .getMoreDatafiltered(
+                                        year_id_selected, subjectId_selected);
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(16),
@@ -452,7 +474,8 @@ class _ChoicesState extends State<Choices> {
                                       teachermanager.seterror(false);
                                       Provider.of<TeacherManager>(context,
                                               listen: false)
-                                          .getMoreData();
+                                          .getMoreDatafiltered(year_id_selected,
+                                              subjectId_selected);
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.all(16),
@@ -470,7 +493,10 @@ class _ChoicesState extends State<Choices> {
                               }
 
                               return GestureDetector(
-                                onTap: () {
+                                onTap: () async {
+                                  Provider.of<GroupManager>(context,
+                                          listen: false)
+                                      .resetlist();
                                   setState(() {
                                     teacher_id_selected = teachermanager
                                         .teachers[index].id
@@ -482,17 +508,21 @@ class _ChoicesState extends State<Choices> {
 
                                     group_name = 'المجموعه';
                                   });
+                                  Navigator.pop(context);
                                   Provider.of<AppStateManager>(context,
                                           listen: false)
                                       .setHomeOptions(false);
-                                  Provider.of<GroupManager>(context,
+                                  await Provider.of<GroupManager>(context,
                                           listen: false)
-                                      .getMoreData()
+                                      .getMoreDatafiltered(
+                                          year_id_selected,
+                                          subjectId_selected,
+                                          teacher_id_selected)
                                       .then((value) {
                                     setState(() {
                                       _isloadinggroups = false;
                                     });
-                                  }).then((value) => Navigator.pop(context));
+                                  });
                                 },
                                 child: ListTile(
                                   title: Text(
@@ -562,7 +592,8 @@ class _ChoicesState extends State<Choices> {
                               groupmanager.setloading(true);
                               groupmanager.seterror(false);
                               Provider.of<GroupManager>(context, listen: false)
-                                  .getMoreData();
+                                  .getMoreDatafiltered(year_id_selected,
+                                      subjectId_selected, teacher_id_selected);
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -590,7 +621,10 @@ class _ChoicesState extends State<Choices> {
                                           groupmanager.seterror(false);
                                           Provider.of<GroupManager>(context,
                                                   listen: false)
-                                              .getMoreData();
+                                              .getMoreDatafiltered(
+                                                  year_id_selected,
+                                                  subjectId_selected,
+                                                  teacher_id_selected);
                                         },
                                         child: Padding(
                                           padding: const EdgeInsets.all(16),

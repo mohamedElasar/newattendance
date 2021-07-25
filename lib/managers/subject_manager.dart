@@ -111,13 +111,56 @@ class SubjectManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> getMoreDatafiltered(String filter) async {
+    // print(_pageNumber);
+    try {
+      var url = Uri.https('development.mrsaidmostafa.com', '/api/subjects', {
+        "year_id": filter,
+        "page": _pageNumber.toString(),
+      });
+      //
+      print(url);
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+
+      final responseData = json.decode(response.body);
+
+      List<dynamic> yearsList = responseData['data'];
+      var fetchedYears =
+          yearsList.map((data) => SubjectModel.fromJson(data)).toList();
+      _hasMore = fetchedYears.length == _defaultYearsPerPageCount;
+      _loading = false;
+      _pageNumber = _pageNumber + 1;
+
+      _subjects!.addAll(fetchedYears);
+    } catch (e) {
+      _loading = false;
+      _error = true;
+      notifyListeners();
+    }
+
+    notifyListeners();
+  }
+
   void resetlist() {
     _subjects = [];
     _loading = true;
     _pageNumber = 1;
     _error = false;
-    _loading = true;
+    // print(_pageNumber);
+    notifyListeners();
   }
+
+  // void setpage1() {
+  //   _pageNumber = 1;
+  //   print(_pageNumber);
+  //   notifyListeners();
+  // }
 
   void setloading(bool value) {
     _loading = value;

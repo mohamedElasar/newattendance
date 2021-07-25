@@ -496,14 +496,14 @@ class _Register_FormState extends State<Register_Form> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
+    Future.delayed(Duration.zero, () async {
       Provider.of<CitiesManager>(context, listen: false).resetlist();
       Provider.of<GroupManager>(context, listen: false).resetlist();
 
-      Provider.of<CitiesManager>(context, listen: false)
-          .get_cities()
+      await Provider.of<CitiesManager>(context, listen: false)
+          .getMoreData()
           .then((value) =>
-              Provider.of<GroupManager>(context, listen: false).get_groups())
+              Provider.of<GroupManager>(context, listen: false).getMoreData())
           .then((_) {
         setState(() {
           _isLoading = false;

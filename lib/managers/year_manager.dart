@@ -115,6 +115,7 @@ class YearManager extends ChangeNotifier {
     _pageNumber = 1;
     _error = false;
     _loading = true;
+    notifyListeners();
   }
 
   void setloading(bool value) {

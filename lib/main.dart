@@ -36,11 +36,17 @@ class MyApp extends StatelessWidget {
   final _citymanager = CitiesManager();
   final _groupmanager = GroupManager();
   final _studentsmanager = StudentManager();
+  final _subjectmanager = SubjectManager();
 
   AppRouter GetRouter() {
     return AppRouter(
       appStateManager: _appStateManager,
       authmanager: _auth_Manager,
+      citiesManager: _citymanager,
+      groupManager: _groupmanager,
+      subjectManager: _subjectmanager,
+      teachermanager: _teachermanager,
+      yearManager: _yearManager,
     );
   }
 
@@ -52,32 +58,32 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => _auth_Manager),
         ChangeNotifierProvider(create: (context) => _citymanager),
         ChangeNotifierProxyProvider<Auth_manager, YearManager>(
-          create: (ctx) => YearManager(),
+          create: (ctx) => _yearManager,
           update: (ctx, auth, prevyear) => prevyear!
             ..receiveToken(auth, prevyear == null ? [] : prevyear.years),
         ),
         ChangeNotifierProxyProvider<Auth_manager, StageManager>(
-          create: (ctx) => StageManager(),
+          create: (ctx) => _stageManager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(auth, prevstage == null ? [] : prevstage.stages!),
         ),
         ChangeNotifierProxyProvider<Auth_manager, SubjectManager>(
-          create: (ctx) => SubjectManager(),
+          create: (ctx) => _subjectmanager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(auth, prevstage == null ? [] : prevstage.subjects!),
         ),
         ChangeNotifierProxyProvider<Auth_manager, TeacherManager>(
-          create: (ctx) => TeacherManager(),
+          create: (ctx) => _teachermanager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(auth, prevstage == null ? [] : prevstage.teachers),
         ),
         ChangeNotifierProxyProvider<Auth_manager, GroupManager>(
-          create: (ctx) => GroupManager(),
+          create: (ctx) => _groupmanager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(auth, prevstage == null ? [] : prevstage.groups),
         ),
         ChangeNotifierProxyProvider<Auth_manager, StudentManager>(
-          create: (ctx) => StudentManager(),
+          create: (ctx) => _studentsmanager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(auth, prevstage == null ? [] : prevstage.students),
         ),

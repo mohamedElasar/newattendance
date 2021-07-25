@@ -215,17 +215,17 @@ class _Teacher_FormState extends State<Teacher_Form> {
   void initState() {
     super.initState();
 
-    Future.delayed(Duration.zero, () {
+    Future.delayed(Duration.zero, () async {
       Provider.of<SubjectManager>(context, listen: false).resetlist();
       Provider.of<YearManager>(context, listen: false).resetlist();
       Provider.of<CitiesManager>(context, listen: false).resetlist();
 
-      Provider.of<SubjectManager>(context, listen: false)
-          .get_subjects()
+      await Provider.of<SubjectManager>(context, listen: false)
+          .getMoreData()
           .then((_) =>
-              Provider.of<YearManager>(context, listen: false).get_years())
+              Provider.of<YearManager>(context, listen: false).getMoreData())
           .then((_) =>
-              Provider.of<CitiesManager>(context, listen: false).get_cities())
+              Provider.of<CitiesManager>(context, listen: false).getMoreData())
           .then((_) {
         setState(() {
           _isLoading = false;
