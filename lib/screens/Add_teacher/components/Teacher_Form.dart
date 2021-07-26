@@ -125,7 +125,7 @@ class _Teacher_FormState extends State<Teacher_Form> {
         experienceController.text,
         notesController.text,
         subjectId_selected,
-        _years_ids.join(','),
+        _years_ids,
         cityId_selected,
       )
           .then((_) {

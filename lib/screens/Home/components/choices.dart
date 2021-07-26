@@ -228,12 +228,12 @@ class _ChoicesState extends State<Choices> {
                                   Provider.of<AppStateManager>(context,
                                           listen: false)
                                       .setHomeOptions(false);
+                                  Navigator.pop(context);
 
                                   await Provider.of<TeacherManager>(context,
                                           listen: false)
                                       .getMoreDatafiltered(
                                           year_id_selected, subjectId_selected)
-                                      .then((value) => Navigator.pop(context))
                                       .then((value) {
                                     setState(() {
                                       _isloadingteachers = false;
@@ -366,6 +366,7 @@ class _ChoicesState extends State<Choices> {
                                     teachername = 'المدرس';
                                     group_name = 'المجموعه';
                                   });
+                                  Navigator.pop(context);
                                   Provider.of<AppStateManager>(context,
                                           listen: false)
                                       .setHomeOptions(false);
@@ -374,7 +375,6 @@ class _ChoicesState extends State<Choices> {
                                           listen: false)
                                       .getMoreDatafiltered(
                                           year_id_selected.toString())
-                                      .then((value) => Navigator.pop(context))
                                       .then((value) {
                                     setState(() {
                                       _isloadingsubjects = false;
@@ -646,9 +646,10 @@ class _ChoicesState extends State<Choices> {
                                     onTap: () {
                                       Provider.of<AppStateManager>(context,
                                               listen: false)
-                                          .setgroupID(groupmanager
-                                              .groups[index].id
-                                              .toString());
+                                          .setgroupID(
+                                              groupmanager.groups[index].id
+                                                  .toString(),
+                                              groupmanager.groups[index]);
                                       setState(() {
                                         group_id_selected = groupmanager
                                             .groups[index].id

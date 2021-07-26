@@ -14,6 +14,7 @@ class Contacts_widget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
+        margin: EdgeInsets.symmetric(vertical: 5),
         alignment: Alignment.centerRight,
         width: size.width * .8,
         // margin: EdgeInsets.symmetric(horizontal: 5),

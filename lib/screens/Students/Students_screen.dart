@@ -1,7 +1,9 @@
+import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/Admin_Login/components/Login_Form.dart';
 import 'package:attendance/screens/Admin_Login/components/Page_Title.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants.dart';
 import 'components/Filter_Container.dart';
 import 'components/Students_Top_Page.dart';
@@ -30,7 +32,7 @@ class Students_Screen extends StatelessWidget {
   }) : super(key: key);
 
   Widget build(BuildContext context) {
-    print(groupid);
+    // print(groupid);
     final size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
@@ -39,7 +41,10 @@ class Students_Screen extends StatelessWidget {
         body: (Column(
           children: [
             Student_Top_Page(size: size),
-            Students_Page_Title(title: '1:30 سنتر الياسمين '),
+            Consumer<AppStateManager>(
+              builder: (builder, appstatemanager, child) => Students_Page_Title(
+                  title: appstatemanager.getGroupSelected.name),
+            ),
             Filter_Container(),
             Expanded(
               child: Column(

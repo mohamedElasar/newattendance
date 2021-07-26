@@ -14,33 +14,17 @@ class Rows_Builder extends StatefulWidget {
 }
 
 class _Rows_BuilderState extends State<Rows_Builder> {
-  List<dynamic> mylist = [
-    [false, 'A', 'B', 'C'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-    [false, 'D', 'E', 'F'],
-  ];
-  void _myfunction(index) {
-    setState(() {
-      mylist[index][0] = !mylist[index][0];
-    });
-  }
+  // void _myfunction(index) {
+  //   setState(() {
+  //     mylist[index][0] = !mylist[index][0];
+  //   });
+  // }
 
-  void _tapFnc() {
+  void _tapFnc(String student_id) {
+    // Provider.of<AppStateManager>(context, listen: false)
+    //     .setStudentID(student_id);
     Provider.of<AppStateManager>(context, listen: false)
-        .goToSingleStudent(true);
+        .goToSingleStudent(true, student_id);
   }
 
   bool _isLoading = true;
@@ -49,9 +33,9 @@ class _Rows_BuilderState extends State<Rows_Builder> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
+    Future.delayed(Duration.zero, () async {
       Provider.of<StudentManager>(context, listen: false).resetlist();
-      Provider.of<StudentManager>(context, listen: false)
+      await Provider.of<StudentManager>(context, listen: false)
           .getMoreDatafiltered(widget.groupId)
           .then((_) {
         setState(() {
@@ -68,8 +52,15 @@ class _Rows_BuilderState extends State<Rows_Builder> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _sc.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print(mylist);
+    print(Provider.of<StudentManager>(context, listen: false).students);
     return Expanded(
         child: _isLoading
             ? Center(
@@ -93,7 +84,8 @@ class _Rows_BuilderState extends State<Rows_Builder> {
                                 !studentmanager.students[index].choosen!;
                             setState(() {});
                           },
-                          tapFnc: () => _tapFnc()),
+                          tapFnc: () => _tapFnc(
+                              studentmanager.students[index].id.toString())),
                     );
                   },
                 ),
@@ -160,7 +152,8 @@ class CELL extends StatelessWidget {
   final text;
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(fontSize: 20, fontFamily: 'AraHamah1964B-Bold');
+    const textStyle =
+        TextStyle(fontSize: 15, fontFamily: 'AraHamah1964B-light');
     return Container(
       width: width,
       height: height,
@@ -171,6 +164,9 @@ class CELL extends StatelessWidget {
           child: Text(
         text,
         style: textStyle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
       )),
     );
   }

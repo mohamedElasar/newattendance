@@ -20,60 +20,63 @@ class Add_Teacher_Screeen extends StatelessWidget {
     // final GlobalKey<ScaffoldState> _scaffoldKey =
     //     new GlobalKey<ScaffoldState>();
 
-    return Scaffold(
-      // key: _scaffoldKey,
-      appBar: AppBar(
-        title: Center(
-          child: Text(
-            'تسجيل معلم',
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 30,
-                fontFamily: 'AraHamah1964B-Bold'),
-          ),
-        ),
-        actions: [
-          SizedBox(width: 10),
-          CircleAvatar(
-            minRadius: 25,
-            backgroundImage: AssetImage('assets/images/pic2.png'),
-          ),
-          SizedBox(
-            width: 30,
-          ),
-          InkWell(
-            onTap: () {
-              Provider.of<AppStateManager>(context, listen: false).go_to_Home();
-            },
-            child: RotatedBox(
-              quarterTurns: 2,
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              ),
+    return SafeArea(
+      child: Scaffold(
+        // key: _scaffoldKey,
+        appBar: AppBar(
+          title: Center(
+            child: Text(
+              'تسجيل معلم',
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 30,
+                  fontFamily: 'AraHamah1964B-Bold'),
             ),
-          )
-          // SizedBox(
-          //   width: 70,
-          // ),
-          // Icon(
-          //   Icons.save_rounded,
-          //   color: Colors.orange[200],
-          //   size: 40,
-          // ),
-          // SizedBox(
-          //   width: 20,
-          // )
-        ],
-        elevation: 0,
-        leading: Icon(
-          Icons.menu,
-          color: Colors.black,
+          ),
+          actions: [
+            SizedBox(width: 10),
+            CircleAvatar(
+              minRadius: 25,
+              backgroundImage: AssetImage('assets/images/pic2.png'),
+            ),
+            SizedBox(
+              width: 30,
+            ),
+            InkWell(
+              onTap: () {
+                Provider.of<AppStateManager>(context, listen: false)
+                    .go_to_Home();
+              },
+              child: RotatedBox(
+                quarterTurns: 2,
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                ),
+              ),
+            )
+            // SizedBox(
+            //   width: 70,
+            // ),
+            // Icon(
+            //   Icons.save_rounded,
+            //   color: Colors.orange[200],
+            //   size: 40,
+            // ),
+            // SizedBox(
+            //   width: 20,
+            // )
+          ],
+          elevation: 0,
+          leading: Icon(
+            Icons.menu,
+            color: Colors.black,
+          ),
+          backgroundColor: Colors.white,
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey[300],
+        body: SingleChildScrollView(child: Teacher_Form(size: size)),
       ),
-      backgroundColor: Colors.grey[300],
-      body: SingleChildScrollView(child: Teacher_Form(size: size)),
     );
   }
 }

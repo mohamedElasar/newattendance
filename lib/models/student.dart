@@ -52,13 +52,20 @@ class StudentModel {
     phone = json['phone'];
     school = json['school'];
     note = json['note'];
-    city = json['city'] != null ? new City.fromJson(json['city']) : null;
-    if (json['groups'] != null) {
-      List<GroupModel> groups = [];
-      json['groups'].forEach((v) {
-        groups.add(new GroupModel.fromJson(v));
-      });
-    }
+    city = json['city_id'] != null ? new City.fromJson(json['city_id']) : null;
+
+    groups = List<GroupModel>.from(
+      json['groups'].map(
+        (model) => GroupModel.fromJson(model),
+      ),
+    );
+
+    // if (json['groups'] != null) {
+    //   List<GroupModel> groups = [];
+    //   json['groups'].forEach((v) {
+    //     groups.add(new GroupModel.fromJson(v));
+    //   });
+    // }
     parent = json['parent'];
     relationType = json['relation_type'];
     parentPhone = json['parent_phone'];
@@ -79,7 +86,7 @@ class StudentModel {
     data['school'] = this.school;
     data['note'] = this.note;
     if (this.city != null) {
-      data['city'] = this.city!.toJson();
+      data['city_id'] = this.city!.toJson();
     }
     if (this.groups != null) {
       data['groups'] = this.groups!.map((v) => v.toJson()).toList();

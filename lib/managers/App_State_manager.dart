@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:attendance/models/group.dart';
 import 'package:flutter/material.dart';
 
 class AppStateManager extends ChangeNotifier {
@@ -12,6 +13,8 @@ class AppStateManager extends ChangeNotifier {
   bool _lesson_modify = false;
   bool _subjects_modify = false;
   bool _years_add = false;
+
+  bool _singleStudentfromHome = false;
   // home screen state.. end
 
   // students page .. start
@@ -32,6 +35,7 @@ class AppStateManager extends ChangeNotifier {
   bool get lessonModify => _lesson_modify;
   bool get subjectsModify => _subjects_modify;
   bool get yearsAdd => _years_add;
+  bool get singleStudentFromHome => _singleStudentfromHome;
   // home screen end
 
   // students page .. start
@@ -43,10 +47,20 @@ class AppStateManager extends ChangeNotifier {
   // students page .. end
 
   String _group_id_selected = '';
+  GroupModel _groupselected = GroupModel();
   String get groupIdSelected => _group_id_selected;
+  GroupModel get getGroupSelected => _groupselected;
+  String _student_id_selected = '';
+  String get studentIdSelected => _student_id_selected;
 
-  void setgroupID(String value) {
+  void setgroupID(String value, GroupModel group) {
     _group_id_selected = value;
+    _groupselected = group;
+    notifyListeners();
+  }
+
+  void setStudentID(String value) {
+    _student_id_selected = value;
     notifyListeners();
   }
 
@@ -95,13 +109,22 @@ class AppStateManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void goToSingleStudent(bool value) {
+  void goToSingleStudent(bool value, String id) {
     _single_student = value;
+    _student_id_selected = id;
     notifyListeners();
   }
 
   void goToSingleStudentAttend(bool value) {
     _single_student_attend = value;
+    notifyListeners();
+  }
+
+  void goToSingleStudentfromHome(bool value, String id) {
+    _singleStudentfromHome = value;
+    _student_id_selected = id;
+    print(id);
+
     notifyListeners();
   }
 
@@ -114,6 +137,7 @@ class AppStateManager extends ChangeNotifier {
     _lesson_modify = false;
     _subjects_modify = false;
     _years_add = false;
+    _singleStudentfromHome = false;
     notifyListeners();
   }
 }

@@ -81,7 +81,13 @@ class AppRouter extends RouterDelegate
         if (authmanager.isLoggedIn &&
             appStateManager.communicateStudents &&
             appStateManager.singleStudent)
-          Single_Student_Screen.page(),
+          Single_Student_Screen.page(
+              studentid: appStateManager.studentIdSelected),
+        if (authmanager.isLoggedIn &&
+            // appStateManager.communicateStudents &&
+            appStateManager.singleStudentFromHome)
+          Single_Student_Screen.page(
+              studentid: appStateManager.studentIdSelected),
         if (authmanager.isLoggedIn &&
             appStateManager.singleStudent &&
             appStateManager.singleStudentAttend)
@@ -102,7 +108,9 @@ class AppRouter extends RouterDelegate
         route.settings.name == Attendance_Screens.student_registerpath ||
         route.settings.name == Attendance_Screens.subjects_add ||
         route.settings.name == Attendance_Screens.years_add ||
-        route.settings.name == Attendance_Screens.teacher_registerpath) {
+        route.settings.name == Attendance_Screens.teacher_registerpath ||
+        (route.settings.name == Attendance_Screens.single_student &&
+            appStateManager.singleStudentFromHome == true)) {
       yearManager.resetlist();
       groupManager.resetlist();
       teachermanager.resetlist();
@@ -111,8 +119,9 @@ class AppRouter extends RouterDelegate
       yearManager.getMoreData();
       appStateManager.go_to_Home();
     }
-    if (route.settings.name == Attendance_Screens.single_student) {
-      appStateManager.goToSingleStudent(false);
+    if (route.settings.name == Attendance_Screens.single_student &&
+        appStateManager.singleStudentFromHome == false) {
+      appStateManager.goToSingleStudent(false, '');
     }
     if (route.settings.name == Attendance_Screens.single_student_attend) {
       appStateManager.goToSingleStudentAttend(false);

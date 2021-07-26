@@ -1,8 +1,12 @@
+import 'package:attendance/managers/Student_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Student_pic_name extends StatelessWidget {
-  const Student_pic_name({
+  final String? stu_id;
+  Student_pic_name({
     Key? key,
+    this.stu_id,
   }) : super(key: key);
 
   @override
@@ -17,12 +21,14 @@ class Student_pic_name extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'سامح الصقار',
-                style: TextStyle(
-                    fontSize: 35,
-                    color: Colors.blue,
-                    fontFamily: 'AraHamah1964B-Bold'),
+              Consumer<StudentManager>(
+                builder: (builder, studentmanager, child) => Text(
+                  studentmanager.singleStudent!.name!,
+                  style: TextStyle(
+                      fontSize: 35,
+                      color: Colors.blue,
+                      fontFamily: 'AraHamah1964B-Bold'),
+                ),
               ),
               SizedBox(
                 width: 20,

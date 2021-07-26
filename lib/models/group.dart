@@ -8,8 +8,8 @@ class GroupModel {
   YearModel? year;
   TeacherModel? teacher;
   SubjectModel? subject;
-  List<dynamic>? day;
   List<dynamic>? time;
+  List<dynamic>? day;
   bool? choosen;
 
   GroupModel(
@@ -33,8 +33,23 @@ class GroupModel {
     teacher = json['teacher'] != null
         ? new TeacherModel.fromJson(json['teacher'])
         : null;
-    day = json['day'];
+
+    // if (json['day'] != null) {
+    //   List<dynamic> day = [];
+    //   json['day'].forEach((v) {
+    //     day.add((v));
+    //   });
+    // }
+    // if (json['time'] != null) {
+    //   List<dynamic> time = [];
+    //   json['time'].forEach((v) {
+    //     time.add((v));
+    //   });
+    // }
+    // day = json['day'];
+    // time = json['time'];
     time = json['time'];
+    day = json['day'];
   }
 
   Map<String, dynamic> toJson() {
@@ -50,8 +65,16 @@ class GroupModel {
     if (this.teacher != null) {
       data['teacher'] = this.teacher!.toJson();
     }
-    data['day'] = this.day;
+    // if (this.day != null) {
+    //   data['day'] = this.day!.map((v) => v.toJson()).toList();
+    // }
+    // if (this.time != null) {
+    //   data['time'] = this.time!.map((v) => v.toJson()).toList();
+    // }
+    // data['day'] = this.day;
+    // data['time'] = this.time;
     data['time'] = this.time;
+    data['day'] = this.day;
     return data;
   }
 }

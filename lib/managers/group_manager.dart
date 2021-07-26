@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:attendance/helper/httpexception.dart';
+import 'package:dio/dio.dart';
 
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/models/group.dart';
@@ -30,42 +31,44 @@ class GroupManager extends ChangeNotifier {
   bool _loading = true;
   final int _defaultGroupsPerPageCount = 15;
 
-  Future<void> add_group(
+  Future<void> addgroup(
     String? name,
     String? year,
     String? subject,
     String? teacher,
-    String? day,
-    String? time,
+    List<String>? day,
+    List<String>? time,
   ) async {
-    var url = Uri.https('development.mrsaidmostafa.com', '/api/groups');
     try {
-      var response = await http.post(
-        url,
-        body: {
-          'name': name,
-          'year_id': year,
-          'subject_id': subject,
-          'teacher_id': teacher,
-          'day[]': day,
-          'time[]': time
-        },
-        headers: {
-          'Accept': 'application/json',
-          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
-        },
-      );
-      final responseData = json.decode(response.body);
+      Dio dio = Dio();
+      String urld = 'https://development.mrsaidmostafa.com/api/groups';
+      print(urld);
+      var params = {
+        'name': name,
+        'year_id': year,
+        'subject_id': subject,
+        'teacher_id': teacher,
+        'day': day,
+        'time': time
+      };
+
+      dio.options.headers["Authorization"] = 'Bearer $_authToken';
+      dio.options.headers["Accept"] = 'application/json';
+
+      var response = await dio.post(urld, data: jsonEncode(params));
+      print(response);
+
+      final responseData = response.data;
       print(responseData);
 
-      // if (response.statusCode == 200) {}
-      // add exception
       if (responseData['errors'] != null) {
+        print(responseData['errors']);
         List<String> errors = [];
         for (var value in responseData['errors'].values) errors.add(value[0]);
         throw HttpException(errors.join('  '));
       }
     } catch (error) {
+      print(error);
       throw (error);
     }
 

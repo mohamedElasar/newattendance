@@ -51,7 +51,7 @@ class _Register_FormState extends State<Register_Form> {
               schoolController.text,
               notesController.text,
               cityId_selected,
-              _groups_id.join(','),
+              _groups_id,
               parentNameController.text,
               relationController.text,
               parentphoneController.text,

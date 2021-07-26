@@ -34,7 +34,8 @@ class _group_formState extends State<group_form> {
       _showErrorDialog('من فضلك استكمل بيانات المجموعه', 'حدث خطا');
       return;
     }
-    var _newlist = _data.where((e) => e != null).toList();
+    var _newlist1 = _data.where((e) => e != null).toList();
+    List<String> _newlist = _newlist1.map((s) => s as String).toList();
     List _newnewlist = [];
     _newlist.forEach((e) {
       var _newnewlist = _newlist;
@@ -117,8 +118,14 @@ class _group_formState extends State<group_form> {
     });
     try {
       await Provider.of<GroupManager>(context, listen: false)
-          .add_group(nameController.text, year_id_selected, subjectId_selected,
-              teacher_id_selected, _newlist.join(','), _finaltimes.join(','))
+          .addgroup(
+            nameController.text,
+            year_id_selected,
+            subjectId_selected,
+            teacher_id_selected,
+            _newlist,
+            _finaltimes,
+          )
           .then((_) {
             nameController.text = '';
             subjectname = 'الماده الدراسيه';

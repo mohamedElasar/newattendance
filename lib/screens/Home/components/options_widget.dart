@@ -46,18 +46,18 @@ class Options extends StatelessWidget {
                     ),
                   ],
                 ),
-                GestureDetector(
-                  onTap: appstatemanager.homeOptions
-                      ? () async {
-                          appstatemanager.modifyLesson();
-                        }
-                      : null,
-                  child: Chip_Container(
-                    size: size,
-                    active: appstatemanager.homeOptions ? true : false,
-                    text: 'تعديل حصه',
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: appstatemanager.homeOptions
+                //       ? () async {
+                //           appstatemanager.modifyLesson();
+                //         }
+                //       : null,
+                //   child: Chip_Container(
+                //     size: size,
+                //     active: appstatemanager.homeOptions ? true : false,
+                //     text: 'تعديل حصه',
+                //   ),
+                // ),
               ],
             ),
           )),
