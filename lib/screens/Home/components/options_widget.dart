@@ -25,7 +25,7 @@ class Options extends StatelessWidget {
                     GestureDetector(
                       onTap: appstatemanager.homeOptions
                           ? () async {
-                              appstatemanager.studentsCommunicate();
+                              appstatemanager.studentsCommunicate(true);
                             }
                           : null,
                       child: Chip_Container(
@@ -36,7 +36,7 @@ class Options extends StatelessWidget {
                     GestureDetector(
                       onTap: appstatemanager.homeOptions
                           ? () async {
-                              appstatemanager.studentsData();
+                              appstatemanager.studentsData(true);
                             }
                           : null,
                       child: Chip_Container(
@@ -46,18 +46,6 @@ class Options extends StatelessWidget {
                     ),
                   ],
                 ),
-                // GestureDetector(
-                //   onTap: appstatemanager.homeOptions
-                //       ? () async {
-                //           appstatemanager.modifyLesson();
-                //         }
-                //       : null,
-                //   child: Chip_Container(
-                //     size: size,
-                //     active: appstatemanager.homeOptions ? true : false,
-                //     text: 'تعديل حصه',
-                //   ),
-                // ),
               ],
             ),
           )),

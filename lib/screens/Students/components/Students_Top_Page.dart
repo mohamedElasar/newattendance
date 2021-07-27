@@ -82,10 +82,15 @@ class Student_Top_Page extends StatelessWidget {
               ),
               SizedBox(width: 5),
               arrowback
-                  ? RotatedBox(
-                      quarterTurns: 2,
-                      child: Icon(
-                        Icons.arrow_back,
+                  ? InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: RotatedBox(
+                        quarterTurns: 2,
+                        child: Icon(
+                          Icons.arrow_back,
+                        ),
                       ),
                     )
                   : Container(),

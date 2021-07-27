@@ -40,25 +40,16 @@ class Home_Screen extends StatelessWidget {
             // ),
             Options(size: size),
             Container(
-              height: size.height * .7,
+              // height: size.height * .75,
               child: SingleChildScrollView(
                 child: Column(
                   children: [
                     SizedBox(height: 10),
                     Choices(size: size),
                     // build_chip_container_down(null, 'مجموعه الحضور'),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Consumer<AppStateManager>(
-                      builder: (context, appstatemanager, child) =>
-                          GestureDetector(
-                        onTap: appstatemanager.homeOptions ? () {} : null,
-                        child: Scan_button(
-                          active: appstatemanager.homeOptions,
-                        ),
-                      ),
-                    )
+                    // SizedBox(
+                    //   height: 10,
+                    // ),
                   ],
                 ),
               ),
@@ -252,31 +243,13 @@ class StudentSearch extends SearchDelegate<String> {
 
           return ListTile(
             onTap: () {
-              // query = suggestion;
-
-              // 1. Show Results
-              // showResults(context);
-              // close(context, '');
+              Provider.of<AppStateManager>(context, listen: false)
+                  .setstudent(suggestions[index]);
               Provider.of<AppStateManager>(context, listen: false)
                   .goToSingleStudentfromHome(
                       true, suggestions[index].id.toString());
-              // print( Provider.of<AppStateManager>(context, listen: false).studentRegister)
-              // .g(
-              //     true, suggestions[index].id.toString());
-
-              // 2. Close Search & Return Result
-              // close(context, suggestion);
-
-              // 3. Navigate to Result Page
-              //  Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (BuildContext context) => ResultPage(suggestion),
-              //   ),
-              // );
             },
             leading: Icon(Icons.person),
-            // title: Text(suggestion),
             title: RichText(
               text: TextSpan(
                 text: queryText,
@@ -324,23 +297,4 @@ class StudentSearch extends SearchDelegate<String> {
           ],
         ),
       );
-
-  // Widget buildDegrees(Weather weather) {
-  //   final style = TextStyle(
-  //     fontSize: 100,
-  //     fontWeight: FontWeight.bold,
-  //     color: Colors.white,
-  //   );
-
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: [
-  //       Opacity(
-  //         opacity: 0,
-  //         child: Text('°', style: style),
-  //       ),
-  //       Text('${weather.degrees}°', style: style),
-  //     ],
-  //   );
-  // }
 }

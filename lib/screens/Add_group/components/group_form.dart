@@ -264,22 +264,25 @@ class _group_formState extends State<group_form> {
   void initState() {
     super.initState();
 
-    Future.delayed(Duration.zero, () {
+    Future.delayed(Duration.zero, () async {
       Provider.of<SubjectManager>(context, listen: false).resetlist();
       Provider.of<YearManager>(context, listen: false).resetlist();
       Provider.of<TeacherManager>(context, listen: false).resetlist();
-
-      Provider.of<SubjectManager>(context, listen: false)
-          .getMoreData()
-          .then((_) =>
-              Provider.of<YearManager>(context, listen: false).getMoreData())
-          .then((_) =>
-              Provider.of<TeacherManager>(context, listen: false).getMoreData())
-          .then((_) {
-        setState(() {
-          _isLoading = false;
+      try {
+        await Provider.of<SubjectManager>(context, listen: false)
+            .getMoreData()
+            .then((_) =>
+                Provider.of<YearManager>(context, listen: false).getMoreData())
+            .then((_) => Provider.of<TeacherManager>(context, listen: false)
+                .getMoreData())
+            .then((_) {
+          setState(() {
+            _isLoading = false;
+          });
         });
-      });
+      } catch (e) {}
+      if (!mounted) return;
+
       _sc.addListener(
         () {
           if (_sc.position.pixels == _sc.position.maxScrollExtent) {

@@ -49,17 +49,20 @@ class _Add_academic_subjectState extends State<Add_academic_subject> {
   void initState() {
     super.initState();
 
-    Future.delayed(Duration.zero, () {
+    Future.delayed(Duration.zero, () async {
       Provider.of<SubjectManager>(context, listen: false).resetlist();
-      Provider.of<YearManager>(context, listen: false)
-          .get_years()
-          .then((_) =>
-              Provider.of<SubjectManager>(context, listen: false).getMoreData())
-          .then((_) {
-        setState(() {
-          _isLoading = false;
+      try {
+        await Provider.of<YearManager>(context, listen: false)
+            .get_years()
+            .then((_) => Provider.of<SubjectManager>(context, listen: false)
+                .getMoreData())
+            .then((_) {
+          setState(() {
+            _isLoading = false;
+          });
         });
-      });
+      } catch (e) {}
+      if (!mounted) return;
 
       _sc.addListener(() {
         if (_sc.position.pixels == _sc.position.maxScrollExtent) {

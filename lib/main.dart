@@ -1,3 +1,4 @@
+import 'package:attendance/managers/Appointment_manager.dart';
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/managers/cities_manager.dart';
@@ -37,9 +38,12 @@ class MyApp extends StatelessWidget {
   final _groupmanager = GroupManager();
   final _studentsmanager = StudentManager();
   final _subjectmanager = SubjectManager();
+  final _appointmentmanager = AppointmentManager();
+  // final _studentmanager = StudentManager();
 
   AppRouter GetRouter() {
     return AppRouter(
+      studentManager: _studentsmanager,
       appStateManager: _appStateManager,
       authmanager: _auth_Manager,
       citiesManager: _citymanager,
@@ -86,6 +90,12 @@ class MyApp extends StatelessWidget {
           create: (ctx) => _studentsmanager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(auth, prevstage == null ? [] : prevstage.students),
+        ),
+        ChangeNotifierProxyProvider<Auth_manager, AppointmentManager>(
+          create: (ctx) => _appointmentmanager,
+          update: (ctx, auth, prevstage) => prevstage!
+            ..receiveToken(
+                auth, prevstage == null ? [] : prevstage.appointments!),
         ),
       ],
       child: MaterialApp(

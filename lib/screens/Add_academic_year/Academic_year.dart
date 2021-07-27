@@ -45,17 +45,21 @@ class _Add_academic_yearState extends State<Add_academic_year> {
   void initState() {
     super.initState();
 
-    Future.delayed(Duration.zero, () {
+    Future.delayed(Duration.zero, () async {
       Provider.of<YearManager>(context, listen: false).resetlist();
-      Provider.of<StageManager>(context, listen: false)
-          .get_stages()
-          .then((value) =>
-              Provider.of<YearManager>(context, listen: false).getMoreData())
-          .then((_) {
-        setState(() {
-          _isLoading = false;
+      try {
+        await Provider.of<StageManager>(context, listen: false)
+            .get_stages()
+            .then((value) =>
+                Provider.of<YearManager>(context, listen: false).getMoreData())
+            .then((_) {
+          setState(() {
+            _isLoading = false;
+          });
         });
-      });
+      } catch (e) {}
+      if (!mounted) return;
+
       _sc.addListener(() {
         if (_sc.position.pixels == _sc.position.maxScrollExtent) {
           Provider.of<YearManager>(context, listen: false).getMoreData();

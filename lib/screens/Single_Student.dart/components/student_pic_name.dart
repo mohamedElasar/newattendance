@@ -1,3 +1,4 @@
+import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,17 @@ class Student_pic_name extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              InkWell(
+                onTap: () {
+                  // print(stu_id);
+                  Provider.of<AppStateManager>(context, listen: false)
+                      .studentTapped(stu_id!, true);
+                },
+                child: Icon(Icons.edit),
+              ),
+              SizedBox(
+                width: 5,
+              ),
               Consumer<StudentManager>(
                 builder: (builder, studentmanager, child) => Text(
                   studentmanager.singleStudent!.name!,

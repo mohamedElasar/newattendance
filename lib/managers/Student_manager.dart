@@ -17,7 +17,7 @@ class StudentManager extends ChangeNotifier {
 
   String? _authToken;
   List<StudentModel> __students = [];
-  StudentModel? _singleStudent;
+  StudentModel _singleStudent = StudentModel();
   List<StudentModel> get students => __students;
   StudentModel? get singleStudent => _singleStudent;
 
@@ -255,5 +255,10 @@ class StudentManager extends ChangeNotifier {
     // } catch (e) {
     //   throw (error);
     // }
+  }
+
+  void setSingleStudent(StudentModel st) {
+    _singleStudent = st;
+    notifyListeners();
   }
 }

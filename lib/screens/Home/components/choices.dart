@@ -1,12 +1,17 @@
 import 'package:attendance/managers/App_State_manager.dart';
+import 'package:attendance/managers/Appointment_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants.dart';
+import '../Home_Screen.dart';
 
 class Choices extends StatefulWidget {
   const Choices({
@@ -28,6 +33,10 @@ late String teacher_id_selected;
 String teachername = 'المدرس';
 late String group_id_selected;
 String group_name = 'المجموعه';
+late String app_id_selected;
+String app_name = 'اختر حصه';
+
+late String scanResult_code;
 
 class _ChoicesState extends State<Choices> {
   ScrollController _sc1 = new ScrollController();
@@ -46,20 +55,23 @@ class _ChoicesState extends State<Choices> {
   bool _isloadingsubjects = false;
   bool _isloadingteachers = false;
   bool _isloadinggroups = false;
+  bool _isloadingappointment = false;
+  bool _scanloading = false;
   bool _isinit = true;
-  @override
-  void didChangeDependencies() async {
-    if (_isinit == true) {
-      // Provider.of<GroupManager>(context, listen: false).resetlist();
-      // Provider.of<TeacherManager>(context, listen: false).resetlist();
-      // // Provider.of<YearManager>(context, listen: false).resetlist();
-      // Provider.of<SubjectManager>(context, listen: false).resetlist();
-      // Provider.of<YearManager>(context, listen: false).resetlist();
 
-    }
-    _isinit = false;
-    super.didChangeDependencies();
-  }
+  // @override
+  // void didChangeDependencies() async {
+  //   if (_isinit == true) {
+  //     // Provider.of<GroupManager>(context, listen: false).resetlist();
+  //     // Provider.of<TeacherManager>(context, listen: false).resetlist();
+  //     // // Provider.of<YearManager>(context, listen: false).resetlist();
+  //     // Provider.of<SubjectManager>(context, listen: false).resetlist();
+  //     // Provider.of<YearManager>(context, listen: false).resetlist();
+
+  //   }
+  //   _isinit = false;
+  //   super.didChangeDependencies();
+  // }
 
   @override
   void initState() {
@@ -68,18 +80,22 @@ class _ChoicesState extends State<Choices> {
       subjectname = 'الماده الدراسيه';
       teachername = 'المدرس';
       group_name = 'المجموعه';
+      app_name = 'الحصه';
       Provider.of<GroupManager>(context, listen: false).resetlist();
       Provider.of<TeacherManager>(context, listen: false).resetlist();
       // Provider.of<YearManager>(context, listen: false).resetlist();
       Provider.of<SubjectManager>(context, listen: false).resetlist();
       Provider.of<YearManager>(context, listen: false).resetlist();
-      await Provider.of<YearManager>(context, listen: false)
-          .getMoreData()
-          .then((value) {
-        setState(() {
-          _isloadingyears = false;
+      try {
+        await Provider.of<YearManager>(context, listen: false)
+            .getMoreData()
+            .then((value) {
+          setState(() {
+            _isloadingyears = false;
+          });
         });
-      });
+      } catch (e) {}
+      if (!mounted) return;
     });
 
     _sc1.addListener(
@@ -114,6 +130,13 @@ class _ChoicesState extends State<Choices> {
       },
     );
     super.initState();
+  }
+
+  String formatTimeOfDay(TimeOfDay tod) {
+    final now = new DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+    final format = DateFormat('hh:mm'); //"6:00 AM"
+    return format.format(dt);
   }
 
   void _modalBottomSheetMenusubject(BuildContext context) {
@@ -221,9 +244,11 @@ class _ChoicesState extends State<Choices> {
                                         subjectmanager.subjects![index].name!;
                                     subject_level = true;
                                     teacher_level = false;
+                                    group_level = false;
                                     _isloadingteachers = true;
                                     teachername = 'المدرس';
                                     group_name = 'المجموعه';
+                                    app_name = 'الحصه';
                                   });
                                   Provider.of<AppStateManager>(context,
                                           listen: false)
@@ -361,10 +386,12 @@ class _ChoicesState extends State<Choices> {
                                     year_level = true;
                                     subject_level = false;
                                     teacher_level = false;
+                                    group_level = false;
                                     _isloadingsubjects = true;
                                     subjectname = 'الماده الدراسيه';
                                     teachername = 'المدرس';
                                     group_name = 'المجموعه';
+                                    app_name = 'الحصه';
                                   });
                                   Navigator.pop(context);
                                   Provider.of<AppStateManager>(context,
@@ -504,9 +531,11 @@ class _ChoicesState extends State<Choices> {
                                     teachername =
                                         teachermanager.teachers[index].name!;
                                     teacher_level = true;
+                                    group_level = false;
                                     _isloadinggroups = true;
 
                                     group_name = 'المجموعه';
+                                    app_name = 'الحصه';
                                   });
                                   Navigator.pop(context);
                                   Provider.of<AppStateManager>(context,
@@ -643,7 +672,7 @@ class _ChoicesState extends State<Choices> {
                                   }
 
                                   return GestureDetector(
-                                    onTap: () {
+                                    onTap: () async {
                                       Provider.of<AppStateManager>(context,
                                               listen: false)
                                           .setgroupID(
@@ -656,11 +685,21 @@ class _ChoicesState extends State<Choices> {
                                             .toString();
                                         group_name =
                                             groupmanager.groups[index].name!;
+                                        group_level = true;
+                                        _isloadingappointment = true;
+                                        app_name = 'الحصه';
                                       });
                                       Provider.of<AppStateManager>(context,
                                               listen: false)
                                           .setHomeOptions(true);
                                       Navigator.pop(context);
+                                      await Provider.of<AppointmentManager>(
+                                              context,
+                                              listen: false)
+                                          .get_appointments(group_id_selected)
+                                          .then((value) => setState(() {
+                                                _isloadingappointment = false;
+                                              }));
                                     },
                                     child: ListTile(
                                       title: Text(
@@ -685,6 +724,261 @@ class _ChoicesState extends State<Choices> {
     );
   }
 
+  void _modalBottomSheetMenuappoint(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (builder) {
+        return Container(
+          height: 250.0,
+          color: Colors.transparent,
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                height: 40,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: kbackgroundColor1,
+                ),
+                child: Center(
+                  child: Text(
+                    'الحصص',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'GE-bold',
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                height: 40,
+                width: double.infinity,
+                color: Colors.white,
+                // decoration: BoxDecoration(
+                //   color: kbackgroundColor2,
+                // ),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(primary: kbuttonColor3),
+                      onPressed: () async {
+                        Navigator.pop(context);
+
+                        setState(() {
+                          _isloadingappointment = true;
+                          group_level = false;
+                        });
+                        try {
+                          await Provider.of<AppointmentManager>(context,
+                                  listen: false)
+                              .add_appointment(
+                                group_id_selected,
+                                formatTimeOfDay(
+                                  TimeOfDay.now(),
+                                ),
+                              )
+                              .then((value) => Provider.of<AppointmentManager>(
+                                      context,
+                                      listen: false)
+                                  .get_appointments(group_id_selected))
+                              .then((value) => setState(() {
+                                    _isloadingappointment = false;
+                                    group_level = true;
+                                  }))
+                              .then(
+                                (_) =>
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: Colors.black38,
+                                    content: Text(
+                                      'تم اضافه الحصه بنجاح',
+                                      style: TextStyle(fontFamily: 'GE-medium'),
+                                    ),
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                ),
+                              );
+                        } catch (e) {
+                          _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
+                        }
+                      },
+                      icon: Icon(Icons.add),
+                      label: Text(
+                        'أضف حصه جديده',
+                        style: TextStyle(
+                            fontFamily: 'GE-medium', color: Colors.black),
+                      )),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    // borderRadius: BorderRadius.only(
+                    //     topLeft: Radius.circular(20.0),
+                    //     topRight: Radius.circular(20.0))
+                  ),
+                  child: Consumer<AppointmentManager>(
+                    builder: (_, appointmentmanager, child) {
+                      if (appointmentmanager.appointments!.isEmpty) {
+                        if (!appointmentmanager.loading) {
+                          // print('1');
+                          return Center(
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              child: Text(
+                                'لا توجد حصص',
+                                style: TextStyle(
+                                    fontFamily: 'GE-medium',
+                                    color: Colors.black),
+                              ),
+                            ),
+                          );
+                        } else if (appointmentmanager.error) {
+                          // print('2');
+
+                          return Center(
+                              child: InkWell(
+                            onTap: () {
+                              appointmentmanager.setloading(true);
+                              appointmentmanager.seterror(false);
+                              Provider.of<AppointmentManager>(context,
+                                      listen: false)
+                                  .get_appointments(group_id_selected);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Text("error please tap to try again"),
+                            ),
+                          ));
+                        }
+                      } else {
+                        // print('3');
+
+                        return Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount:
+                                    appointmentmanager.appointments!.length,
+                                itemBuilder: (BuildContext ctxt, int index) {
+                                  if (index ==
+                                      appointmentmanager.appointments!.length) {
+                                    if (appointmentmanager.error) {
+                                      return Center(
+                                          child: InkWell(
+                                        onTap: () {
+                                          appointmentmanager.setloading(true);
+                                          appointmentmanager.seterror(false);
+                                          Provider.of<AppointmentManager>(
+                                                  context,
+                                                  listen: false)
+                                              .get_appointments(
+                                                  group_id_selected);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Text(
+                                              "error please tap to try again"),
+                                        ),
+                                      ));
+                                    } else {
+                                      return Center(
+                                          child: Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: CircularProgressIndicator(),
+                                      ));
+                                    }
+                                  }
+
+                                  return GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        app_id_selected = appointmentmanager
+                                            .appointments![index].id
+                                            .toString();
+                                        app_name = app_id_selected =
+                                            appointmentmanager
+                                                .appointments![index].time
+                                                .toString();
+                                      });
+                                      Navigator.pop(context);
+                                      // Provider.of<AppStateManager>(context,
+                                      //         listen: false)
+                                      //     .setgroupID(
+                                      //         appointmentmanager
+                                      //             .groups[index].id
+                                      //             .toString(),
+                                      //         appointmentmanager.groups[index]);
+                                      // setState(() {
+                                      //   group_id_selected = appointmentmanager
+                                      //       .groups[index].id
+                                      //       .toString();
+                                      //   group_name = appointmentmanager
+                                      //       .groups[index].name!;
+                                      //   group_level = true;
+                                      // });
+                                      // Provider.of<AppStateManager>(context,
+                                      //         listen: false)
+                                      //     .setHomeOptions(true);
+                                      // Navigator.pop(context);
+                                    },
+                                    child: ListTile(
+                                      title: Text(appointmentmanager
+                                          .appointments![index].time!
+                                          .toString()),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                          ],
+                        );
+                      }
+                      return Container();
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String message, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          title,
+          style: TextStyle(fontFamily: 'GE-Bold'),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(fontFamily: 'AraHamah1964R-Bold'),
+        ),
+        actions: <Widget>[
+          Center(
+            child: TextButton(
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(kbuttonColor2)),
+              // color: kbackgroundColor1,
+              child: Text(
+                'حسنا',
+                style: TextStyle(fontFamily: 'GE-medium', color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(ctx).pop();
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   List<String> years_levels = [];
   List<String> subjects = [];
   List<String> teachers = [];
@@ -692,11 +986,11 @@ class _ChoicesState extends State<Choices> {
   var year_level = false;
   var subject_level = false;
   var teacher_level = false;
-  var group = false;
+  var group_level = false;
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.size.height * .53,
+      height: widget.size.height * .7,
       child: Column(
         children: [
           Container(
@@ -733,16 +1027,7 @@ class _ChoicesState extends State<Choices> {
                   color: kbackgroundColor1,
                   items: teachers,
                   size: widget.size,
-                  // value: teacher,
                   fnc: () => _modalBottomSheetMenuteacher(context),
-                  //  (newval) {
-                  //   setState(() {
-                  //     teacher = newval;
-                  //     Provider.of<AppStateManager>(context, listen: false)
-                  //         .setHomeOptions(false);
-                  //     group = null;
-                  //   });
-                  // },
                   active: subject_level == true,
                   loading: _isloadingteachers,
                 ),
@@ -751,15 +1036,7 @@ class _ChoicesState extends State<Choices> {
                   color: kbackgroundColor3,
                   items: groups,
                   size: widget.size,
-                  // value: group,
                   fnc: () => _modalBottomSheetMenugroup(context),
-                  //  (newval) {
-                  //   setState(() {
-                  //     group = newval;
-                  //     Provider.of<AppStateManager>(context, listen: false)
-                  //         .setHomeOptions(true);
-                  //   });
-                  // },
                   active: teacher_level == true,
                   loading: _isloadinggroups,
                 ),
@@ -776,7 +1053,7 @@ class _ChoicesState extends State<Choices> {
                   text: 'ادخال طالب',
                   fnc: () async {
                     Provider.of<AppStateManager>(context, listen: false)
-                        .registerStudent();
+                        .registerStudent(true);
                   },
                 ),
                 Button_Container(
@@ -785,7 +1062,7 @@ class _ChoicesState extends State<Choices> {
                   text: 'ادخال معلم',
                   fnc: () async {
                     Provider.of<AppStateManager>(context, listen: false)
-                        .registerTeacher();
+                        .registerTeacher(true);
                   },
                 ),
               ],
@@ -807,7 +1084,7 @@ class _ChoicesState extends State<Choices> {
                   text: 'ادخال مجموعه',
                   fnc: () async {
                     Provider.of<AppStateManager>(context, listen: false)
-                        .registerGroup();
+                        .registerGroup(true);
                   },
                 ),
               ],
@@ -823,7 +1100,7 @@ class _ChoicesState extends State<Choices> {
                   text: 'المواد الدراسيه',
                   fnc: () async {
                     Provider.of<AppStateManager>(context, listen: false)
-                        .modifySubjects();
+                        .modifySubjects(true);
                   },
                 ),
                 Button_Container(
@@ -832,15 +1109,81 @@ class _ChoicesState extends State<Choices> {
                   text: 'السنوات الدراسيه',
                   fnc: () async {
                     Provider.of<AppStateManager>(context, listen: false)
-                        .addYears();
+                        .addYears(true);
                   },
                 ),
               ],
             ),
           ),
+          Container(
+            // padding: EdgeInsets.only(right: 6),
+            margin: EdgeInsets.all(10),
+            alignment: Alignment.center,
+            height: 30,
+            width: widget.size.width * .5,
+            decoration: BoxDecoration(
+              color:
+                  group_level ? kbuttonColor3 : kbuttonColor3.withOpacity(.5),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: InkWell(
+              onTap: group_level
+                  ? () {
+                      _modalBottomSheetMenuappoint(context);
+                    }
+                  : null,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 5),
+                child: Row(
+                  children: [
+                    _isloadingappointment
+                        ? CircularProgressIndicator()
+                        : Text(
+                            app_name,
+                            style: TextStyle(
+                                fontFamily: 'AraHamah1964B-Bold',
+                                fontSize: 20,
+                                color: group_level
+                                    ? Colors.black
+                                    : Colors.black26),
+                          ),
+                    Spacer(),
+                    Icon(Icons.keyboard_arrow_down)
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Consumer<AppStateManager>(
+            builder: (context, appstatemanager, child) => GestureDetector(
+              onTap: app_name != 'الحصه' ? scanBarcode : null,
+              child: Scan_button(
+                active: app_name != 'الحصه',
+              ),
+            ),
+          )
         ],
       ),
     );
+  }
+
+  Future scanBarcode() async {
+    String scanResult;
+    setState(() {
+      _scanloading = true;
+    });
+    try {
+      scanResult = await FlutterBarcodeScanner.scanBarcode(
+              '#ff6666', "cancel", true, ScanMode.BARCODE)
+          .then((value) => '');
+    } on PlatformException {
+      scanResult = 'حدث خطأ';
+    }
+    if (!mounted) return;
+    setState(() {
+      scanResult_code = scanResult;
+      _scanloading = false;
+    });
   }
 }
 
@@ -896,33 +1239,6 @@ class Choice_container extends StatelessWidget {
           ),
         ),
       ),
-
-      //  DropdownButton(
-      //   // disabledHint: Text('disabled'),
-      //   isExpanded: true,
-      //   hint: Text(
-      //     hinttext,
-      //     style: TextStyle(
-      //       fontFamily: 'AraHamah1964B-Bold',
-      //       fontSize: 30,
-      //       color: active ? Colors.black : Colors.black26,
-      //     ),
-      //     overflow: TextOverflow.ellipsis,
-      //   ),
-      //   value: value,
-      //   onChanged: active ? fnc : null,
-      //   items: items
-      //       .map((e) => DropdownMenuItem(
-      //             child: Text(
-      //               e,
-      //               style: TextStyle(
-      //                   fontFamily: 'AraHamah1964B-Bold', fontSize: 30),
-      //               overflow: TextOverflow.ellipsis,
-      //             ),
-      //             value: e,
-      //           ))
-      //       .toList(),
-      // ),
     );
   }
 }

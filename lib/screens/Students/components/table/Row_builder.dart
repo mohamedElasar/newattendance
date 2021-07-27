@@ -1,5 +1,6 @@
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
+import 'package:attendance/models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,17 +15,9 @@ class Rows_Builder extends StatefulWidget {
 }
 
 class _Rows_BuilderState extends State<Rows_Builder> {
-  // void _myfunction(index) {
-  //   setState(() {
-  //     mylist[index][0] = !mylist[index][0];
-  //   });
-  // }
-
-  void _tapFnc(String student_id) {
-    // Provider.of<AppStateManager>(context, listen: false)
-    //     .setStudentID(student_id);
+  void _tapFnc(StudentModel student, String id) {
     Provider.of<AppStateManager>(context, listen: false)
-        .goToSingleStudent(true, student_id);
+        .goToSingleStudent(true, student, id);
   }
 
   bool _isLoading = true;
@@ -35,13 +28,18 @@ class _Rows_BuilderState extends State<Rows_Builder> {
     super.initState();
     Future.delayed(Duration.zero, () async {
       Provider.of<StudentManager>(context, listen: false).resetlist();
-      await Provider.of<StudentManager>(context, listen: false)
-          .getMoreDatafiltered(widget.groupId)
-          .then((_) {
-        setState(() {
-          _isLoading = false;
+
+      try {
+        await Provider.of<StudentManager>(context, listen: false)
+            .getMoreDatafiltered(widget.groupId)
+            .then((_) {
+          setState(() {
+            _isLoading = false;
+          });
         });
-      });
+      } catch (e) {}
+      if (!mounted) return;
+
       _sc.addListener(() {
         if (_sc.position.pixels == _sc.position.maxScrollExtent) {
           Provider.of<StudentManager>(context, listen: false)
@@ -84,7 +82,7 @@ class _Rows_BuilderState extends State<Rows_Builder> {
                                 !studentmanager.students[index].choosen!;
                             setState(() {});
                           },
-                          tapFnc: () => _tapFnc(
+                          tapFnc: () => _tapFnc(studentmanager.students[index],
                               studentmanager.students[index].id.toString())),
                     );
                   },
