@@ -5,17 +5,20 @@ class Name extends StatelessWidget {
     Key? key,
     required this.size,
     required this.name,
+    this.title = '',
     this.arrow = false,
   }) : super(key: key);
 
   final Size size;
   final String name;
   final bool arrow;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Container(
+        margin: EdgeInsets.symmetric(vertical: 5),
         alignment: Alignment.centerRight,
         width: size.width * .8,
         // margin: EdgeInsets.symmetric(horizontal: 5),
@@ -30,10 +33,31 @@ class Name extends StatelessWidget {
         child: Container(
           child: Row(
             children: [
+              if (!arrow)
+                Container(
+                  width: size.width * .8 / 4,
+                  child: Text(
+                    title,
+                    style: TextStyle(fontFamily: 'GE-medium'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                  ),
+                ),
+              // if (!arrow) Spacer(),
               SizedBox(
                 width: 10,
               ),
-              Text(name, style: TextStyle(fontFamily: 'GE-medium')),
+              Container(
+                width: size.width * .8 / 2,
+                child: Text(
+                  name,
+                  style: TextStyle(fontFamily: 'GE-medium'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                ),
+              ),
               if (arrow) Spacer(),
               if (arrow)
                 Icon(

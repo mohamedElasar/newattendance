@@ -15,43 +15,36 @@ class Options extends StatelessWidget {
       child: Container(
           decoration: BoxDecoration(color: Colors.white),
           child: Consumer<AppStateManager>(
-            builder: (context, appstatemanager, child) => Row(
+            builder: (context, appstatemanager, child) => Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               // m: MainAxisAlignment.spaceBetween,
               children: [
-                GestureDetector(
-                  onTap: appstatemanager.homeOptions
-                      ? () async {
-                          appstatemanager.studentsCommunicate();
-                        }
-                      : null,
-                  child: Chip_Container(
-                      size: size,
-                      active: appstatemanager.homeOptions ? true : false,
-                      text: 'تواصل مع مجموعه'),
-                ),
-                GestureDetector(
-                  onTap: appstatemanager.homeOptions
-                      ? () async {
-                          appstatemanager.studentsData();
-                        }
-                      : null,
-                  child: Chip_Container(
-                      size: size,
-                      active: appstatemanager.homeOptions ? true : false,
-                      text: 'بيانات مجموعه'),
-                ),
-                GestureDetector(
-                  onTap: appstatemanager.homeOptions
-                      ? () async {
-                          appstatemanager.modifyLesson();
-                        }
-                      : null,
-                  child: Chip_Container(
-                    size: size,
-                    active: appstatemanager.homeOptions ? true : false,
-                    text: 'تعديل حصه',
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: appstatemanager.homeOptions
+                          ? () async {
+                              appstatemanager.studentsCommunicate(true);
+                            }
+                          : null,
+                      child: Chip_Container(
+                          size: size,
+                          active: appstatemanager.homeOptions ? true : false,
+                          text: 'تواصل مع مجموعه'),
+                    ),
+                    GestureDetector(
+                      onTap: appstatemanager.homeOptions
+                          ? () async {
+                              appstatemanager.studentsData(true);
+                            }
+                          : null,
+                      child: Chip_Container(
+                          size: size,
+                          active: appstatemanager.homeOptions ? true : false,
+                          text: 'بيانات مجموعه'),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -73,7 +66,7 @@ class Chip_Container extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: size.width * .3,
+      width: size.width * .45,
       alignment: Alignment.center,
       height: 30,
       padding: EdgeInsets.symmetric(horizontal: 2),

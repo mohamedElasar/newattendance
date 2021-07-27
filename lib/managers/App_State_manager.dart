@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:attendance/models/group.dart';
+import 'package:attendance/models/student.dart';
 import 'package:flutter/material.dart';
 
 class AppStateManager extends ChangeNotifier {
@@ -12,6 +14,8 @@ class AppStateManager extends ChangeNotifier {
   bool _lesson_modify = false;
   bool _subjects_modify = false;
   bool _years_add = false;
+
+  bool _singleStudentfromHome = false;
   // home screen state.. end
 
   // students page .. start
@@ -32,6 +36,7 @@ class AppStateManager extends ChangeNotifier {
   bool get lessonModify => _lesson_modify;
   bool get subjectsModify => _subjects_modify;
   bool get yearsAdd => _years_add;
+  bool get singleStudentFromHome => _singleStudentfromHome;
   // home screen end
 
   // students page .. start
@@ -42,33 +47,62 @@ class AppStateManager extends ChangeNotifier {
   bool get singleStudentAttend => _single_student_attend;
   // students page .. end
 
+  String _group_id_selected = '';
+  GroupModel _groupselected = GroupModel();
+  String get groupIdSelected => _group_id_selected;
+  GroupModel get getGroupSelected => _groupselected;
+  String _student_id_selected = '';
+  String get studentIdSelected => _student_id_selected;
+
+  String _editStudentid = '';
+  String get geteditStudentID => _editStudentid;
+  bool _editStudent = false;
+  bool get geteditstudent => _editStudent;
+  StudentModel _student = StudentModel();
+  StudentModel get getstudent => _student;
+
+  void setstudent(StudentModel st) {
+    _student = st;
+  }
+
+  void setgroupID(String value, GroupModel group) {
+    _group_id_selected = value;
+    _groupselected = group;
+    notifyListeners();
+  }
+
+  void setStudentID(String value) {
+    _student_id_selected = value;
+    notifyListeners();
+  }
+
   void setHomeOptions(bool value) {
     _home_options = value;
     notifyListeners();
   }
 
-  void registerStudent() {
-    _student_register = true;
+  void registerStudent(bool value) {
+    _student_register = value;
     notifyListeners();
   }
 
-  void registerTeacher() {
-    _teacher_register = true;
+  void registerTeacher(bool value) {
+    _teacher_register = value;
     notifyListeners();
   }
 
-  void registerGroup() {
-    _group_register = true;
+  void registerGroup(bool value) {
+    _group_register = value;
     notifyListeners();
   }
 
-  void studentsCommunicate() {
-    _communicate_students = true;
+  void studentsCommunicate(bool value) {
+    _communicate_students = value;
     notifyListeners();
   }
 
-  void studentsData() {
-    _data_students = true;
+  void studentsData(bool value) {
+    _data_students = value;
     notifyListeners();
   }
 
@@ -77,23 +111,33 @@ class AppStateManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void modifySubjects() {
-    _subjects_modify = true;
+  void modifySubjects(bool value) {
+    _subjects_modify = value;
     notifyListeners();
   }
 
-  void addYears() {
-    _years_add = true;
+  void addYears(bool value) {
+    _years_add = value;
     notifyListeners();
   }
 
-  void goToSingleStudent(bool value) {
+  void goToSingleStudent(bool value, StudentModel st, String id) {
     _single_student = value;
+    _student = st;
+    _student_id_selected = id;
     notifyListeners();
   }
 
   void goToSingleStudentAttend(bool value) {
     _single_student_attend = value;
+    notifyListeners();
+  }
+
+  void goToSingleStudentfromHome(bool value, String id) {
+    _singleStudentfromHome = value;
+    _student_id_selected = id;
+    print(id);
+
     notifyListeners();
   }
 
@@ -106,6 +150,15 @@ class AppStateManager extends ChangeNotifier {
     _lesson_modify = false;
     _subjects_modify = false;
     _years_add = false;
+    _singleStudentfromHome = false;
+    /////////////////////////
+    _editStudent = false;
+    notifyListeners();
+  }
+
+  void studentTapped(String id, bool value) {
+    _editStudentid = id;
+    _editStudent = value;
     notifyListeners();
   }
 }

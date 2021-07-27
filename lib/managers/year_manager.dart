@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:attendance/helper/httpexception.dart';
 
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:flutter/material.dart';
@@ -114,6 +115,7 @@ class YearManager extends ChangeNotifier {
     _pageNumber = 1;
     _error = false;
     _loading = true;
+    notifyListeners();
   }
 
   void setloading(bool value) {
@@ -124,6 +126,35 @@ class YearManager extends ChangeNotifier {
   void seterror(bool value) {
     _error = value;
     notifyListeners();
+  }
+
+  Future<void> deleteyear(String id) async {
+    try {
+      var url = Uri.https('development.mrsaidmostafa.com', '/api/years/$id');
+      final existingIndex =
+          _years.indexWhere((subj) => subj.id.toString() == id);
+      var existingyear = _years[existingIndex];
+      // print(existingsubject.name);
+      _years.removeAt(existingIndex);
+      // print('here');
+      notifyListeners();
+      final response = await http.delete(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+      print(response.body);
+      if (response.statusCode >= 400) {
+        // print('asd');
+        _years.insert(existingIndex, existingyear);
+        notifyListeners();
+        throw HttpException('حاول مره اخري');
+      }
+    } catch (error) {
+      throw (error);
+    }
   }
 
   // void sethasmore(bool value) {

@@ -23,17 +23,22 @@ class Filter_Container extends StatelessWidget {
               Filter_Chip(
                 title: 'رساله لطالب',
               ),
-              Filter_Chip(
-                title: 'اشعار لطالب',
-              ),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Filter_Chip(
+                title: 'اشعار لطالب',
+              ),
+              Filter_Chip(
                 title: 'اتصال ولى أمر',
               ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
               Filter_Chip(
                 title: 'رساله لولى الامر',
               ),

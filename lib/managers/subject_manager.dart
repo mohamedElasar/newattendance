@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:attendance/helper/httpexception.dart';
 
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/models/subject.dart';
@@ -13,8 +14,8 @@ class SubjectManager extends ChangeNotifier {
   }
 
   String? _authToken;
-  List<SubjectModel> _subjects = [];
-  List<SubjectModel> get subjects => _subjects;
+  List<SubjectModel>? _subjects = [];
+  List<SubjectModel>? get subjects => _subjects;
   // int _page = 0;
   // get page => _page;
   get hasmore => _hasMore;
@@ -100,7 +101,43 @@ class SubjectManager extends ChangeNotifier {
       _loading = false;
       _pageNumber = _pageNumber + 1;
 
-      _subjects.addAll(fetchedYears);
+      _subjects!.addAll(fetchedYears);
+    } catch (e) {
+      _loading = false;
+      _error = true;
+      notifyListeners();
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> getMoreDatafiltered(String filter) async {
+    // print(_pageNumber);
+    try {
+      var url = Uri.https('development.mrsaidmostafa.com', '/api/subjects', {
+        "year_id": filter,
+        "page": _pageNumber.toString(),
+      });
+      //
+      // print(url);
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+
+      final responseData = json.decode(response.body);
+
+      List<dynamic> yearsList = responseData['data'];
+      var fetchedYears =
+          yearsList.map((data) => SubjectModel.fromJson(data)).toList();
+      _hasMore = fetchedYears.length == _defaultYearsPerPageCount;
+      _loading = false;
+      _pageNumber = _pageNumber + 1;
+
+      _subjects!.addAll(fetchedYears);
     } catch (e) {
       _loading = false;
       _error = true;
@@ -115,8 +152,15 @@ class SubjectManager extends ChangeNotifier {
     _loading = true;
     _pageNumber = 1;
     _error = false;
-    _loading = true;
+    // print(_pageNumber);
+    notifyListeners();
   }
+
+  // void setpage1() {
+  //   _pageNumber = 1;
+  //   print(_pageNumber);
+  //   notifyListeners();
+  // }
 
   void setloading(bool value) {
     _loading = value;
@@ -129,19 +173,31 @@ class SubjectManager extends ChangeNotifier {
   }
 
   Future<void> deletesubject(String id) async {
-    var url = Uri.https('development.mrsaidmostafa.com', '/api/subjects/$id');
-    final existingProductIndex =
-        _subjects.indexWhere((subj) => subj.id.toString() == id);
-    var existingProduct = _subjects[existingProductIndex];
-
-    _subjects.removeAt(existingProductIndex);
-
-    notifyListeners();
-    final response = await http.delete(url);
-    if (response.statusCode >= 400) {
-      _subjects.insert(existingProductIndex, existingProduct);
+    try {
+      var url = Uri.https('development.mrsaidmostafa.com', '/api/subjects/$id');
+      final existingIndex =
+          _subjects!.indexWhere((subj) => subj.id.toString() == id);
+      var existingsubject = _subjects![existingIndex];
+      // print(existingsubject.name);
+      _subjects!.removeAt(existingIndex);
+      // print('here');
       notifyListeners();
-      throw HttpException('حاول مره اخري');
+      final response = await http.delete(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+      print(response.body);
+      if (response.statusCode >= 400) {
+        // print('asd');
+        _subjects!.insert(existingIndex, existingsubject);
+        notifyListeners();
+        throw HttpException('حاول مره اخري');
+      }
+    } catch (error) {
+      throw (error);
     }
   }
 }

@@ -201,8 +201,10 @@ class _Login_FormState extends State<Login_Form> {
           ),
           if (!_isLoading)
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 100),
+              padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * .2),
               child: Container(
+                width: MediaQuery.of(context).size.width,
                 child: CheckboxListTile(
                   title: Text('? Remember Me'),
                   value: _rememberme,

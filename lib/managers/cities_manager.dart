@@ -47,11 +47,12 @@ class CitiesManager extends ChangeNotifier {
 
   Future<void> getMoreData() async {
     try {
-      var url = Uri.https('development.mrsaidmostafa.com', '/api/subjects',
+      var url = Uri.https('development.mrsaidmostafa.com', '/api/select/cities',
           {"page": _pageNumber.toString()});
       var response = await http.get(
         url,
       );
+      // print(url);
 
       final responseData = json.decode(response.body);
 
@@ -72,10 +73,11 @@ class CitiesManager extends ChangeNotifier {
   }
 
   void resetlist() {
+    _cities = [];
     _loading = true;
     _pageNumber = 1;
     _error = false;
-    _loading = true;
+    notifyListeners();
   }
 
   void setloading(bool value) {

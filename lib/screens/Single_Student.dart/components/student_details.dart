@@ -1,5 +1,7 @@
 import 'package:attendance/constants.dart';
 import 'package:attendance/managers/App_State_manager.dart';
+import 'package:attendance/managers/Student_manager.dart';
+import 'package:attendance/models/group.dart';
 import 'package:attendance/screens/Single_Student.dart/components/name_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,15 +9,20 @@ import 'package:provider/provider.dart';
 import 'contacts_widget.dart';
 
 class Student_details extends StatelessWidget {
+  final String? stu_id;
   Student_details({
     Key? key,
     required this.size,
+    this.stu_id,
   }) : super(key: key);
 
   final Size size;
 
-  List<String> teachers_Student = ['عبد المعز', 'احمد محمد'];
-  void _modalBottomSheetMenu(BuildContext context) {
+  // List<String> teachers_Student = ['عبد المعز', 'احمد محمد'];
+  void _modalBottomSheetMenu(
+    BuildContext context,
+    List<GroupModel> groups,
+  ) {
     showModalBottomSheet(
         context: context,
         builder: (builder) {
@@ -47,42 +54,52 @@ class Student_details extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                        child: ListView.builder(
-                      itemCount: teachers_Student.length,
-                      itemBuilder: (context, index) => InkWell(
-                        onTap: () {
-                          Provider.of<AppStateManager>(context, listen: false)
-                              .goToSingleStudentAttend(true);
-                        },
-                        child: ListTile(
-                          trailing: Text(
-                            'سنتر الياسمين 1:30',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontFamily: 'GE-light',
-                            ),
-                          ),
-                          subtitle: Text(
-                            'مدرس لغه عربيه',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontFamily: 'GE-light',
-                            ),
-                          ),
-                          leading: CircleAvatar(
-                            backgroundColor: kbackgroundColor3,
-                            radius: 10,
-                          ),
-                          title: Text(
-                            '${teachers_Student[index]}',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontFamily: 'GE-bold',
-                            ),
-                          ),
-                        ),
-                      ),
-                    ))
+                        child: (groups == null || groups.isEmpty)
+                            ? Center(
+                                child: Container(
+                                  child: Text(
+                                    'لا يوجد مجموعات',
+                                    style: TextStyle(fontFamily: 'GE-light'),
+                                  ),
+                                ),
+                              )
+                            : ListView.builder(
+                                itemCount: groups.length,
+                                itemBuilder: (context, index) => InkWell(
+                                  onTap: () {
+                                    Provider.of<AppStateManager>(context,
+                                            listen: false)
+                                        .goToSingleStudentAttend(true);
+                                  },
+                                  child: ListTile(
+                                    trailing: Text(
+                                      '${groups[index].name}',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: 'GE-light',
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      '${groups[index].teacher!.name}',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: 'GE-light',
+                                      ),
+                                    ),
+                                    leading: CircleAvatar(
+                                      backgroundColor: kbackgroundColor3,
+                                      radius: 10,
+                                    ),
+                                    title: Text(
+                                      '${groups[index].subject!.name}',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontFamily: 'GE-bold',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ))
                   ],
                 )),
           );
@@ -93,113 +110,115 @@ class Student_details extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Name(size: size, name: 'الاسم'),
-            Row(
-              children: [
-                SizedBox(
-                  width: 40,
-                ),
-                Text(
-                  'رقم التليفون',
-                  style: TextStyle(fontSize: 16, fontFamily: 'GE-bold'),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Text(
-                  '012345678912',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            Contacts_widget(size: size),
-            Container(
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 40,
+          child: Consumer<StudentManager>(
+        builder: (builder, studentmanager, child) => SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Name(
+                  title: 'الاسم :',
+                  size: size,
+                  name: studentmanager.singleStudent!.name!),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 5),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Row(
+                    children: [
+                      Container(
+                        child: Text(
+                          'رقم التليفون',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'GE-bold',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Container(
+                        width: size.width / 3,
+                        child: Text(
+                          studentmanager.singleStudent!.phone!,
+                          style: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    'رقم ولى الامر ',
-                    style: TextStyle(fontSize: 16, fontFamily: 'GE-bold'),
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Text(
-                    '0123456789',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                  ),
-                ],
+                ),
               ),
-            ),
-            Contacts_widget(size: size),
-            GestureDetector(
-              onTap: () => _modalBottomSheetMenu(context),
-              child: Name(size: size, name: 'المجموعات', arrow: true),
-            ),
-            // Center(
-            //   child: Container(
-            //     width: size.width * .8,
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //       children: [Name(size: size / 2, name: 'الملاحظات')],
-            //     ),
-            //   ),
-            // ),
-            Center(
-              child: Container(
-                width: size.width * .8,
+              Contacts_widget(size: size),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 40),
+                margin: EdgeInsets.symmetric(vertical: 5),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Name(size: size / 2, name: 'المحافظه'),
-                    Name(
-                      size: size / 2,
-                      name: 'المدرسه',
-                    )
+                    Text(
+                      //رقم تليفون ولى الامر
+                      'رقم تليفون ولى الامر',
+                      style: TextStyle(fontSize: 16, fontFamily: 'GE-bold'),
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    Container(
+                      width: size.width / 3,
+                      child: Text(
+                        studentmanager.singleStudent!.parentPhone!,
+                        style: TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-            Center(
-              child: Container(
-                width: size.width * .8,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Name(size: size / 2, name: 'السداد'),
-                    // SizedBox(
-                    //   width: 20,
-                    // ),
-                    Name(size: size / 2, name: 'الشعبه')
-                  ],
+              Contacts_widget(size: size),
+              GestureDetector(
+                onTap: () => _modalBottomSheetMenu(
+                  context,
+                  studentmanager.singleStudent!.groups!,
                 ),
+                child:
+                    Name(size: size, name: 'عرض مجموعات الطالب', arrow: true),
               ),
-            ),
-            Divider(
-              thickness: 2,
-            ),
-            Name(size: size, name: 'ملاحظات'),
-            // Center(
-            //   child: Container(
-            //     width: size.width * .8,
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       children: [
-            //         Name(size: size / 2, name: 'الحضور والغياب'),
-            //         Name(size: size / 2, name: 'الدرجات')
-            //       ],
-            //     ),
-            //   ),
-            // ),
-          ],
+              Name(
+                  title: 'المحافظه :',
+                  size: size,
+                  name: studentmanager.singleStudent!.city!.name!),
+              Name(
+                title: 'المدرسه :',
+                size: size,
+                name: studentmanager.singleStudent!.school.toString(),
+              ),
+              Name(
+                  title: 'الشعبه :',
+                  size: size,
+                  name: studentmanager.singleStudent!.studyType.toString()),
+              Name(size: size, name: 'السداد'),
+              Divider(
+                thickness: 2,
+              ),
+              Name(
+                  size: size,
+                  name: studentmanager.singleStudent!.note == null
+                      ? 'لا يوجد ملاحظات'
+                      : studentmanager.singleStudent!.note.toString()),
+            ],
+          ),
         ),
-      ),
+      )),
     );
   }
 }

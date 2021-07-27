@@ -1,4 +1,5 @@
 import 'package:attendance/managers/App_State_manager.dart';
+import 'package:attendance/models/student.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/Admin_Login/components/Login_Form.dart';
 import 'package:flutter/material.dart';
@@ -8,15 +9,18 @@ import 'components/Register_form.dart';
 import 'components/title_with_register.dart';
 
 class Student_Register_Screen extends StatelessWidget {
-  static MaterialPage page() {
+  final StudentModel? myStudent;
+  final bool? myedit;
+  static MaterialPage page({required StudentModel editStudent, required edit}) {
     return MaterialPage(
       name: Attendance_Screens.student_registerpath,
       key: ValueKey(Attendance_Screens.student_registerpath),
-      child: const Student_Register_Screen(),
+      child: Student_Register_Screen(myStudent: editStudent, myedit: edit),
     );
   }
 
-  const Student_Register_Screen({Key? key}) : super(key: key);
+  const Student_Register_Screen({Key? key, this.myStudent, this.myedit})
+      : super(key: key);
 
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -25,7 +29,7 @@ class Student_Register_Screen extends StatelessWidget {
         appBar: AppBar(
           title: Center(
             child: Text(
-              'تسجيل طالب',
+              myedit! ? 'تعديل طالب' : 'تسجيل طالب',
               style: TextStyle(
                   color: Colors.black,
                   fontSize: 30,
@@ -62,7 +66,8 @@ class Student_Register_Screen extends StatelessWidget {
           backgroundColor: Colors.white,
         ),
         backgroundColor: Colors.grey[300],
-        body: SingleChildScrollView(child: Register_Form(size: size)),
+        body: SingleChildScrollView(
+            child: Register_Form(size: size, edit: myedit, student: myStudent)),
       ),
     );
   }

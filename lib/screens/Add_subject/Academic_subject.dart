@@ -11,11 +11,8 @@ import 'package:attendance/screens/Add_subject/components/subject_Top_Page.dart'
 import 'package:attendance/screens/Students/components/Students_Top_Page.dart';
 import 'package:attendance/screens/degrees/components/Degrees_top.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_select/smart_select.dart';
 import '../../constants.dart';
 import 'package:provider/provider.dart';
-
-import 'package:searchable_dropdown/searchable_dropdown.dart';
 
 import '../splash_screen.dart';
 import 'components/default_form_field.dart';
@@ -52,17 +49,20 @@ class _Add_academic_subjectState extends State<Add_academic_subject> {
   void initState() {
     super.initState();
 
-    Future.delayed(Duration.zero, () {
+    Future.delayed(Duration.zero, () async {
       Provider.of<SubjectManager>(context, listen: false).resetlist();
-      Provider.of<YearManager>(context, listen: false)
-          .get_years()
-          .then((_) =>
-              Provider.of<SubjectManager>(context, listen: false).getMoreData())
-          .then((_) {
-        setState(() {
-          _isLoading = false;
+      try {
+        await Provider.of<YearManager>(context, listen: false)
+            .get_years()
+            .then((_) => Provider.of<SubjectManager>(context, listen: false)
+                .getMoreData())
+            .then((_) {
+          setState(() {
+            _isLoading = false;
+          });
         });
-      });
+      } catch (e) {}
+      if (!mounted) return;
 
       _sc.addListener(() {
         if (_sc.position.pixels == _sc.position.maxScrollExtent) {
@@ -289,7 +289,7 @@ class _Add_academic_subjectState extends State<Add_academic_subject> {
                         ),
                         child: Consumer<SubjectManager>(
                           builder: (_, subjectmanager, child) {
-                            if (subjectmanager.subjects.isEmpty) {
+                            if (subjectmanager.subjects!.isEmpty) {
                               if (subjectmanager.loading) {
                                 return Center(
                                     child: Padding(
@@ -320,10 +320,11 @@ class _Add_academic_subjectState extends State<Add_academic_subject> {
                                     (BuildContext ctxt, int index) => Divider(
                                   color: Colors.grey,
                                 ),
-                                itemCount: subjectmanager.subjects.length +
+                                itemCount: subjectmanager.subjects!.length +
                                     (subjectmanager.hasmore ? 1 : 0),
                                 itemBuilder: (BuildContext ctxt, int index) {
-                                  if (index == subjectmanager.subjects.length) {
+                                  if (index ==
+                                      subjectmanager.subjects!.length) {
                                     if (subjectmanager.error) {
                                       return Center(
                                           child: InkWell(
@@ -350,20 +351,52 @@ class _Add_academic_subjectState extends State<Add_academic_subject> {
                                   }
 
                                   return Dismissible(
-                                    key: Key(subjectmanager.subjects[index].id
+                                    background: Container(
+                                      color: Colors.red,
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Icon(
+                                            Icons.delete,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    key: Key(subjectmanager.subjects![index].id
                                         .toString()),
-                                    onDismissed: (DismissDirection) {
-                                      setState(() {
-                                        // litems.removeAt(Index);
-                                      });
+                                    onDismissed: (DismissDirection) async {
+                                      try {
+                                        String? subname = subjectmanager
+                                            .subjects![index].name;
+                                        await Provider.of<SubjectManager>(
+                                                context,
+                                                listen: false)
+                                            .deletesubject(subjectmanager
+                                                .subjects![index].id
+                                                .toString());
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                backgroundColor: Colors.black45,
+                                                content: Text('تم مسح $subname',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily:
+                                                            'GE-medium'))));
+                                      } on HttpException catch (error) {
+                                        _showErrorDialog(error.toString());
+                                      } catch (e) {
+                                        _showErrorDialog('حاول مره اخري');
+                                      }
                                     },
                                     child: ListTile(
-                                      title: Text(
-                                          subjectmanager.subjects[index].name!),
+                                      title: Text(subjectmanager
+                                          .subjects![index].name!),
                                       leading: Text(
                                           //.stage.name
                                           subjectmanager
-                                              .subjects[index].year!.name!),
+                                              .subjects![index].year!.name!),
                                     ),
                                   );
                                 },

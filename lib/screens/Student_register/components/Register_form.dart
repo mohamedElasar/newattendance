@@ -3,10 +3,10 @@ import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/managers/cities_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/models/city.dart';
+import 'package:attendance/models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_select/smart_select.dart';
 
 import '../../../constants.dart';
 
@@ -16,9 +16,13 @@ class Register_Form extends StatefulWidget {
   const Register_Form({
     Key? key,
     required this.size,
+    this.edit,
+    this.student,
   }) : super(key: key);
 
   final Size size;
+  final bool? edit;
+  final StudentModel? student;
 
   @override
   _Register_FormState createState() => _Register_FormState();
@@ -42,6 +46,7 @@ class _Register_FormState extends State<Register_Form> {
     setState(() {
       _isLoading = true;
     });
+    print(_groups_id.join(','));
     try {
       await Provider.of<StudentManager>(context, listen: false)
           .add_student(
@@ -51,7 +56,7 @@ class _Register_FormState extends State<Register_Form> {
               schoolController.text,
               notesController.text,
               cityId_selected,
-              _groups_id.join(','),
+              _groups_id,
               parentNameController.text,
               relationController.text,
               parentphoneController.text,
@@ -302,20 +307,21 @@ class _Register_FormState extends State<Register_Form> {
                           topLeft: Radius.circular(20.0),
                           topRight: Radius.circular(20.0))),
                   child: Consumer<GroupManager>(
-                    builder: (_, yearmanager, child) {
-                      if (yearmanager.groups.isEmpty) {
-                        if (yearmanager.loading) {
+                    builder: (_, groupmanager, child) {
+                      if (groupmanager.groups.isEmpty) {
+                        if (groupmanager.loading) {
+                          print(groupmanager.loading);
                           return Center(
                               child: Padding(
                             padding: const EdgeInsets.all(8),
                             child: CircularProgressIndicator(),
                           ));
-                        } else if (yearmanager.error) {
+                        } else if (groupmanager.error) {
                           return Center(
                               child: InkWell(
                             onTap: () {
-                              yearmanager.setloading(true);
-                              yearmanager.seterror(false);
+                              groupmanager.setloading(true);
+                              groupmanager.seterror(false);
                               Provider.of<GroupManager>(context, listen: false)
                                   .getMoreData();
                             },
@@ -331,16 +337,18 @@ class _Register_FormState extends State<Register_Form> {
                             Expanded(
                               child: ListView.builder(
                                 controller: _sc2,
-                                itemCount: yearmanager.groups.length +
-                                    (yearmanager.hasmore ? 1 : 0),
+                                itemCount: groupmanager.groups.length +
+                                    (groupmanager.hasmore ? 1 : 0),
                                 itemBuilder: (BuildContext ctxt, int index) {
-                                  if (index == yearmanager.groups.length) {
-                                    if (yearmanager.error) {
+                                  if (index == groupmanager.groups.length) {
+                                    if (groupmanager.error) {
+                                      print('2');
+
                                       return Center(
                                           child: InkWell(
                                         onTap: () {
-                                          yearmanager.setloading(true);
-                                          yearmanager.seterror(false);
+                                          groupmanager.setloading(true);
+                                          groupmanager.seterror(false);
                                           Provider.of<GroupManager>(context,
                                                   listen: false)
                                               .getMoreData();
@@ -352,6 +360,7 @@ class _Register_FormState extends State<Register_Form> {
                                         ),
                                       ));
                                     } else {
+                                      print('1');
                                       return Center(
                                           child: Padding(
                                         padding: const EdgeInsets.all(8),
@@ -365,18 +374,18 @@ class _Register_FormState extends State<Register_Form> {
                                         StateSetter checkboxstate) {
                                       return ListTile(
                                         title: Text(
-                                            yearmanager.groups[index].name!),
+                                            groupmanager.groups[index].name!),
                                         leading: Checkbox(
                                           onChanged: (value) {
                                             checkboxstate(() {
-                                              yearmanager
+                                              groupmanager
                                                       .groups[index].choosen =
-                                                  !yearmanager
+                                                  !groupmanager
                                                       .groups[index].choosen!;
                                             });
                                           },
-                                          value:
-                                              yearmanager.groups[index].choosen,
+                                          value: groupmanager
+                                              .groups[index].choosen,
                                         ),
                                       );
                                     },
@@ -493,19 +502,78 @@ class _Register_FormState extends State<Register_Form> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
+    // print(widget.student!.id);
+    // print(widget.edit);
+    widget.edit!
+        ? nameController.text = widget.student!.name ?? ''
+        : nameController.text = '';
+    widget.edit!
+        ? parentNameController.text = widget.student!.parent ?? ''
+        : parentNameController.text = '';
+    widget.edit!
+        ? relationController.text = widget.student!.relationType ?? ''
+        : relationController.text = '';
+    widget.edit!
+        ? parentPhoneController.text = widget.student!.parentPhone ?? ''
+        : parentPhoneController.text = '';
+    widget.edit!
+        ? parentWhatsController.text = widget.student!.parentWhatsapp ?? ''
+        : parentWhatsController.text = '';
+    widget.edit!
+        ? schoolController.text = widget.student!.school ?? ''
+        : schoolController.text = '';
+    widget.edit!
+        ? barCodeController.text = widget.student!.code!.name.toString()
+        : barCodeController.text = '';
+    widget.edit!
+        ? discountController.text = widget.student!.discount ?? ''
+        : discountController.text = '';
+    widget.edit!
+        ? notesController.text = widget.student!.note ?? ''
+        : notesController.text = '';
+    widget.edit!
+        ? emailController.text = widget.student!.email ?? ''
+        : emailController.text = '';
+    widget.edit!
+        ? studyTypeController.text = widget.student!.studyType ?? ''
+        : studyTypeController.text = '';
+    widget.edit!
+        ? phonecontroller.text = widget.student!.phone!
+        : phonecontroller.text = '';
+
+    widget.edit!
+        ? parentphoneController.text = widget.student!.parentPhone ?? ''
+        : parentphoneController.text = '';
+    if (widget.edit! && widget.student!.gender == 'ذكر')
+      _register_data['gender'] = 'ذكر';
+    if (widget.edit! && widget.student!.gender != 'ذكر')
+      _register_data['gender'] = 'أنثي';
+    if (widget.edit!) cityname = widget.student!.city!.name.toString();
+    if (widget.edit!) {
+      _groups_id = widget.student!.groups!.map((e) => e.id.toString()).toList();
+      _groups_shown =
+          widget.student!.groups!.map((e) => e.name.toString()).toList();
+      // print(widget.student!.secondLanguage.toString());
+    } else {
+      _groups_id = [];
+      _groups_shown = [];
+    }
+
+    Future.delayed(Duration.zero, () async {
       Provider.of<CitiesManager>(context, listen: false).resetlist();
       Provider.of<GroupManager>(context, listen: false).resetlist();
-
-      Provider.of<CitiesManager>(context, listen: false)
-          .get_cities()
-          .then((value) =>
-              Provider.of<GroupManager>(context, listen: false).get_groups())
-          .then((_) {
-        setState(() {
-          _isLoading = false;
+      try {
+        await Provider.of<CitiesManager>(context, listen: false)
+            .getMoreData()
+            .then((value) =>
+                Provider.of<GroupManager>(context, listen: false).getMoreData())
+            .then((_) {
+          setState(() {
+            _isLoading = false;
+          });
         });
-      });
+      } catch (e) {}
+      if (!mounted) return;
 
       _sc.addListener(
         () {
@@ -942,14 +1010,20 @@ class _Register_FormState extends State<Register_Form> {
                     child: TextButton(
                       style: ButtonStyle(
                           elevation: MaterialStateProperty.all(2),
-                          backgroundColor:
-                              MaterialStateProperty.all(kbuttonColor2)),
+                          backgroundColor: MaterialStateProperty.all(
+                              widget.edit! ? Colors.red[200] : kbuttonColor2)),
                       onPressed: _submit,
-                      child: Text(
-                        'تسجيل',
-                        style: TextStyle(
-                            fontFamily: 'GE-Bold', color: Colors.black),
-                      ),
+                      child: widget.edit!
+                          ? Text(
+                              'تعديل',
+                              style: TextStyle(
+                                  fontFamily: 'GE-Bold', color: Colors.black),
+                            )
+                          : Text(
+                              'تسجيل',
+                              style: TextStyle(
+                                  fontFamily: 'GE-Bold', color: Colors.black),
+                            ),
                     ),
                   )
                 ],

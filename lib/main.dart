@@ -1,3 +1,4 @@
+import 'package:attendance/managers/Appointment_manager.dart';
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/managers/cities_manager.dart';
@@ -8,6 +9,7 @@ import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/screens/Add_academic_year/Academic_year.dart';
 import 'package:attendance/screens/Add_teacher/Add_Teacher_Screen.dart';
 import 'package:attendance/screens/Student_register/Student_register_screen.dart';
+import 'package:attendance/screens/degrees/Degrees_Screen.dart';
 
 import 'package:attendance/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -35,11 +37,20 @@ class MyApp extends StatelessWidget {
   final _citymanager = CitiesManager();
   final _groupmanager = GroupManager();
   final _studentsmanager = StudentManager();
+  final _subjectmanager = SubjectManager();
+  final _appointmentmanager = AppointmentManager();
+  // final _studentmanager = StudentManager();
 
   AppRouter GetRouter() {
     return AppRouter(
+      studentManager: _studentsmanager,
       appStateManager: _appStateManager,
       authmanager: _auth_Manager,
+      citiesManager: _citymanager,
+      groupManager: _groupmanager,
+      subjectManager: _subjectmanager,
+      teachermanager: _teachermanager,
+      yearManager: _yearManager,
     );
   }
 
@@ -51,34 +62,40 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => _auth_Manager),
         ChangeNotifierProvider(create: (context) => _citymanager),
         ChangeNotifierProxyProvider<Auth_manager, YearManager>(
-          create: (ctx) => YearManager(),
+          create: (ctx) => _yearManager,
           update: (ctx, auth, prevyear) => prevyear!
             ..receiveToken(auth, prevyear == null ? [] : prevyear.years),
         ),
         ChangeNotifierProxyProvider<Auth_manager, StageManager>(
-          create: (ctx) => StageManager(),
+          create: (ctx) => _stageManager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(auth, prevstage == null ? [] : prevstage.stages!),
         ),
         ChangeNotifierProxyProvider<Auth_manager, SubjectManager>(
-          create: (ctx) => SubjectManager(),
+          create: (ctx) => _subjectmanager,
           update: (ctx, auth, prevstage) => prevstage!
-            ..receiveToken(auth, prevstage == null ? [] : prevstage.subjects),
+            ..receiveToken(auth, prevstage == null ? [] : prevstage.subjects!),
         ),
         ChangeNotifierProxyProvider<Auth_manager, TeacherManager>(
-          create: (ctx) => TeacherManager(),
+          create: (ctx) => _teachermanager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(auth, prevstage == null ? [] : prevstage.teachers),
         ),
         ChangeNotifierProxyProvider<Auth_manager, GroupManager>(
-          create: (ctx) => GroupManager(),
+          create: (ctx) => _groupmanager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(auth, prevstage == null ? [] : prevstage.groups),
         ),
         ChangeNotifierProxyProvider<Auth_manager, StudentManager>(
-          create: (ctx) => StudentManager(),
+          create: (ctx) => _studentsmanager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(auth, prevstage == null ? [] : prevstage.students),
+        ),
+        ChangeNotifierProxyProvider<Auth_manager, AppointmentManager>(
+          create: (ctx) => _appointmentmanager,
+          update: (ctx, auth, prevstage) => prevstage!
+            ..receiveToken(
+                auth, prevstage == null ? [] : prevstage.appointments!),
         ),
       ],
       child: MaterialApp(

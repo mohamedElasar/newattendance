@@ -43,7 +43,7 @@ class Tabel_here extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: size.height * .75,
+        height: size.height * .73,
         // color: Colors.red,
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) =>
