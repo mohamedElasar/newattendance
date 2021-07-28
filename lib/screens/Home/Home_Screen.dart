@@ -3,13 +3,21 @@ import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/models/student.dart';
 import 'package:attendance/navigation/screens.dart';
+import 'package:attendance/screens/Add_academic_year/Academic_year.dart';
+import 'package:attendance/screens/Add_group/Add_group_Screen.dart';
+import 'package:attendance/screens/Add_subject/Academic_subject.dart';
+import 'package:attendance/screens/Add_teacher/Add_Teacher_Screen.dart';
+import 'package:attendance/screens/Student_register/Student_register_screen.dart';
 import 'package:attendance/screens/Students/components/Students_Top_Page.dart';
+import 'package:attendance/screens/show_group/show_group.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 import 'components/choices.dart';
 import 'components/options_widget.dart';
+
+final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class Home_Screen extends StatelessWidget {
   static MaterialPage page() {
@@ -26,38 +34,295 @@ class Home_Screen extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: kbackgroundColor2,
-        body: (Column(
-          children: [
-            HomeTopPage(
-              size: size,
+        child: Scaffold(
+      key: _scaffoldKey,
+      resizeToAvoidBottomInset: false,
+      backgroundColor: kbackgroundColor2,
+      body: (Column(
+        children: [
+          HomeTopPage(
+            size: size,
+          ),
+          // Student_Top_Page(
+          //   size: size,
+          //   arrowback: false,
+          // ),
+          Options(size: size),
+          Container(
+            // height: size.height * .75,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  Choices(size: size),
+                  // build_chip_container_down(null, 'مجموعه الحضور'),
+                  // SizedBox(
+                  //   height: 10,
+                  // ),
+                ],
+              ),
             ),
-            // Student_Top_Page(
-            //   size: size,
-            //   arrowback: false,
-            // ),
-            Options(size: size),
-            Container(
-              // height: size.height * .75,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    Choices(size: size),
-                    // build_chip_container_down(null, 'مجموعه الحضور'),
-                    // SizedBox(
-                    //   height: 10,
-                    // ),
-                  ],
+          )
+        ],
+      )),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            Image.asset('assets/images/logo.jpg'),
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.7,
+                    ),
+                  ),
+                  height: 55,
+                  child: Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Center(
+                      child: Text(
+                        "ادخال طالب",
+                        style: TextStyle(
+                            fontSize: 19, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            )
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Student_Register_Screen()));
+              },
+            ),
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.7,
+                    ),
+                  ),
+                  height: 55,
+                  child: Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Center(
+                      child: Text(
+                        "ادخال معلم",
+                        style: TextStyle(
+                            fontSize: 19, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Add_Teacher_Screeen()));
+              },
+            ),
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.7,
+                    ),
+                  ),
+                  height: 55,
+                  child: Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Center(
+                      child: Text(
+                        "ادخال مجموعة",
+                        style: TextStyle(
+                            fontSize: 19, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Add_group_screen()));
+              },
+            ),
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.7,
+                    ),
+                  ),
+                  height: 55,
+                  child: Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Center(
+                      child: Text(
+                        "اظهار مجموعة",
+                        style: TextStyle(
+                            fontSize: 19, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Show_Group()));
+              },
+            ),
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.7,
+                    ),
+                  ),
+                  height: 55,
+                  child: Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Center(
+                      child: Text(
+                        "السنوات الدراسية",
+                        style: TextStyle(
+                            fontSize: 19, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Add_academic_year()));
+              },
+            ),
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.7,
+                    ),
+                  ),
+                  height: 55,
+                  child: Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Center(
+                      child: Text(
+                        "المواد الدراسية",
+                        style: TextStyle(
+                            fontSize: 19, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Add_academic_subject()));
+              },
+            ),
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.7,
+                    ),
+                  ),
+                  height: 55,
+                  child: Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Center(
+                      child: Text(
+                        "الدرجات",
+                        style: TextStyle(
+                            fontSize: 19, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () {
+                // Navigator.push(context,
+                //     MaterialPageRoute(builder: (context) => Degrees_Screen()));
+              },
+            ),
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.7,
+                    ),
+                  ),
+                  height: 55,
+                  child: Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Center(
+                      child: Text(
+                        "تسجيل الخروج",
+                        style: TextStyle(
+                            fontSize: 19, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () {
+                Provider.of<Auth_manager>(context, listen: false).logout();
+              },
+            ),
           ],
-        )),
+        ),
       ),
-    );
+    ));
   }
 }
 
@@ -102,7 +367,8 @@ class HomeTopPage extends StatelessWidget {
         children: [
           InkWell(
             onTap: () {
-              Provider.of<Auth_manager>(context, listen: false).logout();
+              // Provider.of<Auth_manager>(context, listen: false).logout();
+              _scaffoldKey.currentState!.openDrawer();
             },
             child: Icon(
               Icons.menu,
