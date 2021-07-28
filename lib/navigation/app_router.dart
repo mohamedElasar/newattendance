@@ -124,12 +124,12 @@ class AppRouter extends RouterDelegate
     if (route.settings.name == Attendance_Screens.student_registerpath &&
         appStateManager.geteditstudent == true &&
         appStateManager.communicateStudents == true) {
-      appStateManager.studentTapped('', false);
+      appStateManager.studentTapped('', false, StudentModel());
       // appStateManager.goToSingleStudent(false, StudentModel(), '');
     }
     if (route.settings.name == Attendance_Screens.student_registerpath &&
         appStateManager.geteditstudent == true) {
-      appStateManager.studentTapped('', false);
+      appStateManager.studentTapped('', false, StudentModel());
     }
     if (route.settings.name == Attendance_Screens.single_student) {
       appStateManager.goToSingleStudentfromHome(false, '');

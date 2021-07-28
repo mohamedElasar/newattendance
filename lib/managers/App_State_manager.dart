@@ -141,24 +141,25 @@ class AppStateManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void go_to_Home() {
-    _student_register = false;
-    _teacher_register = false;
-    _group_register = false;
-    _communicate_students = false;
-    _data_students = false;
-    _lesson_modify = false;
-    _subjects_modify = false;
-    _years_add = false;
-    _singleStudentfromHome = false;
-    /////////////////////////
-    _editStudent = false;
-    notifyListeners();
-  }
+  // void go_to_Home() {
+  //   _student_register = false;
+  //   _teacher_register = false;
+  //   _group_register = false;
+  //   _communicate_students = false;
+  //   _data_students = false;
+  //   _lesson_modify = false;
+  //   _subjects_modify = false;
+  //   _years_add = false;
+  //   _singleStudentfromHome = false;
+  //   /////////////////////////
+  //   _editStudent = false;
+  //   notifyListeners();
+  // }
 
-  void studentTapped(String id, bool value) {
+  void studentTapped(String id, bool value, StudentModel stu) {
     _editStudentid = id;
     _editStudent = value;
+    _student = stu;
     notifyListeners();
   }
 }

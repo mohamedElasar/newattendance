@@ -87,9 +87,10 @@ class _Modify_Lessons_screenState extends State<Modify_Lessons_screen> {
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
                                 Navigator.of(context).pop();
-                                Provider.of<AppStateManager>(context,
-                                        listen: false)
-                                    .go_to_Home();
+                                // Provider.of<AppStateManager>(context,
+                                //         listen: false)
+                                //     .go_to_Home();
+                                Navigator.pop(context);
                               }
                             },
                           ),
@@ -127,7 +128,8 @@ class _Modify_Lessons_screenState extends State<Modify_Lessons_screen> {
       setState(() {
         selectedDate = picked;
       });
-    Provider.of<AppStateManager>(context, listen: false).go_to_Home();
+    // Provider.of<AppStateManager>(context, listen: false).go_to_Home();
+    Navigator.pop(context);
   }
 
   Widget build(BuildContext context) {

@@ -16,7 +16,9 @@ class AppointmentManager extends ChangeNotifier {
 
   String? authToken;
   List<AppointmentModel> _appointments = [];
+  AppointmentModel? _currentApp = AppointmentModel();
   List<AppointmentModel>? get appointments => _appointments;
+  AppointmentModel? get currentapp => _currentApp;
   // get hasmore => _hasMore;
   // get pageNumber => _pageNumber;
   get error => _error;
@@ -41,7 +43,7 @@ class AppointmentManager extends ChangeNotifier {
         },
       );
       final responseData = json.decode(response.body);
-      print(responseData['data']['appointments']);
+      // print(responseData['data']['appointments']);
       List<dynamic> appointments = responseData['data']['appointments'];
       List<AppointmentModel> list =
           appointments.map((data) => AppointmentModel.fromJson(data)).toList();
@@ -59,7 +61,7 @@ class AppointmentManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> add_appointment(String groupid, String time) async {
+  Future<void> add_appointment(String groupid, String time, String date) async {
     var url = Uri.https('development.mrsaidmostafa.com', '/api/appointments');
     try {
       var response = await http.post(url, headers: {
@@ -67,8 +69,12 @@ class AppointmentManager extends ChangeNotifier {
         HttpHeaders.authorizationHeader: 'Bearer $authToken'
       }, body: {
         'group_id': groupid,
-        'time': time
+        'time': time,
+        'date': date
       });
+      final responseData = json.decode(response.body);
+      AppointmentModel appo = AppointmentModel.fromJson(responseData['data']);
+      _currentApp = appo;
       // final responseData = json.decode(response.body);
       // print(responseData['data']['appointments']);
       // List<dynamic> appointments = responseData['data']['appointments'];

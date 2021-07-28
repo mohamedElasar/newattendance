@@ -69,7 +69,18 @@ class Home_Screen extends StatelessWidget {
         child: Column(
           children: [
             Container(
-                height: 150, child: Image.asset('assets/images/logo.jpg')),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: AssetImage(
+                    'assets/images/logo.jpg',
+                    // fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              height: 200,
+            ),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
@@ -85,7 +96,7 @@ class Home_Screen extends StatelessWidget {
                             width: 0.7,
                           ),
                         ),
-                        height: 55,
+                        height: 40,
                         child: Material(
                           // elevation: 5.0,
                           borderRadius: BorderRadius.circular(5.0),
@@ -119,7 +130,7 @@ class Home_Screen extends StatelessWidget {
                             width: 0.7,
                           ),
                         ),
-                        height: 55,
+                        height: 40,
                         child: Material(
                           // elevation: 5.0,
                           borderRadius: BorderRadius.circular(5.0),
@@ -153,7 +164,7 @@ class Home_Screen extends StatelessWidget {
                             width: 0.7,
                           ),
                         ),
-                        height: 55,
+                        height: 40,
                         child: Material(
                           // elevation: 5.0,
                           borderRadius: BorderRadius.circular(5.0),
@@ -187,7 +198,7 @@ class Home_Screen extends StatelessWidget {
                             width: 0.7,
                           ),
                         ),
-                        height: 55,
+                        height: 40,
                         child: Material(
                           // elevation: 5.0,
                           borderRadius: BorderRadius.circular(5.0),
@@ -219,7 +230,7 @@ class Home_Screen extends StatelessWidget {
                             width: 0.7,
                           ),
                         ),
-                        height: 55,
+                        height: 40,
                         child: Material(
                           // elevation: 5.0,
                           borderRadius: BorderRadius.circular(5.0),
@@ -253,7 +264,7 @@ class Home_Screen extends StatelessWidget {
                             width: 0.7,
                           ),
                         ),
-                        height: 55,
+                        height: 40,
                         child: Material(
                           // elevation: 5.0,
                           borderRadius: BorderRadius.circular(5.0),
@@ -287,7 +298,7 @@ class Home_Screen extends StatelessWidget {
                             width: 0.7,
                           ),
                         ),
-                        height: 55,
+                        height: 40,
                         child: Material(
                           // elevation: 5.0,
                           borderRadius: BorderRadius.circular(5.0),
@@ -317,7 +328,7 @@ class Home_Screen extends StatelessWidget {
                             width: 0.7,
                           ),
                         ),
-                        height: 55,
+                        height: 40,
                         child: Material(
                           // elevation: 5.0,
                           borderRadius: BorderRadius.circular(5.0),

@@ -28,15 +28,15 @@ class Student_Top_Page extends StatelessWidget {
           Row(
             children: [
               //test
-              InkWell(
-                onTap: () {
-                  Provider.of<Auth_manager>(context, listen: false).logout();
-                },
-                child: Icon(
-                  Icons.menu,
-                  size: 30,
-                ),
-              ),
+              // InkWell(
+              //   onTap: () {
+              //     Provider.of<Auth_manager>(context, listen: false).logout();
+              //   },
+              //   child: Icon(
+              //     Icons.menu,
+              //     size: 30,
+              //   ),
+              // ),
               SizedBox(width: 10),
               Expanded(
                 child: Container(

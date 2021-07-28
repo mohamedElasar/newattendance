@@ -53,9 +53,82 @@ class StudentManager extends ChangeNotifier {
     String? password,
     String? passwordconfirmation,
   ) async {
+    // try {
+    Dio dio = Dio();
+    String urld = 'https://development.mrsaidmostafa.com/api/students';
+
+    var params = {
+      'name': name,
+      'phone': phone,
+      'email': email,
+      'password': password,
+      'password_confirmation': passwordconfirmation,
+      'school': school,
+      // 'subject_id': subject,
+      'groups': groups,
+      'city_id': city,
+      'parent': parent,
+      'relation_type': relationType,
+      'parent_phone': parentPhone,
+      'parent_whatsapp': parentWhatsapp,
+      'gender': gender,
+      'study_type': studyType,
+      'discount': discount,
+      'code': code,
+      'second_language': secondLanguage,
+    };
+    dio.options.headers["Authorization"] = 'Bearer $_authToken';
+    dio.options.headers["Accept"] = 'application/json';
+    var response = await dio.post(urld, data: jsonEncode(params));
+
+    final responseData = response.data;
+    print(responseData);
+    // if (responseData['errors'] != null) {
+    //   print('here');
+    //   List<String> errors = [];
+    //   for (var value in responseData['errors'].values) errors.add(value[0]);
+    //   throw HttpException(errors.join('  '));
+
+    // } on DioError catch (e) {
+    //   if (e.response!.data['errors'] != null) {
+    //     print(e.response!.data);
+    //     List<String> errors = [];
+    //     for (var value in e.response!.data['errors'].values)
+    //       errors.add(value[0]);
+    //     throw HttpException(errors.join('  '));
+    //   } else {
+    //     print(error);
+    //   }
+    // }
+
+    notifyListeners();
+  }
+
+  Future<void> modify_student(
+    String id,
+    String? name,
+    String? email,
+    String? phone,
+    String? school,
+    String? note,
+    String? city,
+    List<String>? groups,
+    String? parent,
+    String? relationType,
+    String? parentPhone,
+    String? parentWhatsapp,
+    String? gender,
+    String? studyType,
+    String? secondLanguage,
+    String? discount,
+    String? code,
+    String? password,
+    String? passwordconfirmation,
+  ) async {
     try {
       Dio dio = Dio();
-      String urld = 'https://development.mrsaidmostafa.com/api/students';
+      String urld = 'https://development.mrsaidmostafa.com/api/students/$id';
+      print(urld);
 
       var params = {
         'name': name,
@@ -79,7 +152,7 @@ class StudentManager extends ChangeNotifier {
       };
       dio.options.headers["Authorization"] = 'Bearer $_authToken';
       dio.options.headers["Accept"] = 'application/json';
-      var response = await dio.post(urld, data: jsonEncode(params));
+      var response = await dio.put(urld, data: jsonEncode(params));
 
       final responseData = response.data;
       print(responseData);
@@ -88,6 +161,7 @@ class StudentManager extends ChangeNotifier {
       //   List<String> errors = [];
       //   for (var value in responseData['errors'].values) errors.add(value[0]);
       //   throw HttpException(errors.join('  '));
+
     } on DioError catch (e) {
       if (e.response!.data['errors'] != null) {
         print(e.response!.data);
@@ -96,7 +170,7 @@ class StudentManager extends ChangeNotifier {
           errors.add(value[0]);
         throw HttpException(errors.join('  '));
       } else {
-        throw (error);
+        print(e);
       }
     }
 

@@ -132,11 +132,12 @@ class _ChoicesState extends State<Choices> {
     super.initState();
   }
 
-  String formatTimeOfDay(TimeOfDay tod) {
+  List<String> formatTimeOfDay(TimeOfDay tod) {
     final now = new DateTime.now();
     final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
     final format = DateFormat('hh:mm'); //"6:00 AM"
-    return format.format(dt);
+    final dateformate = DateFormat('y-M-d');
+    return [format.format(dt), dateformate.format(dt)];
   }
 
   void _modalBottomSheetMenusubject(BuildContext context) {
@@ -773,9 +774,8 @@ class _ChoicesState extends State<Choices> {
                                   listen: false)
                               .add_appointment(
                                 group_id_selected,
-                                formatTimeOfDay(
-                                  TimeOfDay.now(),
-                                ),
+                                formatTimeOfDay(TimeOfDay.now())[0],
+                                formatTimeOfDay(TimeOfDay.now())[1],
                               )
                               .then((value) => Provider.of<AppointmentManager>(
                                       context,
@@ -784,6 +784,18 @@ class _ChoicesState extends State<Choices> {
                               .then((value) => setState(() {
                                     _isloadingappointment = false;
                                     group_level = true;
+                                  }))
+                              .then((value) => setState(() {
+                                    app_name = [
+                                      Provider.of<AppointmentManager>(context,
+                                              listen: false)
+                                          .currentapp!
+                                          .date,
+                                      Provider.of<AppointmentManager>(context,
+                                              listen: false)
+                                          .currentapp!
+                                          .time
+                                    ].join(',');
                                   }))
                               .then(
                                 (_) =>
@@ -892,43 +904,50 @@ class _ChoicesState extends State<Choices> {
                                   }
 
                                   return GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        app_id_selected = appointmentmanager
-                                            .appointments![index].id
-                                            .toString();
-                                        app_name = app_id_selected =
+                                      onTap: () {
+                                        setState(() {
+                                          app_id_selected = appointmentmanager
+                                              .appointments![index].id
+                                              .toString();
+                                          app_name = app_id_selected =
+                                              appointmentmanager
+                                                  .appointments![index].time
+                                                  .toString();
+                                        });
+                                        Navigator.pop(context);
+                                        // Provider.of<AppStateManager>(context,
+                                        //         listen: false)
+                                        //     .setgroupID(
+                                        //         appointmentmanager
+                                        //             .groups[index].id
+                                        //             .toString(),
+                                        //         appointmentmanager.groups[index]);
+                                        // setState(() {
+                                        //   group_id_selected = appointmentmanager
+                                        //       .groups[index].id
+                                        //       .toString();
+                                        //   group_name = appointmentmanager
+                                        //       .groups[index].name!;
+                                        //   group_level = true;
+                                        // });
+                                        // Provider.of<AppStateManager>(context,
+                                        //         listen: false)
+                                        //     .setHomeOptions(true);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: ListTile(
+                                        title: Text(
+                                          [
                                             appointmentmanager
-                                                .appointments![index].time
-                                                .toString();
-                                      });
-                                      Navigator.pop(context);
-                                      // Provider.of<AppStateManager>(context,
-                                      //         listen: false)
-                                      //     .setgroupID(
-                                      //         appointmentmanager
-                                      //             .groups[index].id
-                                      //             .toString(),
-                                      //         appointmentmanager.groups[index]);
-                                      // setState(() {
-                                      //   group_id_selected = appointmentmanager
-                                      //       .groups[index].id
-                                      //       .toString();
-                                      //   group_name = appointmentmanager
-                                      //       .groups[index].name!;
-                                      //   group_level = true;
-                                      // });
-                                      // Provider.of<AppStateManager>(context,
-                                      //         listen: false)
-                                      //     .setHomeOptions(true);
-                                      // Navigator.pop(context);
-                                    },
-                                    child: ListTile(
-                                      title: Text(appointmentmanager
-                                          .appointments![index].time!
-                                          .toString()),
-                                    ),
-                                  );
+                                                .appointments![index].time!
+                                                .toString(),
+                                            appointmentmanager
+                                                    .appointments![index]
+                                                    .date ??
+                                                ''
+                                          ].join(','),
+                                        ),
+                                      ));
                                 },
                               ),
                             )

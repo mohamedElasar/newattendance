@@ -6,6 +6,7 @@ import 'package:attendance/models/city.dart';
 import 'package:attendance/models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants.dart';
@@ -95,6 +96,71 @@ class _Register_FormState extends State<Register_Form> {
                 backgroundColor: Colors.green[300],
                 content: Text(
                   'تم اضافه الطالب بنجاح',
+                  style: TextStyle(fontFamily: 'GE-medium'),
+                ),
+                duration: Duration(seconds: 3),
+              )));
+    } on HttpException catch (error) {
+      _showErrorDialog(error.toString());
+    } catch (error) {
+      const errorMessage = 'حاول مره اخري';
+      _showErrorDialog(errorMessage);
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void _modify() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+    if (_register_data['gender'] == null ||
+        _register_data['language'] == null ||
+        cityname == 'المحافظه' ||
+        _groups_shown.isEmpty) {
+      return;
+    }
+    _formKey.currentState!.save();
+    // print('asdasdasd');
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await Provider.of<StudentManager>(context, listen: false)
+          .modify_student(
+              widget.student!.id.toString(),
+              nameController.text,
+              emailController.text,
+              phonecontroller.text,
+              schoolController.text,
+              notesController.text,
+              cityId_selected,
+              _groups_id,
+              parentNameController.text,
+              relationController.text,
+              parentphoneController.text,
+              parentWhatsController.text,
+              _register_data['gender'],
+              studyTypeController.text,
+              _register_data['language'],
+              discountController.text,
+              barCodeController.text,
+              passwordcontroller.text,
+              confirmpasswordController.text)
+          .then(
+            (value) => Provider.of<StudentManager>(context, listen: false)
+              ..getMoreDatafilteredId(
+                widget.student!.id.toString(),
+              ),
+          )
+          .then((_) {
+        Navigator.pop(context);
+      }).then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Colors.green[300],
+                content: Text(
+                  'تم تعديل الطالب بنجاح',
                   style: TextStyle(fontFamily: 'GE-medium'),
                 ),
                 duration: Duration(seconds: 3),
@@ -540,6 +606,9 @@ class _Register_FormState extends State<Register_Form> {
     widget.edit!
         ? phonecontroller.text = widget.student!.phone!
         : phonecontroller.text = '';
+    widget.edit!
+        ? cityId_selected = widget.student!.city!.id!.toString()
+        : cityId_selected = '';
 
     widget.edit!
         ? parentphoneController.text = widget.student!.parentPhone ?? ''
@@ -912,18 +981,21 @@ class _Register_FormState extends State<Register_Form> {
                               },
                               focus: focus12),
                           Center(
-                            child: Container(
-                              alignment: Alignment.centerRight,
-                              width: widget.size.width / 2 * .9,
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              height: 40,
-                              decoration: BoxDecoration(),
+                            child: InkWell(
+                              onTap: scanBarcode,
                               child: Container(
-                                child: Row(
-                                  children: [
-                                    Text('scan code  '),
-                                    Icon(Icons.camera_alt_outlined),
-                                  ],
+                                alignment: Alignment.centerRight,
+                                width: widget.size.width / 2 * .9,
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                height: 40,
+                                decoration: BoxDecoration(),
+                                child: Container(
+                                  child: Row(
+                                    children: [
+                                      Text('scan code  '),
+                                      Icon(Icons.camera_alt_outlined),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -1012,7 +1084,7 @@ class _Register_FormState extends State<Register_Form> {
                           elevation: MaterialStateProperty.all(2),
                           backgroundColor: MaterialStateProperty.all(
                               widget.edit! ? Colors.red[200] : kbuttonColor2)),
-                      onPressed: _submit,
+                      onPressed: widget.edit! ? _modify : _submit,
                       child: widget.edit!
                           ? Text(
                               'تعديل',
@@ -1030,6 +1102,25 @@ class _Register_FormState extends State<Register_Form> {
               ),
             ),
           );
+  }
+
+  Future scanBarcode() async {
+    String scanResult;
+    setState(() {
+      // _scanloading = true;
+    });
+    try {
+      scanResult = await FlutterBarcodeScanner.scanBarcode(
+              '#ff6666', "cancel", true, ScanMode.BARCODE)
+          .then((value) => '');
+    } on PlatformException {
+      scanResult = 'حدث خطأ';
+    }
+    if (!mounted) return;
+    setState(() {
+      barCodeController.text = scanResult;
+      // _scanloading = false;
+    });
   }
 
   Center build_edit_field({

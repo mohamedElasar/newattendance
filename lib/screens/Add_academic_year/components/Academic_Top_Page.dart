@@ -15,10 +15,11 @@ class Academic_Top_Page extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(
-            Icons.menu,
-            size: 30,
-          ),
+          // Icon(
+          //   Icons.menu,
+          //   size: 30,
+          // ),
+          Container(),
           Text(
             'السنوات الدراسية',
             style: TextStyle(
@@ -28,7 +29,8 @@ class Academic_Top_Page extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
-              Provider.of<AppStateManager>(context, listen: false).go_to_Home();
+              Provider.of<AppStateManager>(context, listen: false)
+                  .addYears(false);
             },
             child: RotatedBox(
               quarterTurns: 2,

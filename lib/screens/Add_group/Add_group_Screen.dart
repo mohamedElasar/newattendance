@@ -40,25 +40,30 @@ class Add_group_screen extends StatelessWidget {
             SizedBox(
               width: 30,
             ),
-            InkWell(
-              onTap: () {
-                Provider.of<AppStateManager>(context, listen: false)
-                    .go_to_Home();
-              },
-              child: RotatedBox(
-                quarterTurns: 2,
-                child: Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
+            Container(
+              padding: EdgeInsets.all(8),
+              child: InkWell(
+                onTap: () {
+                  Provider.of<AppStateManager>(context, listen: false)
+                      .registerGroup(false);
+                },
+                child: RotatedBox(
+                  quarterTurns: 2,
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             )
           ],
           elevation: 0,
-          leading: Icon(
-            Icons.menu,
-            color: Colors.black,
-          ),
+          // leading:
+          //  Icon(
+          //   Icons.menu,
+          //   color: Colors.black,
+          // ),
+
           backgroundColor: Colors.white,
         ),
         backgroundColor: Colors.grey[300],
