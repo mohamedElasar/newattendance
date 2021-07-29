@@ -1,10 +1,12 @@
 import 'package:attendance/models/student.dart';
 
+import 'StudentModelSimple.dart';
+
 class AppointmentModel {
   int? id;
   String? time;
   String? date;
-  List<StudentModel>? students;
+  List<StudentModelSimple>? students;
 
   AppointmentModel({this.id, this.time, this.students});
 
@@ -12,9 +14,9 @@ class AppointmentModel {
     id = json['id'];
     time = json['time'];
     date = json['date'];
-    students = List<StudentModel>.from(
+    students = List<StudentModelSimple>.from(
       json['students'].map(
-        (model) => StudentModel.fromJson(model),
+        (model) => StudentModelSimple.fromJson(model),
       ),
     );
   }

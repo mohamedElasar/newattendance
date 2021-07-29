@@ -1,8 +1,5 @@
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/Single_Student.dart/components/student_pic_name.dart';
-import 'package:attendance/screens/Students/components/Students_Top_Page.dart';
-import 'package:attendance/screens/Students/components/table/Row_builder.dart';
-import 'package:attendance/screens/Students/components/table/table_head.dart';
 import 'package:flutter/material.dart';
 import '../../constants.dart';
 import 'components/table_head_2.dart';

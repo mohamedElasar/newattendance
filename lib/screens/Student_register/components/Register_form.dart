@@ -2,6 +2,7 @@ import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/managers/cities_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/city.dart';
 import 'package:attendance/models/student.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class Register_Form extends StatefulWidget {
 
   final Size size;
   final bool? edit;
-  final StudentModel? student;
+  final StudentModelSearch? student;
 
   @override
   _Register_FormState createState() => _Register_FormState();
@@ -103,6 +104,7 @@ class _Register_FormState extends State<Register_Form> {
     } on HttpException catch (error) {
       _showErrorDialog(error.toString());
     } catch (error) {
+      print(error);
       const errorMessage = 'حاول مره اخري';
       _showErrorDialog(errorMessage);
     }
@@ -145,7 +147,7 @@ class _Register_FormState extends State<Register_Form> {
               _register_data['gender'],
               studyTypeController.text,
               _register_data['language'],
-              discountController.text,
+              discountController.text.toString(),
               barCodeController.text,
               passwordcontroller.text,
               confirmpasswordController.text)
@@ -589,7 +591,7 @@ class _Register_FormState extends State<Register_Form> {
         ? schoolController.text = widget.student!.school ?? ''
         : schoolController.text = '';
     widget.edit!
-        ? barCodeController.text = widget.student!.code!.name.toString()
+        ? barCodeController.text = widget.student!.code!.name ?? ''
         : barCodeController.text = '';
     widget.edit!
         ? discountController.text = widget.student!.discount ?? ''
@@ -982,7 +984,7 @@ class _Register_FormState extends State<Register_Form> {
                               focus: focus12),
                           Center(
                             child: InkWell(
-                              onTap: scanBarcode,
+                              onTap: () => scanBarcodeNormal(),
                               child: Container(
                                 alignment: Alignment.centerRight,
                                 width: widget.size.width / 2 * .9,
@@ -1081,9 +1083,10 @@ class _Register_FormState extends State<Register_Form> {
                     width: widget.size.width * .9,
                     child: TextButton(
                       style: ButtonStyle(
-                          elevation: MaterialStateProperty.all(2),
-                          backgroundColor: MaterialStateProperty.all(
-                              widget.edit! ? Colors.red[200] : kbuttonColor2)),
+                        elevation: MaterialStateProperty.all(2),
+                        backgroundColor: MaterialStateProperty.all(
+                            widget.edit! ? Colors.red[200] : kbuttonColor2),
+                      ),
                       onPressed: widget.edit! ? _modify : _submit,
                       child: widget.edit!
                           ? Text(
@@ -1104,23 +1107,25 @@ class _Register_FormState extends State<Register_Form> {
           );
   }
 
-  Future scanBarcode() async {
-    String scanResult;
-    setState(() {
-      // _scanloading = true;
-    });
+  Future<void> scanBarcodeNormal() async {
+    String barcodeScanRes;
+    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      scanResult = await FlutterBarcodeScanner.scanBarcode(
-              '#ff6666', "cancel", true, ScanMode.BARCODE)
-          .then((value) => '');
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+      print(barcodeScanRes);
     } on PlatformException {
-      scanResult = 'حدث خطأ';
+      barcodeScanRes = 'Failed to get platform version.';
     }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
     if (!mounted) return;
-    setState(() {
-      barCodeController.text = scanResult;
-      // _scanloading = false;
-    });
+    barCodeController.text = barcodeScanRes;
+    // setState(() {
+    //   _scanBarcode = barcodeScanRes;
+    // });
   }
 
   Center build_edit_field({

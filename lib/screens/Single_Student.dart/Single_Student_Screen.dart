@@ -1,9 +1,5 @@
-import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/navigation/screens.dart';
-import 'package:attendance/screens/Admin_Login/components/Login_Form.dart';
-import 'package:attendance/screens/Admin_Login/components/Page_Title.dart';
-import 'package:attendance/screens/Students/components/Students_Top_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants.dart';

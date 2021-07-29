@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:attendance/helper/httpexception.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
+import 'package:attendance/models/group.dart';
+import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:dio/dio.dart';
 
 import 'package:attendance/managers/Auth_manager.dart';
@@ -10,16 +13,16 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class StudentManager extends ChangeNotifier {
-  void receiveToken(Auth_manager auth, List<StudentModel> students) {
+  void receiveToken(Auth_manager auth, List<StudentModelSearch> students) {
     _authToken = auth.token;
     __students = students;
   }
 
   String? _authToken;
-  List<StudentModel> __students = [];
-  StudentModel _singleStudent = StudentModel();
-  List<StudentModel> get students => __students;
-  StudentModel? get singleStudent => _singleStudent;
+  List<StudentModelSearch> __students = [];
+  StudentModelSearch _singleStudent = StudentModelSearch();
+  List<StudentModelSearch> get students => __students;
+  StudentModelSearch? get singleStudent => _singleStudent;
 
   get hasmore => _hasMore;
   get pageNumber => _pageNumber;
@@ -53,53 +56,53 @@ class StudentManager extends ChangeNotifier {
     String? password,
     String? passwordconfirmation,
   ) async {
-    // try {
-    Dio dio = Dio();
-    String urld = 'https://development.mrsaidmostafa.com/api/students';
+    try {
+      Dio dio = Dio();
+      String urld = 'https://development.mrsaidmostafa.com/api/students';
 
-    var params = {
-      'name': name,
-      'phone': phone,
-      'email': email,
-      'password': password,
-      'password_confirmation': passwordconfirmation,
-      'school': school,
-      // 'subject_id': subject,
-      'groups': groups,
-      'city_id': city,
-      'parent': parent,
-      'relation_type': relationType,
-      'parent_phone': parentPhone,
-      'parent_whatsapp': parentWhatsapp,
-      'gender': gender,
-      'study_type': studyType,
-      'discount': discount,
-      'code': code,
-      'second_language': secondLanguage,
-    };
-    dio.options.headers["Authorization"] = 'Bearer $_authToken';
-    dio.options.headers["Accept"] = 'application/json';
-    var response = await dio.post(urld, data: jsonEncode(params));
+      var params = {
+        'name': name,
+        'phone': phone,
+        'email': email,
+        'password': password,
+        'password_confirmation': passwordconfirmation,
+        'school': school,
+        // 'subject_id': subject,
+        'groups': groups,
+        'city_id': city,
+        'parent': parent,
+        'relation_type': relationType,
+        'parent_phone': parentPhone,
+        'parent_whatsapp': parentWhatsapp,
+        'gender': gender,
+        'study_type': studyType,
+        'discount': discount,
+        'code': code,
+        'second_language': secondLanguage,
+      };
+      dio.options.headers["Authorization"] = 'Bearer $_authToken';
+      dio.options.headers["Accept"] = 'application/json';
+      var response = await dio.post(urld, data: jsonEncode(params));
 
-    final responseData = response.data;
-    print(responseData);
-    // if (responseData['errors'] != null) {
-    //   print('here');
-    //   List<String> errors = [];
-    //   for (var value in responseData['errors'].values) errors.add(value[0]);
-    //   throw HttpException(errors.join('  '));
+      final responseData = response.data;
+      print(responseData);
+      // if (responseData['errors'] != null) {
+      //   print('here');
+      //   List<String> errors = [];
+      //   for (var value in responseData['errors'].values) errors.add(value[0]);
+      //   throw HttpException(errors.join('  '));
 
-    // } on DioError catch (e) {
-    //   if (e.response!.data['errors'] != null) {
-    //     print(e.response!.data);
-    //     List<String> errors = [];
-    //     for (var value in e.response!.data['errors'].values)
-    //       errors.add(value[0]);
-    //     throw HttpException(errors.join('  '));
-    //   } else {
-    //     print(error);
-    //   }
-    // }
+    } on DioError catch (e) {
+      if (e.response!.data['errors'] != null) {
+        print(e.response!.data);
+        List<String> errors = [];
+        for (var value in e.response!.data['errors'].values)
+          errors.add(value[0]);
+        throw HttpException(errors.join('  '));
+      } else {
+        print(error);
+      }
+    }
 
     notifyListeners();
   }
@@ -149,6 +152,7 @@ class StudentManager extends ChangeNotifier {
         'discount': discount,
         'code': code,
         'second_language': secondLanguage,
+        'note': note
       };
       dio.options.headers["Authorization"] = 'Bearer $_authToken';
       dio.options.headers["Accept"] = 'application/json';
@@ -190,7 +194,8 @@ class StudentManager extends ChangeNotifier {
       final responseData = json.decode(response.body);
 
       List<dynamic> yearsList = responseData['data'];
-      var list = yearsList.map((data) => StudentModel.fromJson(data)).toList();
+      var list =
+          yearsList.map((data) => StudentModelSearch.fromJson(data)).toList();
       __students = list;
       print(responseData);
       // add exception
@@ -225,8 +230,9 @@ class StudentManager extends ChangeNotifier {
       final responseData = json.decode(response.body);
 
       List<dynamic> studentsList = responseData['data'];
-      var fetchedstudents =
-          studentsList.map((data) => StudentModel.fromJson(data)).toList();
+      var fetchedstudents = studentsList
+          .map((data) => StudentModelSearch.fromJson(data))
+          .toList();
       _hasMore = fetchedstudents.length == _defaultPerPageCount;
       _loading = false;
       _pageNumber = _pageNumber + 1;
@@ -264,7 +270,7 @@ class StudentManager extends ChangeNotifier {
       List<dynamic> studentsList = responseData['data'];
       // var fetchedstudents =
       //     studentsList.map((data) => StudentModel.fromJson(data)).toList();
-      var fetchedstudent = StudentModel.fromJson(studentsList[0]);
+      var fetchedstudent = StudentModelSearch.fromJson(studentsList[0]);
 
       // _hasMore = fetchedstudents.length == _defaultPerPageCount;
       // _loading = false;
@@ -301,37 +307,42 @@ class StudentManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<StudentModel>> searchStudent(String filter1) async {
+  Future<List<StudentModelSearch>> searchStudent(String filter1) async {
     // print(_pageNumber);
-    // try {
-    var url = Uri.https('development.mrsaidmostafa.com', '/api/students', {
-      "name": filter1,
-    });
-    // print(_pageNumber);
-    //
-    print(url);
-    var response = await http.get(
-      url,
-      headers: {
-        'Accept': 'application/json',
-        HttpHeaders.authorizationHeader: 'Bearer $_authToken'
-      },
-    );
+    try {
+      var url = Uri.https('development.mrsaidmostafa.com', '/api/students', {
+        "name": filter1,
+      });
+      // print(_pageNumber);
+      //
+      print(url);
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
 
-    final responseData = json.decode(response.body);
-    // print(responseData);
-    List<dynamic> studentsList = responseData['data'];
-    // print(studentsList);
-    List<StudentModel> list =
-        studentsList.map((data) => StudentModel.fromJson(data)).toList();
-    print(list);
-    return list;
-    // } catch (e) {
-    //   throw (error);
-    // }
+      final responseData = json.decode(response.body);
+      // print(responseData);
+      List<dynamic> studentsList = responseData['data'];
+      // print(studentsList[0]);
+      // print(studentsList);
+      print(StudentModelSearch.fromJson(studentsList[0]));
+
+      List<StudentModelSearch> list = studentsList
+          .map((data) => StudentModelSearch.fromJson(data))
+          .toList();
+
+      return list;
+    } catch (e) {
+      // print(e);
+      throw e;
+    }
   }
 
-  void setSingleStudent(StudentModel st) {
+  void setSingleStudent(StudentModelSearch st) {
     _singleStudent = st;
     notifyListeners();
   }

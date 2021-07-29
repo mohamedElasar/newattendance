@@ -1,9 +1,8 @@
-import 'package:attendance/models/appointment.dart';
 import 'package:attendance/models/subject.dart';
 import 'package:attendance/models/teacher.dart';
 import 'package:attendance/models/year.dart';
 
-class GroupModel {
+class GroupModelSimple {
   int? id;
   String? name;
   YearModel? year;
@@ -12,9 +11,9 @@ class GroupModel {
   List<dynamic>? time;
   List<dynamic>? day;
   bool? choosen;
-  List<AppointmentModel>? appointments;
+  // List<AppointmentModel>? appointments;
 
-  GroupModel(
+  GroupModelSimple(
       {this.id,
       this.year,
       this.teacher,
@@ -22,10 +21,10 @@ class GroupModel {
       this.time,
       this.name,
       this.subject,
-      this.appointments,
+      // this.appointments,
       this.choosen = false});
 
-  GroupModel.fromJson(Map<String, dynamic> json) {
+  GroupModelSimple.fromJson(Map<String, dynamic> json) {
     choosen = false;
 
     id = json['id'];
@@ -37,26 +36,12 @@ class GroupModel {
     teacher = json['teacher'] != null
         ? new TeacherModel.fromJson(json['teacher'])
         : null;
-    appointments = List<AppointmentModel>.from(
-      json['appointments'].map(
-        (model) => AppointmentModel.fromJson(model),
-      ),
-    );
+    // appointments = List<AppointmentModel>.from(
+    //   json['appointments'].map(
+    //     (model) => AppointmentModel.fromJson(model),
+    //   ),
+    // );
 
-    // if (json['day'] != null) {
-    //   List<dynamic> day = [];
-    //   json['day'].forEach((v) {
-    //     day.add((v));
-    //   });
-    // }
-    // if (json['time'] != null) {
-    //   List<dynamic> time = [];
-    //   json['time'].forEach((v) {
-    //     time.add((v));
-    //   });
-    // }
-    // day = json['day'];
-    // time = json['time'];
     time = json['time'];
     day = json['day'];
   }
@@ -74,17 +59,10 @@ class GroupModel {
     if (this.teacher != null) {
       data['teacher'] = this.teacher!.toJson();
     }
-    if (this.appointments != null) {
-      data['appointments'] = this.appointments!.map((v) => v.toJson()).toList();
-    }
-    // if (this.day != null) {
-    //   data['day'] = this.day!.map((v) => v.toJson()).toList();
+    // if (this.appointments != null) {
+    //   data['appointments'] = this.appointments!.map((v) => v.toJson()).toList();
     // }
-    // if (this.time != null) {
-    //   data['time'] = this.time!.map((v) => v.toJson()).toList();
-    // }
-    // data['day'] = this.day;
-    // data['time'] = this.time;
+
     data['time'] = this.time;
     data['day'] = this.day;
     return data;

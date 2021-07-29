@@ -2,19 +2,14 @@ import 'dart:ui';
 
 import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/managers/Auth_manager.dart';
-import 'package:attendance/managers/stage_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
-import 'package:attendance/models/year.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/Add_subject/components/subject_Top_Page.dart';
-import 'package:attendance/screens/Students/components/Students_Top_Page.dart';
-import 'package:attendance/screens/degrees/components/Degrees_top.dart';
 import 'package:flutter/material.dart';
 import '../../constants.dart';
 import 'package:provider/provider.dart';
 
-import '../splash_screen.dart';
 import 'components/default_form_field.dart';
 
 class Add_academic_subject extends StatefulWidget {

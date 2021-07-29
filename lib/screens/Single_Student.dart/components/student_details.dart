@@ -2,6 +2,7 @@ import 'package:attendance/constants.dart';
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/models/group.dart';
+import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:attendance/screens/Single_Student.dart/components/name_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +22,7 @@ class Student_details extends StatelessWidget {
   // List<String> teachers_Student = ['عبد المعز', 'احمد محمد'];
   void _modalBottomSheetMenu(
     BuildContext context,
-    List<GroupModel> groups,
+    List<GroupModelSimple> groups,
   ) {
     showModalBottomSheet(
         context: context,

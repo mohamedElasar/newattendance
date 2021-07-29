@@ -1,14 +1,9 @@
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/student.dart';
 import 'package:attendance/navigation/screens.dart';
-import 'package:attendance/screens/Add_academic_year/Academic_year.dart';
-import 'package:attendance/screens/Add_group/Add_group_Screen.dart';
-import 'package:attendance/screens/Add_subject/Academic_subject.dart';
-import 'package:attendance/screens/Add_teacher/Add_Teacher_Screen.dart';
-import 'package:attendance/screens/Student_register/Student_register_screen.dart';
-import 'package:attendance/screens/Students/components/Students_Top_Page.dart';
 import 'package:attendance/screens/show_group/show_group.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -415,7 +410,7 @@ class HomeTopPage extends StatelessWidget {
           ),
           InkWell(
             onTap: () async {
-              showSearch(context: context, delegate: StudentSearch());
+              await showSearch(context: context, delegate: StudentSearch());
             },
             child: Row(
               children: [
@@ -432,18 +427,6 @@ class HomeTopPage extends StatelessWidget {
               ],
             ),
           )
-          // InkWell(
-          //   onTap: () {
-          //     Provider.of<AppStateManager>(context, listen: false).go_to_Home();
-          //   },
-          //   child: RotatedBox(
-          //     quarterTurns: 2,
-          //     child: Icon(
-          //       Icons.arrow_back,
-          //       color: Colors.black,
-          //     ),
-          //   ),
-          // )
         ],
       ),
     );
@@ -474,7 +457,7 @@ class StudentSearch extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) =>
-      FutureBuilder<List<StudentModel>>(
+      FutureBuilder<List<StudentModelSearch>>(
         future: Provider.of<StudentManager>(context, listen: false)
             .searchStudent(query),
         builder: (context, snapshot) {
@@ -502,11 +485,11 @@ class StudentSearch extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) => Container(
         // color: Colors.black,
-        child: FutureBuilder<List<StudentModel>>(
+        child: FutureBuilder<List<StudentModelSearch>>(
           future: Provider.of<StudentManager>(context, listen: false)
               .searchStudent(query),
           builder: (context, snapshot) {
-            print(snapshot.error);
+            // print(snapshot.data);
             if (query.isEmpty) return buildNoSuggestions();
 
             switch (snapshot.connectionState) {
@@ -530,7 +513,7 @@ class StudentSearch extends SearchDelegate<String> {
         ),
       );
 
-  Widget buildSuggestionsSuccess(List<StudentModel>? suggestions) =>
+  Widget buildSuggestionsSuccess(List<StudentModelSearch>? suggestions) =>
       ListView.builder(
         itemCount: suggestions!.length,
         itemBuilder: (context, index) {
@@ -570,7 +553,7 @@ class StudentSearch extends SearchDelegate<String> {
         },
       );
 
-  Widget buildResultSuccess(StudentModel student) => Container(
+  Widget buildResultSuccess(StudentModelSearch student) => Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF3279e2), Colors.purple],

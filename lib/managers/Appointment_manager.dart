@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:attendance/managers/Auth_manager.dart';
+import 'package:attendance/models/StudentModelSimple.dart';
 import 'package:attendance/models/appointment.dart';
+// ignore: unused_import
 import 'package:attendance/models/stage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:attendance/models/year.dart';
 
 class AppointmentManager extends ChangeNotifier {
   void receiveToken(Auth_manager auth, List<AppointmentModel> appointments) {
@@ -16,8 +17,13 @@ class AppointmentManager extends ChangeNotifier {
 
   String? authToken;
   List<AppointmentModel> _appointments = [];
+  List<AppointmentModel> _appointmentsshow = [];
   AppointmentModel? _currentApp = AppointmentModel();
+  List<StudentModelSimple> _students_attend = [];
+  List<StudentModelSimple> get student_attend => _students_attend;
+
   List<AppointmentModel>? get appointments => _appointments;
+  List<AppointmentModel>? get appointmentsshow => _appointmentsshow;
   AppointmentModel? get currentapp => _currentApp;
   // get hasmore => _hasMore;
   // get pageNumber => _pageNumber;
@@ -43,8 +49,11 @@ class AppointmentManager extends ChangeNotifier {
         },
       );
       final responseData = json.decode(response.body);
+      // print(responseData['data']['appointments'][0]);
+      print(url);
       // print(responseData['data']['appointments']);
-      List<dynamic> appointments = responseData['data']['appointments'];
+      List appointments = responseData['data']['appointments'];
+      print(appointments);
       List<AppointmentModel> list =
           appointments.map((data) => AppointmentModel.fromJson(data)).toList();
       _appointments = list;
@@ -53,9 +62,71 @@ class AppointmentManager extends ChangeNotifier {
       // add exception
 
     } catch (error) {
+      throw (error);
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> get_appointmentsshow(String groupid) async {
+    var url =
+        Uri.https('development.mrsaidmostafa.com', '/api/groups/$groupid');
+    try {
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $authToken'
+        },
+      );
+      final responseData = json.decode(response.body);
+      // print(responseData['data']['appointments']);
+      List<dynamic> appointments = responseData['data']['appointments'];
+      List<AppointmentModel> list =
+          appointments.map((data) => AppointmentModel.fromJson(data)).toList();
+      _appointmentsshow = list;
       _loading = false;
-      _error = true;
-      notifyListeners();
+      print(_appointmentsshow);
+
+      // add exception
+
+    } catch (error) {
+      throw (error);
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> get_students_attending_lesson(
+      String groupid, String lessonid) async {
+    var url =
+        Uri.https('development.mrsaidmostafa.com', '/api/groups/$groupid');
+    try {
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $authToken'
+        },
+      );
+      final responseData = json.decode(response.body);
+      // print(responseData['data']['appointments']);
+      List<dynamic> appointments = responseData['data']['appointments'];
+      List<AppointmentModel> list =
+          appointments.map((data) => AppointmentModel.fromJson(data)).toList();
+
+      AppointmentModel ourApp =
+          list.firstWhere((element) => element.id.toString() == lessonid);
+
+      List<StudentModelSimple>? studentsattend = ourApp.students;
+      _students_attend = studentsattend!;
+      _loading = false;
+      print(_students_attend);
+
+      // add exception
+
+    } catch (error) {
+      throw (error);
     }
 
     notifyListeners();
@@ -87,9 +158,38 @@ class AppointmentManager extends ChangeNotifier {
       // add exception
 
     } catch (error) {
-      _loading = false;
-      _error = true;
-      notifyListeners();
+      throw (error);
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> attendlesson(
+      String groupid, String code, String lessonid) async {
+    var url = Uri.https(
+        'development.mrsaidmostafa.com', '/api/attend/appointments/$groupid');
+    print(url);
+    print(code);
+    print(lessonid);
+    print(groupid);
+    try {
+      var response = await http.post(url, headers: {
+        'Accept': 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $authToken'
+      }, body: {
+        'code': code,
+        'appointment_id': lessonid,
+        // 'compensation_id': compensation_id
+      });
+      final responseData = json.decode(response.body);
+      print(responseData);
+
+      // return (responseData);
+
+      // add exception
+
+    } catch (error) {
+      throw (error);
     }
 
     notifyListeners();

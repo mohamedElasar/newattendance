@@ -1,7 +1,6 @@
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/Add_group/components/group_form.dart';
-import 'package:attendance/screens/Add_teacher/components/Teacher_Form.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

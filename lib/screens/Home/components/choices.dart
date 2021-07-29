@@ -132,6 +132,7 @@ class _ChoicesState extends State<Choices> {
     super.initState();
   }
 
+  bool _loadingscann = false;
   List<String> formatTimeOfDay(TimeOfDay tod) {
     final now = new DateTime.now();
     final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
@@ -730,7 +731,7 @@ class _ChoicesState extends State<Choices> {
       context: context,
       builder: (builder) {
         return Container(
-          height: 250.0,
+          height: 300.0,
           color: Colors.transparent,
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.start,
@@ -743,7 +744,7 @@ class _ChoicesState extends State<Choices> {
                 ),
                 child: Center(
                   child: Text(
-                    'الحصص',
+                    'اختار حصه',
                     style: TextStyle(
                       fontSize: 20,
                       fontFamily: 'GE-bold',
@@ -904,50 +905,51 @@ class _ChoicesState extends State<Choices> {
                                   }
 
                                   return GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          app_id_selected = appointmentmanager
-                                              .appointments![index].id
-                                              .toString();
-                                          app_name = app_id_selected =
-                                              appointmentmanager
-                                                  .appointments![index].time
-                                                  .toString();
-                                        });
-                                        Navigator.pop(context);
-                                        // Provider.of<AppStateManager>(context,
-                                        //         listen: false)
-                                        //     .setgroupID(
-                                        //         appointmentmanager
-                                        //             .groups[index].id
-                                        //             .toString(),
-                                        //         appointmentmanager.groups[index]);
-                                        // setState(() {
-                                        //   group_id_selected = appointmentmanager
-                                        //       .groups[index].id
-                                        //       .toString();
-                                        //   group_name = appointmentmanager
-                                        //       .groups[index].name!;
-                                        //   group_level = true;
-                                        // });
-                                        // Provider.of<AppStateManager>(context,
-                                        //         listen: false)
-                                        //     .setHomeOptions(true);
-                                        // Navigator.pop(context);
-                                      },
-                                      child: ListTile(
-                                        title: Text(
-                                          [
-                                            appointmentmanager
-                                                .appointments![index].time!
-                                                .toString(),
-                                            appointmentmanager
-                                                    .appointments![index]
-                                                    .date ??
-                                                ''
-                                          ].join(','),
-                                        ),
-                                      ));
+                                    onTap: () {
+                                      setState(() {
+                                        app_id_selected = appointmentmanager
+                                            .appointments![index].id
+                                            .toString();
+                                        app_name = appointmentmanager
+                                            .appointments![index].time
+                                            .toString();
+                                      });
+                                      Navigator.pop(context);
+                                      // Provider.of<AppStateManager>(context,
+                                      //         listen: false)
+                                      //     .setgroupID(
+                                      //         appointmentmanager
+                                      //             .groups[index].id
+                                      //             .toString(),
+                                      //         appointmentmanager.groups[index]);
+                                      // setState(() {
+                                      //   group_id_selected = appointmentmanager
+                                      //       .groups[index].id
+                                      //       .toString();
+                                      //   group_name = appointmentmanager
+                                      //       .groups[index].name!;
+                                      //   group_level = true;
+                                      // });
+                                      // Provider.of<AppStateManager>(context,
+                                      //         listen: false)
+                                      //     .setHomeOptions(true);
+                                      // Navigator.pop(context);
+                                    },
+                                    //  ' الساعه :   ${appointmentmanager.appointments![index].time!
+                                    // .toString()}'
+                                    child: ListTile(
+                                      title: Text(
+                                        ' الساعه :   ${appointmentmanager.appointments![index].time!.toString()}',
+                                        style:
+                                            TextStyle(fontFamily: 'GE-light'),
+                                      ),
+                                      trailing: Text(
+                                        ' التاريخ :   ${appointmentmanager.appointments![index].date!.toString()}',
+                                        style:
+                                            TextStyle(fontFamily: 'GE-light'),
+                                      ),
+                                    ),
+                                  );
                                 },
                               ),
                             )
@@ -1175,9 +1177,45 @@ class _ChoicesState extends State<Choices> {
           ),
           Consumer<AppStateManager>(
             builder: (context, appstatemanager, child) => GestureDetector(
-              onTap: app_name != 'الحصه' ? scanBarcode : null,
+              onTap: app_name != 'الحصه'
+                  ? () async {
+                      setState(() {
+                        _loadingscann = true;
+                      });
+                      String res = await FlutterBarcodeScanner.scanBarcode(
+                          '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+                      try {
+                        await Provider.of<AppointmentManager>(context,
+                                listen: false)
+                            .attendlesson(app_id_selected, res, app_id_selected)
+                            .then(
+                              (value) =>
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Colors.green[300],
+                                  content: Text(
+                                    'تم تسجيل حضور الطالب بنجاح',
+                                    style: TextStyle(fontFamily: 'GE-medium'),
+                                  ),
+                                  duration: Duration(seconds: 3),
+                                ),
+                              ),
+                            );
+                      } catch (e) {
+                        _showErrorDialog('حاول مره اخري', 'حدث خطأ');
+                      }
+                      setState(() {
+                        _loadingscann = false;
+                      });
+
+                      // .then((value) =>
+                      //     _showErrorDialog(app_id_selected, res));
+                    }
+                  // .then((value) =>
+                  //     _showErrorDialog(app_id_selected, scanResult_code))
+                  : null,
               child: Scan_button(
-                active: app_name != 'الحصه',
+                active: app_name != 'الحصه' || !_loadingscann,
               ),
             ),
           )
@@ -1186,21 +1224,61 @@ class _ChoicesState extends State<Choices> {
     );
   }
 
+  Future<void> scanBarcodeNormal() async {
+    String barcodeScanRes;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+      print(barcodeScanRes);
+    } on PlatformException {
+      barcodeScanRes = 'حدث خطأ حاول مره اخري ';
+      _showErrorDialog('حاول مره اخري', 'حدث خطا');
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      scanResult_code = barcodeScanRes;
+    });
+    // setState(() {
+    //   _scanBarcode = barcodeScanRes;
+    // });
+  }
+
   Future scanBarcode() async {
-    String scanResult;
+    String? scanResult;
     setState(() {
       _scanloading = true;
     });
     try {
       scanResult = await FlutterBarcodeScanner.scanBarcode(
               '#ff6666', "cancel", true, ScanMode.BARCODE)
-          .then((value) => '');
+          .then((value) {
+        print(value);
+      });
+      // .then(
+      //   (value) => Provider.of<AppointmentManager>(context, listen: false)
+      //       .attendlesson(group_id_selected, value, app_id_selected),
+      // )
+      // .then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //       backgroundColor: Colors.green[300],
+      //       content: Text(
+      //         'تم تسجيل حضور الطالب بنجاح',
+      //         style: TextStyle(fontFamily: 'GE-medium'),
+      //       ),
+      //       duration: Duration(seconds: 3),
+      //     )));
     } on PlatformException {
-      scanResult = 'حدث خطأ';
+      _showErrorDialog('حاول مره اخري', 'حدث خطا');
     }
     if (!mounted) return;
     setState(() {
-      scanResult_code = scanResult;
+      scanResult_code = scanResult!;
+
       _scanloading = false;
     });
   }
@@ -1245,12 +1323,18 @@ class Choice_container extends StatelessWidget {
             children: [
               loading!
                   ? CircularProgressIndicator()
-                  : Text(
-                      hinttext,
-                      style: TextStyle(
-                          fontFamily: 'AraHamah1964B-Bold',
-                          fontSize: 30,
-                          color: active ? Colors.black : Colors.black26),
+                  : Container(
+                      width: size.width * .35,
+                      child: Text(
+                        hinttext,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                        style: TextStyle(
+                            fontFamily: 'AraHamah1964B-Bold',
+                            fontSize: 30,
+                            color: active ? Colors.black : Colors.black26),
+                      ),
                     ),
               Spacer(),
               Icon(Icons.keyboard_arrow_down)
@@ -1293,9 +1377,16 @@ class Button_Container extends StatelessWidget {
             SizedBox(
               width: 10,
             ),
-            Text(
-              text,
-              style: TextStyle(fontFamily: 'AraHamah1964B-Bold', fontSize: 30),
+            Container(
+              width: size.width * .4,
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style:
+                    TextStyle(fontFamily: 'AraHamah1964B-Bold', fontSize: 30),
+              ),
             ),
           ],
         ),

@@ -3,8 +3,6 @@ import 'package:attendance/managers/cities_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
-import 'package:attendance/screens/Admin_Login/components/Page_Title.dart';
-import 'package:attendance/screens/Home/components/choices.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

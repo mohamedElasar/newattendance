@@ -1,5 +1,6 @@
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,7 @@ class Rows_Builder extends StatefulWidget {
 }
 
 class _Rows_BuilderState extends State<Rows_Builder> {
-  void _tapFnc(StudentModel student, String id) {
+  void _tapFnc(StudentModelSearch student, String id) {
     Provider.of<AppStateManager>(context, listen: false)
         .goToSingleStudent(true, student, id);
   }

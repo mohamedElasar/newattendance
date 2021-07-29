@@ -1,25 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:attendance/helper/httpexception.dart';
+import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:dio/dio.dart';
 
 import 'package:attendance/managers/Auth_manager.dart';
-import 'package:attendance/models/group.dart';
-import 'package:attendance/models/subject.dart';
-import 'package:attendance/models/teacher.dart';
-import 'package:attendance/models/year.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class GroupManager extends ChangeNotifier {
-  void receiveToken(Auth_manager auth, List<GroupModel> groups) {
+  void receiveToken(Auth_manager auth, List<GroupModelSimple> groups) {
     _authToken = auth.token;
     _groups = groups;
   }
 
   String? _authToken;
-  List<GroupModel> _groups = [];
-  List<GroupModel> get groups => _groups;
+  List<GroupModelSimple> _groups = [];
+  List<GroupModelSimple> get groups => _groups;
   get hasmore => _hasMore;
   get pageNumber => _pageNumber;
   get error => _error;
@@ -88,7 +85,8 @@ class GroupManager extends ChangeNotifier {
       final responseData = json.decode(response.body);
 
       List<dynamic> stagesList = responseData['data'];
-      var list = stagesList.map((data) => GroupModel.fromJson(data)).toList();
+      var list =
+          stagesList.map((data) => GroupModelSimple.fromJson(data)).toList();
       _groups = list;
       // _loading = false;
       // add exception
@@ -116,7 +114,7 @@ class GroupManager extends ChangeNotifier {
 
       List<dynamic> yearsList = responseData['data'];
       var fetchedGroups =
-          yearsList.map((data) => GroupModel.fromJson(data)).toList();
+          yearsList.map((data) => GroupModelSimple.fromJson(data)).toList();
       _hasMore = fetchedGroups.length == _defaultGroupsPerPageCount;
       _loading = false;
       _pageNumber = _pageNumber + 1;
@@ -157,7 +155,7 @@ class GroupManager extends ChangeNotifier {
 
       List<dynamic> groupsList = responseData['data'];
       var fetchedgroups =
-          groupsList.map((data) => GroupModel.fromJson(data)).toList();
+          groupsList.map((data) => GroupModelSimple.fromJson(data)).toList();
       _hasMore = fetchedgroups.length == _defaultGroupsPerPageCount;
       _loading = false;
       _pageNumber = _pageNumber + 1;
