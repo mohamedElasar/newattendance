@@ -52,15 +52,15 @@ class AppRouter extends RouterDelegate
     required this.appStateManager,
     required this.authmanager,
   }) : navigatorKey = GlobalKey<NavigatorState>() {
-    appStateManager.addListener(notifyListeners);
     authmanager.addListener(notifyListeners);
+    appStateManager.addListener(notifyListeners);
     // studentManager.addListener(notifyListeners);
   }
 
   @override
   void dispose() {
-    appStateManager.removeListener(notifyListeners);
     authmanager.removeListener(notifyListeners);
+    appStateManager.removeListener(notifyListeners);
     // studentManager.removeListener(notifyListeners);
 
     super.dispose();
@@ -68,12 +68,19 @@ class AppRouter extends RouterDelegate
 
   @override
   Widget build(BuildContext context) {
+    print('object');
+    print(authmanager.type);
+    print('aaaa');
     return Navigator(
       key: navigatorKey,
       onPopPage: _handlePopPage,
       pages: [
         if (!authmanager.isLoggedIn) Admin_logIn.page(),
-        if (authmanager.isLoggedIn) Home_Screen.page(),
+        if (authmanager.isLoggedIn && authmanager.type == user.center)
+          Home_Screen.page(),
+        if (authmanager.isLoggedIn && authmanager.type == user.student)
+          Single_Student_Screen.page(
+              userstudent: authmanager.studentUser, user: user.student),
         if (authmanager.isLoggedIn && appStateManager.studentRegister)
           Student_Register_Screen.page(
               editStudent: StudentModelSearch(), edit: false),
@@ -112,19 +119,21 @@ class AppRouter extends RouterDelegate
             appStateManager.communicateStudents &&
             appStateManager.singleStudent)
           Single_Student_Screen.page(
-              studentid: appStateManager.studentIdSelected),
+              studentid: appStateManager.studentIdSelected, user: user.center),
         if (authmanager.isLoggedIn &&
             // appStateManager.communicateStudents &&
             appStateManager.singleStudentFromHome)
           Single_Student_Screen.page(
-              studentid: appStateManager.studentIdSelected),
+              studentid: appStateManager.studentIdSelected, user: user.center),
         if (authmanager.isLoggedIn &&
             appStateManager.singleStudent &&
             appStateManager.singleStudentAttend)
           Single_Student_attend.page(),
         if (authmanager.isLoggedIn && appStateManager.geteditstudent)
           Student_Register_Screen.page(
-              editStudent: appStateManager.getstudent, edit: true),
+            editStudent: appStateManager.getstudent,
+            edit: true,
+          ),
       ],
     );
   }

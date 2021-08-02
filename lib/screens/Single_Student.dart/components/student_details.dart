@@ -1,6 +1,8 @@
 import 'package:attendance/constants.dart';
 import 'package:attendance/managers/App_State_manager.dart';
+import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/group.dart';
 import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:attendance/screens/Single_Student.dart/components/name_widget.dart';
@@ -11,15 +13,18 @@ import 'contacts_widget.dart';
 
 class Student_details extends StatelessWidget {
   final String? stu_id;
+  final user? myuser;
+  StudentModelSearch? studentProfile;
   Student_details({
     Key? key,
     required this.size,
     this.stu_id,
+    this.myuser,
+    this.studentProfile,
   }) : super(key: key);
 
   final Size size;
 
-  // List<String> teachers_Student = ['عبد المعز', 'احمد محمد'];
   void _modalBottomSheetMenu(
     BuildContext context,
     List<GroupModelSimple> groups,
@@ -109,6 +114,8 @@ class Student_details extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(
+        Provider.of<StudentManager>(context, listen: true).singleStudent!.name);
     return Expanded(
       child: Container(
           child: Consumer<StudentManager>(
@@ -117,10 +124,13 @@ class Student_details extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Name(
-                  title: 'الاسم :',
-                  size: size,
-                  name: studentmanager.singleStudent!.name!),
+              if (myuser != user.student)
+                Name(
+                    title: 'الاسم :',
+                    size: size,
+                    name: studentmanager.singleStudent!.name),
+              if (myuser == user.student)
+                Name(title: 'الاسم :', size: size, name: studentProfile!.name),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 5),
                 child: Padding(
@@ -145,7 +155,9 @@ class Student_details extends StatelessWidget {
                       Container(
                         width: size.width / 3,
                         child: Text(
-                          studentmanager.singleStudent!.phone!,
+                          myuser == user.center
+                              ? studentmanager.singleStudent!.phone!
+                              : studentProfile!.phone!,
                           style: TextStyle(
                               fontSize: 17, fontWeight: FontWeight.bold),
                           maxLines: 1,
@@ -174,7 +186,9 @@ class Student_details extends StatelessWidget {
                     Container(
                       width: size.width / 3,
                       child: Text(
-                        studentmanager.singleStudent!.parentPhone!,
+                        myuser == user.center
+                            ? studentmanager.singleStudent!.parentPhone!
+                            : studentProfile!.parentPhone!,
                         style: TextStyle(
                             fontSize: 17, fontWeight: FontWeight.bold),
                         maxLines: 1,
@@ -189,7 +203,9 @@ class Student_details extends StatelessWidget {
               GestureDetector(
                 onTap: () => _modalBottomSheetMenu(
                   context,
-                  studentmanager.singleStudent!.groups!,
+                  myuser == user.center
+                      ? studentmanager.singleStudent!.groups!
+                      : studentProfile!.groups!,
                 ),
                 child:
                     Name(size: size, name: 'عرض مجموعات الطالب', arrow: true),
@@ -197,25 +213,38 @@ class Student_details extends StatelessWidget {
               Name(
                   title: 'المحافظه :',
                   size: size,
-                  name: studentmanager.singleStudent!.city!.name!),
+                  name: myuser == user.center
+                      ? studentmanager.singleStudent!.city!.name!
+                      : studentProfile!.city!.name!),
               Name(
                 title: 'المدرسه :',
                 size: size,
-                name: studentmanager.singleStudent!.school.toString(),
+                name: myuser == user.center
+                    ? studentmanager.singleStudent!.school.toString()
+                    : studentProfile!.school!.toString(),
               ),
               Name(
                   title: 'الشعبه :',
                   size: size,
-                  name: studentmanager.singleStudent!.studyType.toString()),
+                  name: myuser == user.center
+                      ? studentmanager.singleStudent!.studyType.toString()
+                      : studentProfile!.studyType!.toString()),
               Name(size: size, name: 'السداد'),
               Divider(
                 thickness: 2,
               ),
-              Name(
-                  size: size,
-                  name: studentmanager.singleStudent!.note == null
-                      ? 'لا يوجد ملاحظات'
-                      : studentmanager.singleStudent!.note.toString()),
+              if (myuser == user.center)
+                Name(
+                    size: size,
+                    name: studentmanager.singleStudent!.note == null
+                        ? 'لا يوجد ملاحظات'
+                        : studentmanager.singleStudent!.note.toString()),
+              if (myuser == user.student)
+                Name(
+                    size: size,
+                    name: studentProfile!.note == null
+                        ? 'لا يوجد ملاحظات'
+                        : studentProfile!.note.toString()),
             ],
           ),
         ),
