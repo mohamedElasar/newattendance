@@ -1,21 +1,34 @@
+import 'package:attendance/managers/Student_manager.dart';
+import 'package:attendance/models/attendgroupstudent.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/Single_Student.dart/components/student_pic_name.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants.dart';
 import 'components/table_head_2.dart';
 
 class Single_Student_attend extends StatelessWidget {
-  static MaterialPage page() {
+  final String? stId;
+  final String? grId;
+
+  static MaterialPage page({String? studentid, String? groupid}) {
     return MaterialPage(
       name: Attendance_Screens.single_student_attend,
       key: ValueKey(Attendance_Screens.single_student_attend),
-      child: const Single_Student_attend(),
+      child: Single_Student_attend(
+        grId: groupid!,
+        stId: studentid!,
+      ),
     );
   }
 
-  const Single_Student_attend({Key? key}) : super(key: key);
+  const Single_Student_attend({Key? key, this.stId, this.grId})
+      : super(key: key);
 
   Widget build(BuildContext context) {
+    print(grId);
+    print(stId);
+    print(grId);
     final size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
@@ -45,60 +58,78 @@ class Single_Student_attend extends StatelessWidget {
         ),
         resizeToAvoidBottomInset: false,
         // backgroundColor: kbackgroundColor2,
-        body: (Column(
-          children: [
-            Student_pic_name(),
-            SizedBox(height: 5),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        body: (FutureBuilder<AttendGroupStudentModel>(
+          future: Provider.of<StudentManager>(context, listen: false)
+              .getAttendanceStudent(grId!, stId!),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.hasData) {
+              return Column(
                 children: [
-                  Text(
-                    'اسم الماده',
-                    style: TextStyle(fontFamily: 'GE-medium'),
+                  Student_pic_name(),
+                  SizedBox(height: 5),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    width: double.infinity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Text(
+                        //   'اسم الماده',
+                        //   style: TextStyle(fontFamily: 'GE-medium'),
+                        // ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          ' المدرس:  ${snapshot.data!.teacher!.name!}',
+                          style: TextStyle(fontFamily: 'GE-medium'),
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          ' المجموعه:  ${snapshot.data!.name!}',
+                          style: TextStyle(fontFamily: 'GE-medium'),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    'اسم المدرس',
-                    style: TextStyle(fontFamily: 'GE-medium'),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    'اسم المجموعه',
-                    style: TextStyle(fontFamily: 'GE-medium'),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: Column(
-                children: [
-                  TABLE_HEAD_2(
-                    size: size,
-                    data: ['الحصه', 'التاريخ', 'الحضور', 'الدرجه'],
+                    height: 20,
                   ),
                   Expanded(
-                    child: ListView.builder(
-                      itemBuilder: (context, index) => TABLE_HEAD_2(
-                        head: false,
-                        size: size,
-                        data: ['1', '14/5', false, '50'],
-                      ),
+                    child: Column(
+                      children: [
+                        TABLE_HEAD_2(
+                          size: size,
+                          data: ['الحصه', 'التاريخ', 'الحضور', 'الدرجه'],
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: snapshot.data!.appointments!.length,
+                            itemBuilder: (context, index) => TABLE_HEAD_2(
+                              myindex: index,
+                              attend: snapshot.data,
+                              head: false,
+                              size: size,
+                              data: ['1', '14/5', true, '50'],
+                            ),
+                          ),
+                        )
+                      ],
                     ),
-                  )
+                  ),
                 ],
-              ),
-            ),
-          ],
+              );
+            }
+            return Container();
+          },
         )),
       ),
     );

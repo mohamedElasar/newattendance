@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/models/StudentModelSimple.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
+import 'package:attendance/models/attendgroupstudent.dart';
 import 'package:attendance/models/group.dart';
 import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:dio/dio.dart';
@@ -353,5 +354,39 @@ class StudentManager extends ChangeNotifier {
   void setSingleStudent(StudentModelSearch st) {
     _singleStudent = st;
     notifyListeners();
+  }
+
+  Future<AttendGroupStudentModel> getAttendanceStudent(
+      String groupid, String stuid) async {
+    // print(_pageNumber);
+    try {
+      var url = Uri.https('development.mrsaidmostafa.com',
+          '/api/groups/$groupid/students/$stuid');
+      // print(_pageNumber);
+      //
+      print(url);
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+
+      final responseData = json.decode(response.body);
+      // print(responseData);
+      dynamic groupstudent = responseData['data'];
+      // print(studentsList[0]);
+      // print(studentsList);
+      // print(StudentModelSearch.fromJson(studentsList[0]));
+
+      AttendGroupStudentModel attendance =
+          AttendGroupStudentModel.fromJson(groupstudent);
+
+      return attendance;
+    } catch (e) {
+      // print(e);
+      throw e;
+    }
   }
 }

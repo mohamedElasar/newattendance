@@ -75,7 +75,8 @@ class Student_details extends StatelessWidget {
                                   onTap: () {
                                     Provider.of<AppStateManager>(context,
                                             listen: false)
-                                        .goToSingleStudentAttend(true);
+                                        .goToSingleStudentAttend(
+                                            true, groups[index].id.toString());
                                   },
                                   child: ListTile(
                                     trailing: Text(

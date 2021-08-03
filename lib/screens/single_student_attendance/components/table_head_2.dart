@@ -1,3 +1,4 @@
+import 'package:attendance/models/attendgroupstudent.dart';
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
@@ -9,11 +10,15 @@ class TABLE_HEAD_2 extends StatelessWidget {
     // required this.color,
     required this.data,
     this.head = true,
+    this.attend,
+    this.myindex,
   }) : super(key: key);
   final size;
   // final Color color;
   final List<dynamic> data;
   final bool head;
+  final int? myindex;
+  final AttendGroupStudentModel? attend;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -46,7 +51,7 @@ class TABLE_HEAD_2 extends StatelessWidget {
               : CELL_Icon(
                   height: 30,
                   width: size.width / 5,
-                  attend: data[2],
+                  attend: attend!.appointments![myindex!].attend!,
                 ),
           CELL_2(
             height: 30,

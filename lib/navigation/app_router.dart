@@ -68,9 +68,6 @@ class AppRouter extends RouterDelegate
 
   @override
   Widget build(BuildContext context) {
-    print('object');
-    print(authmanager.type);
-    print('aaaa');
     return Navigator(
       key: navigatorKey,
       onPopPage: _handlePopPage,
@@ -126,9 +123,12 @@ class AppRouter extends RouterDelegate
           Single_Student_Screen.page(
               studentid: appStateManager.studentIdSelected, user: user.center),
         if (authmanager.isLoggedIn &&
-            appStateManager.singleStudent &&
+            (appStateManager.singleStudent ||
+                appStateManager.singleStudentFromHome) &&
             appStateManager.singleStudentAttend)
-          Single_Student_attend.page(),
+          Single_Student_attend.page(
+              studentid: appStateManager.studentIdSelected,
+              groupid: appStateManager.mysinglegroup),
         if (authmanager.isLoggedIn && appStateManager.geteditstudent)
           Student_Register_Screen.page(
             editStudent: appStateManager.getstudent,
@@ -203,7 +203,7 @@ class AppRouter extends RouterDelegate
       appStateManager.goToSingleStudent(false, StudentModelSearch(), '');
     }
     if (route.settings.name == Attendance_Screens.single_student_attend) {
-      appStateManager.goToSingleStudentAttend(false);
+      appStateManager.goToSingleStudentAttend(false, '');
     }
     if (route.settings.name == Attendance_Screens.groupclasses) {
       appStateManager.goToSinglegroup(false, '', GroupModelSimple());

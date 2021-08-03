@@ -170,7 +170,8 @@ class AppStateManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void goToSingleStudentAttend(bool value) {
+  void goToSingleStudentAttend(bool value, String groupid) {
+    _singlegroupid = groupid;
     _single_student_attend = value;
     notifyListeners();
   }
