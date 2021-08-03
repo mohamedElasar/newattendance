@@ -2,6 +2,7 @@ import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/managers/cities_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
+import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/city.dart';
 import 'package:attendance/models/student.dart';
@@ -38,7 +39,7 @@ class _Register_FormState extends State<Register_Form> {
       return;
     }
     if (_register_data['gender'] == null ||
-        _register_data['language'] == null ||
+        langname == 'اللغه الثانيه' ||
         cityname == 'المحافظه' ||
         _groups_shown.isEmpty) {
       return;
@@ -65,7 +66,7 @@ class _Register_FormState extends State<Register_Form> {
               parentWhatsController.text,
               _register_data['gender'],
               studyTypeController.text,
-              _register_data['language'],
+              langId_selected,
               discountController.text,
               barCodeController.text,
               passwordcontroller.text,
@@ -91,6 +92,7 @@ class _Register_FormState extends State<Register_Form> {
         _register_data['gender'] = null;
         _register_data['language'] = null;
         cityname = 'المحافظه';
+        langname = 'اللغه الثانيه';
         _groups_id = [];
         _groups_shown = [];
       }).then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -119,7 +121,7 @@ class _Register_FormState extends State<Register_Form> {
       return;
     }
     if (_register_data['gender'] == null ||
-        _register_data['language'] == null ||
+        langname == 'اللغه الثانيه' ||
         cityname == 'المحافظه' ||
         _groups_shown.isEmpty) {
       return;
@@ -146,7 +148,7 @@ class _Register_FormState extends State<Register_Form> {
               parentWhatsController.text,
               _register_data['gender'],
               studyTypeController.text,
-              _register_data['language'],
+              langId_selected,
               discountController.text.toString(),
               barCodeController.text,
               passwordcontroller.text,
@@ -221,9 +223,130 @@ class _Register_FormState extends State<Register_Form> {
     'government': null,
   };
   String cityname = 'المحافظه';
+  String langname = 'اللغه الثانيه';
   late String cityId_selected;
+  late String langId_selected;
   List<String> _groups_id = [];
   List<String> _groups_shown = [];
+
+  void _modalBottomSheetMenulang(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+            height: 250.0,
+            color: Colors.transparent,
+            child: Column(
+              children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: kbackgroundColor3,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'اللغه الثانيه',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GE-bold',
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20.0),
+                            topRight: Radius.circular(20.0))),
+                    child: Consumer<SubjectManager>(
+                      builder: (_, subjectmanager, child) {
+                        if (subjectmanager.subjects!.isEmpty) {
+                          if (subjectmanager.loading) {
+                            return Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: CircularProgressIndicator(),
+                            ));
+                          } else if (subjectmanager.error) {
+                            return Center(
+                                child: InkWell(
+                              onTap: () {
+                                subjectmanager.setloading(true);
+                                subjectmanager.seterror(false);
+                                Provider.of<CitiesManager>(context,
+                                        listen: false)
+                                    .getMoreData();
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Text("error please tap to try again"),
+                              ),
+                            ));
+                          }
+                        } else {
+                          return ListView.builder(
+                            controller: _sc3,
+                            itemCount: subjectmanager.subjects!.length +
+                                (subjectmanager.hasmore ? 1 : 0),
+                            itemBuilder: (BuildContext ctxt, int index) {
+                              if (index == subjectmanager.subjects!.length) {
+                                if (subjectmanager.error) {
+                                  return Center(
+                                      child: InkWell(
+                                    onTap: () {
+                                      subjectmanager.setloading(true);
+                                      subjectmanager.seterror(false);
+                                      Provider.of<CitiesManager>(context,
+                                              listen: false)
+                                          .getMoreData();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child:
+                                          Text("error please tap to try again"),
+                                    ),
+                                  ));
+                                } else {
+                                  return Center(
+                                      child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: CircularProgressIndicator(),
+                                  ));
+                                }
+                              }
+
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    langId_selected = subjectmanager
+                                        .subjects![index].id
+                                        .toString();
+                                    langname =
+                                        subjectmanager.subjects![index].name!;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                child: ListTile(
+                                  title: Text(
+                                      subjectmanager.subjects![index].name!),
+                                ),
+                              );
+                            },
+                          );
+                        }
+                        return Container();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
 
   void _modalBottomSheetMenu(BuildContext context) {
     showModalBottomSheet(
@@ -527,6 +650,7 @@ class _Register_FormState extends State<Register_Form> {
   final focus14 = FocusNode();
   ScrollController _sc = new ScrollController();
   ScrollController _sc2 = new ScrollController();
+  ScrollController _sc3 = new ScrollController();
   @override
   void dispose() {
     _isLoading = false;
@@ -620,6 +744,9 @@ class _Register_FormState extends State<Register_Form> {
     if (widget.edit! && widget.student!.gender != 'ذكر')
       _register_data['gender'] = 'أنثي';
     if (widget.edit!) cityname = widget.student!.city!.name.toString();
+    if (widget.edit!) cityId_selected = widget.student!.city!.id.toString();
+    if (widget.edit!) langname = widget.student!.secLang!.name.toString();
+    if (widget.edit!) langId_selected = widget.student!.secLang!.id.toString();
     if (widget.edit!) {
       _groups_id = widget.student!.groups!.map((e) => e.id.toString()).toList();
       _groups_shown =
@@ -633,11 +760,14 @@ class _Register_FormState extends State<Register_Form> {
     Future.delayed(Duration.zero, () async {
       Provider.of<CitiesManager>(context, listen: false).resetlist();
       Provider.of<GroupManager>(context, listen: false).resetlist();
+      Provider.of<SubjectManager>(context, listen: false).resetlist();
       try {
         await Provider.of<CitiesManager>(context, listen: false)
             .getMoreData()
             .then((value) =>
                 Provider.of<GroupManager>(context, listen: false).getMoreData())
+            .then((value) => Provider.of<SubjectManager>(context, listen: false)
+                .getMoreData())
             .then((_) {
           setState(() {
             _isLoading = false;
@@ -657,6 +787,13 @@ class _Register_FormState extends State<Register_Form> {
         () {
           if (_sc2.position.pixels == _sc2.position.maxScrollExtent) {
             Provider.of<GroupManager>(context, listen: false).getMoreData();
+          }
+        },
+      );
+      _sc3.addListener(
+        () {
+          if (_sc3.position.pixels == _sc3.position.maxScrollExtent) {
+            Provider.of<SubjectManager>(context, listen: false).getMoreData();
           }
         },
       );
@@ -1021,51 +1158,82 @@ class _Register_FormState extends State<Register_Form> {
                           focus: focus13),
                       Center(
                         child: Container(
+                          alignment: Alignment.centerRight,
                           width: widget.size.width / 2 * .9,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                alignment: Alignment.centerRight,
-                                width: widget.size.width / 2 * .9,
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Colors.grey),
-                                ),
-                                child: Container(
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton(
-                                      style: TextStyle(
-                                          fontFamily: 'GE-medium',
-                                          color: Colors.black),
-                                      value: _register_data['language'],
-                                      hint: Text('اللغة الثانية'),
-                                      isExpanded: true,
-                                      iconSize: 30,
-                                      onChanged: (newval) {
-                                        setState(() {
-                                          _register_data['language'] =
-                                              newval.toString();
-                                        });
-                                      },
-                                      icon: Icon(Icons.keyboard_arrow_down),
-                                      items: ['ألماني', 'فرنساوي']
-                                          .map((item) => DropdownMenuItem(
-                                                child: Text(item),
-                                                value: item,
-                                              ))
-                                          .toList(),
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: Container(
+                            child: InkWell(
+                              onTap: () => _modalBottomSheetMenulang(context),
+                              child: Container(
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      langname,
+                                      style: TextStyle(fontFamily: 'GE-light'),
                                     ),
-                                  ),
+                                    Spacer(),
+                                    Icon(Icons.keyboard_arrow_down)
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
+
+                      // Center(
+                      //   child: Container(
+                      //     width: widget.size.width / 2 * .9,
+                      //     child: Row(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children: [
+                      //         Container(
+                      //           alignment: Alignment.centerRight,
+                      //           width: widget.size.width / 2 * .9,
+                      //           padding: EdgeInsets.symmetric(horizontal: 20),
+                      //           height: 40,
+                      //           decoration: BoxDecoration(
+                      //             color: Colors.white,
+                      //             borderRadius: BorderRadius.circular(20),
+                      //             border: Border.all(color: Colors.grey),
+                      //           ),
+                      //           child: Container(
+                      //             child: DropdownButtonHideUnderline(
+                      //               child: DropdownButton(
+                      //                 style: TextStyle(
+                      //                     fontFamily: 'GE-medium',
+                      //                     color: Colors.black),
+                      //                 value: _register_data['language'],
+                      //                 hint: Text('اللغة الثانية'),
+                      //                 isExpanded: true,
+                      //                 iconSize: 30,
+                      //                 onChanged: (newval) {
+                      //                   setState(() {
+                      //                     _register_data['language'] =
+                      //                         newval.toString();
+                      //                   });
+                      //                 },
+                      //                 icon: Icon(Icons.keyboard_arrow_down),
+                      //                 items: ['ألماني', 'فرنساوي']
+                      //                     .map((item) => DropdownMenuItem(
+                      //                           child: Text(item),
+                      //                           value: item,
+                      //                         ))
+                      //                     .toList(),
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                   build_edit_field(

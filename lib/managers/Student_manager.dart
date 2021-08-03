@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:attendance/helper/httpexception.dart';
+import 'package:attendance/models/StudentModelSimple.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/group.dart';
 import 'package:attendance/models/groupmodelsimple.dart';
@@ -20,8 +21,10 @@ class StudentManager extends ChangeNotifier {
 
   String? _authToken;
   List<StudentModelSearch> __students = [];
+  List<StudentModelSimple> _studentsSimple = [];
   StudentModelSearch _singleStudent = StudentModelSearch();
   List<StudentModelSearch> get students => __students;
+  List<StudentModelSimple> get studentsSimple => _studentsSimple;
   StudentModelSearch? get singleStudent => _singleStudent;
 
   get hasmore => _hasMore;
@@ -230,7 +233,11 @@ class StudentManager extends ChangeNotifier {
       final responseData = json.decode(response.body);
 
       List<dynamic> studentsList = responseData['data'];
-      var fetchedstudents = studentsList
+      // print(studentsList[0]['groups']);
+      // print(StudentModelSearch.fromJson(studentsList[0]).code);
+      // __students.add(StudentModelSearch.fromJson(studentsList[0]));
+
+      List<StudentModelSearch> fetchedstudents = studentsList
           .map((data) => StudentModelSearch.fromJson(data))
           .toList();
       _hasMore = fetchedstudents.length == _defaultPerPageCount;
@@ -239,6 +246,7 @@ class StudentManager extends ChangeNotifier {
 
       __students.addAll(fetchedstudents);
     } catch (e) {
+      print(e);
       _loading = false;
       _error = true;
       notifyListeners();

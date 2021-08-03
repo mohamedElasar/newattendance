@@ -118,7 +118,9 @@ class _Show_Group_ClassState extends State<Show_Group_Class> {
                     buildChip(widget.mygroup!.name!),
                     buildChip(widget.mygroup!.subject!.name!),
                     // buildChip('مجموعة الياسمين 2'),
-                    buildChip(widget.mygroup!.teacher!.name!),
+                    widget.mygroup!.teacher == null
+                        ? Container()
+                        : buildChip(widget.mygroup!.teacher!.name!),
                   ]),
                 ),
                 SizedBox(

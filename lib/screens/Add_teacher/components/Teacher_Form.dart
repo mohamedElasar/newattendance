@@ -32,6 +32,9 @@ class _Teacher_FormState extends State<Teacher_Form> {
   final focus9 = FocusNode();
   final focus10 = FocusNode();
   final focus11 = FocusNode();
+  final focus12 = FocusNode();
+  final focus13 = FocusNode();
+  final focus14 = FocusNode();
 
   var nameController = TextEditingController();
   var emailController = TextEditingController();
@@ -47,6 +50,10 @@ class _Teacher_FormState extends State<Teacher_Form> {
   var assisAlternativePhoneController = TextEditingController();
   var notesController = TextEditingController();
   var experienceController = TextEditingController();
+
+  var assistantnamecontroller = TextEditingController();
+  var assistantemailcontroller = TextEditingController();
+  var assistantpasscontrooller = TextEditingController();
 
   @override
   void dispose() {
@@ -65,6 +72,10 @@ class _Teacher_FormState extends State<Teacher_Form> {
     assisAlternativePhoneController.dispose();
     notesController.dispose();
     experienceController.dispose();
+    assistantnamecontroller.dispose();
+    assistantemailcontroller.dispose();
+    assistantpasscontrooller.dispose();
+
     focus1.dispose();
     focus2.dispose();
     focus3.dispose();
@@ -111,21 +122,23 @@ class _Teacher_FormState extends State<Teacher_Form> {
     try {
       await Provider.of<TeacherManager>(context, listen: false)
           .add_teacher(
-        nameController.text,
-        phoneController.text,
-        emailController.text,
-        alternativePhoneController.text,
-        pass1Controller.text,
-        pass2Controller.text,
-        assistantphoneController.text,
-        assisAlternativePhoneController.text,
-        schoolController.text,
-        experienceController.text,
-        notesController.text,
-        subjectId_selected,
-        _years_ids,
-        cityId_selected,
-      )
+              nameController.text,
+              phoneController.text,
+              emailController.text,
+              alternativePhoneController.text,
+              pass1Controller.text,
+              pass2Controller.text,
+              assistantphoneController.text,
+              assisAlternativePhoneController.text,
+              schoolController.text,
+              experienceController.text,
+              notesController.text,
+              subjectId_selected,
+              _years_ids,
+              cityId_selected,
+              assistantemailcontroller.text,
+              assistantpasscontrooller.text,
+              assistantnamecontroller.text)
           .then((_) {
         _formKey.currentState?.reset();
         nameController.text = '';
@@ -142,6 +155,9 @@ class _Teacher_FormState extends State<Teacher_Form> {
         assisAlternativePhoneController.text = '';
         notesController.text = '';
         experienceController.text = '';
+        assistantemailcontroller.text = '';
+        assistantpasscontrooller.text = '';
+        assistantnamecontroller.text = '';
         subjectname = 'الماده';
         cityname = 'المحافظه';
         subjectId_selected = '';
@@ -680,12 +696,28 @@ class _Teacher_FormState extends State<Teacher_Form> {
                     focus: focus3,
                   ),
                   build_edit_field(
-                    item: 'password2',
-                    hint: 'confirm password',
-                    controller: pass2Controller,
+                    item: 'assistant_name',
+                    hint: 'اسم المساعد ',
+                    controller: assistantnamecontroller,
                     inputType: TextInputType.name,
                     validate: (value) {},
-                    focus: focus4,
+                    focus: focus12,
+                  ),
+                  build_edit_field(
+                    item: 'assitant_password',
+                    hint: 'Assistant email',
+                    controller: assistantemailcontroller,
+                    inputType: TextInputType.name,
+                    validate: (value) {},
+                    focus: focus13,
+                  ),
+                  build_edit_field(
+                    item: 'password2',
+                    hint: 'Assistant Password',
+                    controller: assistantpasscontrooller,
+                    inputType: TextInputType.name,
+                    validate: (value) {},
+                    focus: focus14,
                   ),
                   Center(
                     child: Container(

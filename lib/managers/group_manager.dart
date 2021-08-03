@@ -162,6 +162,7 @@ class GroupManager extends ChangeNotifier {
 
       _groups.addAll(fetchedgroups);
     } catch (e) {
+      print(e);
       _loading = false;
       _error = true;
       notifyListeners();

@@ -38,7 +38,9 @@ class _Rows_BuilderState extends State<Rows_Builder> {
             _isLoading = false;
           });
         });
-      } catch (e) {}
+      } catch (e) {
+        print(e);
+      }
       if (!mounted) return;
 
       _sc.addListener(() {
@@ -59,7 +61,7 @@ class _Rows_BuilderState extends State<Rows_Builder> {
 
   @override
   Widget build(BuildContext context) {
-    print(Provider.of<StudentManager>(context, listen: false).students);
+    print(Provider.of<StudentManager>(context, listen: false).studentsSimple);
     return Expanded(
         child: _isLoading
             ? Center(

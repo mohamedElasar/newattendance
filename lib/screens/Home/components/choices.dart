@@ -1,3 +1,4 @@
+import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Appointment_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
@@ -787,6 +788,12 @@ class _ChoicesState extends State<Choices> {
                                     group_level = true;
                                   }))
                               .then((value) => setState(() {
+                                    app_id_selected =
+                                        Provider.of<AppointmentManager>(context,
+                                                listen: false)
+                                            .currentapp!
+                                            .id
+                                            .toString();
                                     app_name = [
                                       Provider.of<AppointmentManager>(context,
                                               listen: false)
@@ -1182,25 +1189,44 @@ class _ChoicesState extends State<Choices> {
                       setState(() {
                         _loadingscann = true;
                       });
-                      String res = await FlutterBarcodeScanner.scanBarcode(
-                          '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+                      // String res = await FlutterBarcodeScanner.scanBarcode(
+                      //     '#ff6666', 'Cancel', true, ScanMode.BARCODE);
                       try {
-                        await Provider.of<AppointmentManager>(context,
+                        String res = await FlutterBarcodeScanner.scanBarcode(
+                            '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+                        print(app_id_selected);
+                        print(res);
+                        dynamic resp = await Provider.of<AppointmentManager>(
+                                context,
                                 listen: false)
-                            .attendlesson(app_id_selected, res, app_id_selected)
-                            .then(
-                              (value) =>
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  backgroundColor: Colors.green[300],
-                                  content: Text(
-                                    'تم تسجيل حضور الطالب بنجاح',
-                                    style: TextStyle(fontFamily: 'GE-medium'),
-                                  ),
-                                  duration: Duration(seconds: 3),
-                                ),
+                            .attendlesson(res, app_id_selected);
+
+                        if (resp['last_appointment_attend'] == false) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.orange[200],
+                              content: Text(
+                                ' تم التسجيل بنجاح والحصه السابقه لم يحضرها',
+                                style: TextStyle(fontFamily: 'GE-medium'),
                               ),
-                            );
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                        if (resp['last_appointment_attend'] == true) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.green[300],
+                              content: Text(
+                                ' تم التسجيل بنجاح',
+                                style: TextStyle(fontFamily: 'GE-medium'),
+                              ),
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      } on HttpException catch (e) {
+                        _showErrorDialog(e.toString(), 'حدث خطأ');
                       } catch (e) {
                         _showErrorDialog('حاول مره اخري', 'حدث خطأ');
                       }
@@ -1215,7 +1241,7 @@ class _ChoicesState extends State<Choices> {
                   //     _showErrorDialog(app_id_selected, scanResult_code))
                   : null,
               child: Scan_button(
-                active: app_name != 'الحصه' || !_loadingscann,
+                active: app_name != 'الحصه' && _loadingscann == false,
               ),
             ),
           )
@@ -1225,28 +1251,19 @@ class _ChoicesState extends State<Choices> {
   }
 
   Future<void> scanBarcodeNormal() async {
-    String barcodeScanRes;
-    // Platform messages may fail, so we use a try/catch PlatformException.
+    late String barcodeScanRes;
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
           '#ff6666', 'Cancel', true, ScanMode.BARCODE);
-      print(barcodeScanRes);
     } on PlatformException {
-      barcodeScanRes = 'حدث خطأ حاول مره اخري ';
       _showErrorDialog('حاول مره اخري', 'حدث خطا');
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
       scanResult_code = barcodeScanRes;
     });
-    // setState(() {
-    //   _scanBarcode = barcodeScanRes;
-    // });
   }
 
   Future scanBarcode() async {
@@ -1332,7 +1349,7 @@ class Choice_container extends StatelessWidget {
                         softWrap: false,
                         style: TextStyle(
                             fontFamily: 'AraHamah1964B-Bold',
-                            fontSize: 30,
+                            fontSize: 25,
                             color: active ? Colors.black : Colors.black26),
                       ),
                     ),
@@ -1385,7 +1402,7 @@ class Button_Container extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
                 style:
-                    TextStyle(fontFamily: 'AraHamah1964B-Bold', fontSize: 30),
+                    TextStyle(fontFamily: 'AraHamah1964B-Bold', fontSize: 25),
               ),
             ),
           ],

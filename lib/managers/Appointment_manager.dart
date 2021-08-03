@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:attendance/helper/httpexception.dart';
 
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/models/StudentModelSimple.dart';
@@ -164,26 +165,34 @@ class AppointmentManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> attendlesson(
-      String groupid, String code, String lessonid) async {
+  Future<dynamic> attendlesson(String code, String lessonid) async {
     var url = Uri.https(
-        'development.mrsaidmostafa.com', '/api/attend/appointments/$groupid');
-    print(url);
-    print(code);
-    print(lessonid);
-    print(groupid);
+        'development.mrsaidmostafa.com', '/api/attend/appointments/$lessonid');
+    // print(url);
+    // print(code);
+    // print(lessonid);
+    // print(groupid);
     try {
       var response = await http.post(url, headers: {
         'Accept': 'application/json',
         HttpHeaders.authorizationHeader: 'Bearer $authToken'
       }, body: {
         'code': code,
-        'appointment_id': lessonid,
-        // 'compensation_id': compensation_id
       });
       final responseData = json.decode(response.body);
-      print(responseData);
+      // print(code);
+      // print(code);
+      // print(code);
+      print(code);
+      print(lessonid);
 
+      if (responseData['errors'] != null) {
+        // print(responseData['errors']);
+        List<String> errors = [];
+        for (var value in responseData['errors'].values) errors.add(value[0]);
+        throw HttpException(errors.join('  '));
+      }
+      return responseData;
       // return (responseData);
 
       // add exception

@@ -122,9 +122,12 @@ class _Show_GroupState extends State<Show_Group> {
                                         color: colors[Index % colors.length],
                                         child: ListTile(
                                           trailing: Text(
-                                            groupManager.groups[Index].teacher!
-                                                    .name ??
-                                                '',
+                                            groupManager.groups[Index]
+                                                        .teacher ==
+                                                    null
+                                                ? ''
+                                                : groupManager.groups[Index]
+                                                    .teacher!.name!,
                                             style: TextStyle(
                                                 color: text_colors[
                                                     Index % colors.length],

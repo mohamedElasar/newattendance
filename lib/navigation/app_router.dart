@@ -76,7 +76,7 @@ class AppRouter extends RouterDelegate
       onPopPage: _handlePopPage,
       pages: [
         if (!authmanager.isLoggedIn) Admin_logIn.page(),
-        if (authmanager.isLoggedIn && authmanager.type == user.center)
+        if (authmanager.isLoggedIn && authmanager.type != user.student)
           Home_Screen.page(),
         if (authmanager.isLoggedIn && authmanager.type == user.student)
           Single_Student_Screen.page(

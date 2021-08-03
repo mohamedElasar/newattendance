@@ -1,3 +1,4 @@
+import 'package:attendance/models/simpleteacher.dart';
 import 'package:attendance/models/subject.dart';
 import 'package:attendance/models/teacher.dart';
 import 'package:attendance/models/year.dart';
@@ -6,7 +7,7 @@ class GroupModelSimple {
   int? id;
   String? name;
   YearModel? year;
-  TeacherModel? teacher;
+  SimpleTeacher? teacher;
   SubjectModel? subject;
   List<dynamic>? time;
   List<dynamic>? day;
@@ -34,7 +35,7 @@ class GroupModelSimple {
         ? new SubjectModel.fromJson(json['subject'])
         : null;
     teacher = json['teacher'] != null
-        ? new TeacherModel.fromJson(json['teacher'])
+        ? new SimpleTeacher.fromJson(json['teacher'])
         : null;
     // appointments = List<AppointmentModel>.from(
     //   json['appointments'].map(

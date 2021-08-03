@@ -48,13 +48,15 @@ class Auth_manager extends ChangeNotifier {
       _userPhone = responseData['data']['phone'];
       _name = responseData['data']['name'];
       _type = responseData['data']['type'];
-      // print(_type);
+      print(_type);
+      print(_type);
+      print(_type);
 
       if (_type == 'student') {
         _studentUser = StudentModelSearch.fromJson(responseData['data']);
       }
     } catch (error) {
-      // print(error);
+      print(error);
       throw (error);
     }
 
@@ -63,18 +65,34 @@ class Auth_manager extends ChangeNotifier {
 
   Future<void> rememberMe() async {
     final prefs = await SharedPreferences.getInstance();
-    final userData = json.encode(
-      {
-        'token': token,
-        'userId': _userId,
-        'userEmail': _userEmail,
-        'userPhone': _userPhone,
-        'name': _name,
-        'type': _type,
-        'student': _studentUser!.toJson()
-      },
-    );
-    prefs.setString('userData', userData);
+    if (_type == 'student') {
+      final userData = json.encode(
+        {
+          'token': token,
+          'userId': _userId,
+          'userEmail': _userEmail,
+          'userPhone': _userPhone,
+          'name': _name,
+          'type': _type,
+          'student': _studentUser!.toJson()
+        },
+      );
+      prefs.setString('userData', userData);
+    }
+    if (_type == 'center') {
+      final userData = json.encode(
+        {
+          'token': token,
+          'userId': _userId,
+          'userEmail': _userEmail,
+          'userPhone': _userPhone,
+          'name': _name,
+          'type': _type,
+          // 'student': _studentUser!.toJson()
+        },
+      );
+      prefs.setString('userData', userData);
+    }
   }
 
   void logout() async {
@@ -94,16 +112,31 @@ class Auth_manager extends ChangeNotifier {
     if (!prefs.containsKey('userData')) {
       return false;
     }
-    final extractedData = prefs.getString('userData');
+    if (_type == 'student') {
+      final extractedData = prefs.getString('userData');
 
-    final data = (json.decode(extractedData!));
-    token = data['token'];
-    _userId = data['userId'];
-    _userPhone = data['userPhone'];
-    _userEmail = data['userEmail'];
-    _name = data['name'];
-    _type = data['type'];
-    _studentUser = StudentModelSearch.fromJson(data['student']);
+      final data = (json.decode(extractedData!));
+      token = data['token'];
+      _userId = data['userId'];
+      _userPhone = data['userPhone'];
+      _userEmail = data['userEmail'];
+      _name = data['name'];
+      _type = data['type'];
+      _studentUser = StudentModelSearch.fromJson(data['student']);
+    }
+    if (_type == 'center') {
+      final extractedData = prefs.getString('userData');
+
+      final data = (json.decode(extractedData!));
+      token = data['token'];
+      _userId = data['userId'];
+      _userPhone = data['userPhone'];
+      _userEmail = data['userEmail'];
+      _name = data['name'];
+      _type = data['type'];
+      // _studentUser = StudentModelSearch.fromJson(data['student']);
+    }
+
     notifyListeners();
     return true;
   }
