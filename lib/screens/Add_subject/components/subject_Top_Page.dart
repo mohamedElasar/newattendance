@@ -16,10 +16,11 @@ class Subject_Top_Page extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(
-            Icons.menu,
-            size: 30,
-          ),
+          Container(),
+          // Icon(
+          //   Icons.menu,
+          //   size: 30,
+          // ),
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -34,7 +35,8 @@ class Subject_Top_Page extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
-              Provider.of<AppStateManager>(context, listen: false).go_to_Home();
+              Provider.of<AppStateManager>(context, listen: false)
+                  .modifySubjects(false);
             },
             child: RotatedBox(
               quarterTurns: 2,

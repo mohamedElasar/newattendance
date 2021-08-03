@@ -1,5 +1,6 @@
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,7 @@ class Rows_Builder extends StatefulWidget {
 }
 
 class _Rows_BuilderState extends State<Rows_Builder> {
-  void _tapFnc(StudentModel student, String id) {
+  void _tapFnc(StudentModelSearch student, String id) {
     Provider.of<AppStateManager>(context, listen: false)
         .goToSingleStudent(true, student, id);
   }
@@ -37,7 +38,9 @@ class _Rows_BuilderState extends State<Rows_Builder> {
             _isLoading = false;
           });
         });
-      } catch (e) {}
+      } catch (e) {
+        print(e);
+      }
       if (!mounted) return;
 
       _sc.addListener(() {
@@ -58,7 +61,7 @@ class _Rows_BuilderState extends State<Rows_Builder> {
 
   @override
   Widget build(BuildContext context) {
-    print(Provider.of<StudentManager>(context, listen: false).students);
+    print(Provider.of<StudentManager>(context, listen: false).studentsSimple);
     return Expanded(
         child: _isLoading
             ? Center(
@@ -73,8 +76,8 @@ class _Rows_BuilderState extends State<Rows_Builder> {
                       child: TABLE_ROW(
                           size: widget.size,
                           name: studentmanager.students[index].name!,
-                          id: studentmanager.students[index].code!.name
-                              .toString(),
+                          id: studentmanager.students[index].code?.name ??
+                              ''.toString(),
                           mobile: studentmanager.students[index].phone!,
                           check: studentmanager.students[index].choosen!,
                           myfnc: () {

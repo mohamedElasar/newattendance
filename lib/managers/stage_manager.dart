@@ -5,7 +5,6 @@ import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/models/stage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:attendance/models/year.dart';
 
 class StageManager extends ChangeNotifier {
   void receiveToken(Auth_manager auth, List<Stage> stages) {

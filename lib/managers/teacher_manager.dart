@@ -45,6 +45,9 @@ class TeacherManager extends ChangeNotifier {
     String? subject,
     List<String>? years,
     String? cityId,
+    String? assiemail,
+    String? assispass,
+    String? assisname,
   ) async {
     try {
       Dio dio = Dio();
@@ -64,6 +67,9 @@ class TeacherManager extends ChangeNotifier {
         'subject_id': subject,
         'years': years,
         'city_id': cityId,
+        'assistant_email': assiemail,
+        'assistant_password': assispass,
+        'assistant_name': assisname,
       };
       dio.options.headers["Authorization"] = 'Bearer $_authToken';
       dio.options.headers["Accept"] = 'application/json';

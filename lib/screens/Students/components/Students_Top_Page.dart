@@ -3,6 +3,7 @@ import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/managers/stage_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,15 +29,15 @@ class Student_Top_Page extends StatelessWidget {
           Row(
             children: [
               //test
-              InkWell(
-                onTap: () {
-                  Provider.of<Auth_manager>(context, listen: false).logout();
-                },
-                child: Icon(
-                  Icons.menu,
-                  size: 30,
-                ),
-              ),
+              // InkWell(
+              //   onTap: () {
+              //     Provider.of<Auth_manager>(context, listen: false).logout();
+              //   },
+              //   child: Icon(
+              //     Icons.menu,
+              //     size: 30,
+              //   ),
+              // ),
               SizedBox(width: 10),
               Expanded(
                 child: Container(
@@ -126,7 +127,7 @@ class StudentSearch extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) =>
-      FutureBuilder<List<StudentModel>>(
+      FutureBuilder<List<StudentModelSearch>>(
         future: Provider.of<StudentManager>(context, listen: false)
             .searchStudent(query),
         builder: (context, snapshot) {
@@ -154,7 +155,7 @@ class StudentSearch extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) => Container(
         // color: Colors.black,
-        child: FutureBuilder<List<StudentModel>>(
+        child: FutureBuilder<List<StudentModelSearch>>(
           future: Provider.of<StudentManager>(context, listen: false)
               .searchStudent(query),
           builder: (context, snapshot) {
@@ -182,7 +183,7 @@ class StudentSearch extends SearchDelegate<String> {
         ),
       );
 
-  Widget buildSuggestionsSuccess(List<StudentModel>? suggestions) =>
+  Widget buildSuggestionsSuccess(List<StudentModelSearch>? suggestions) =>
       ListView.builder(
         itemCount: suggestions!.length,
         itemBuilder: (context, index) {
@@ -240,7 +241,7 @@ class StudentSearch extends SearchDelegate<String> {
         },
       );
 
-  Widget buildResultSuccess(StudentModel student) => Container(
+  Widget buildResultSuccess(StudentModelSearch student) => Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF3279e2), Colors.purple],

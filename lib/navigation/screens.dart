@@ -11,4 +11,7 @@ class Attendance_Screens {
   static String single_student_attend = '/single_student_group';
   static String subjects_add = '/subjects_add';
   static String years_add = '/years_add';
+  static String groupcheck = '/groupcheck';
+  static String groupclasses = '/groupclasses';
+  static String classattend = '/classattend';
 }

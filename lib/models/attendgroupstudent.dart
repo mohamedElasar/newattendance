@@ -1,45 +1,43 @@
-import 'package:attendance/models/appointment.dart';
-import 'package:attendance/models/subject.dart';
-import 'package:attendance/models/teacher.dart';
+import 'package:attendance/models/teacherSimple.dart';
 import 'package:attendance/models/year.dart';
+import 'package:attendance/models/appointmentSimple.dart';
 
-class GroupModel {
+class AttendGroupStudentModel {
   int? id;
   String? name;
   YearModel? year;
-  TeacherModel? teacher;
-  SubjectModel? subject;
+  TeacherModelSimple? teacher;
   List<dynamic>? time;
   List<dynamic>? day;
   bool? choosen;
-  List<AppointmentModel>? appointments;
+  List<AppointmentModelSimple>? appointments;
 
-  GroupModel(
+  AttendGroupStudentModel(
       {this.id,
       this.year,
       this.teacher,
       this.day,
       this.time,
       this.name,
-      this.subject,
+      // this.subject,
       this.appointments,
       this.choosen = false});
 
-  GroupModel.fromJson(Map<String, dynamic> json) {
+  AttendGroupStudentModel.fromJson(Map<String, dynamic> json) {
     choosen = false;
 
     id = json['id'];
     name = json['name'];
     year = json['year'] != null ? new YearModel.fromJson(json['year']) : null;
-    subject = json['subject'] != null
-        ? new SubjectModel.fromJson(json['subject'])
-        : null;
+    // subject = json['subject'] != null
+    //     ? new SubjectModel.fromJson(json['subject'])
+    //     : null;
     teacher = json['teacher'] != null
-        ? new TeacherModel.fromJson(json['teacher'])
+        ? new TeacherModelSimple.fromJson(json['teacher'])
         : null;
-    appointments = List<AppointmentModel>.from(
+    appointments = List<AppointmentModelSimple>.from(
       json['appointments'].map(
-        (model) => AppointmentModel.fromJson(model),
+        (model) => AppointmentModelSimple.fromJson(model),
       ),
     );
 
@@ -68,9 +66,9 @@ class GroupModel {
     if (this.year != null) {
       data['year'] = this.year!.toJson();
     }
-    if (this.subject != null) {
-      data['subject'] = this.subject!.toJson();
-    }
+    // if (this.subject != null) {
+    //   data['subject'] = this.subject!.toJson();
+    // }
     if (this.teacher != null) {
       data['teacher'] = this.teacher!.toJson();
     }

@@ -1,17 +1,14 @@
-import 'package:attendance/managers/App_State_manager.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/student.dart';
 import 'package:attendance/navigation/screens.dart';
-import 'package:attendance/screens/Admin_Login/components/Login_Form.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../constants.dart';
 import 'components/Register_form.dart';
-import 'components/title_with_register.dart';
 
 class Student_Register_Screen extends StatelessWidget {
-  final StudentModel? myStudent;
+  final StudentModelSearch? myStudent;
   final bool? myedit;
-  static MaterialPage page({required StudentModel editStudent, required edit}) {
+  static MaterialPage page(
+      {required StudentModelSearch editStudent, required edit}) {
     return MaterialPage(
       name: Attendance_Screens.student_registerpath,
       key: ValueKey(Attendance_Screens.student_registerpath),
@@ -44,25 +41,29 @@ class Student_Register_Screen extends StatelessWidget {
             SizedBox(
               width: 30,
             ),
-            InkWell(
-              onTap: () {
-                Provider.of<AppStateManager>(context, listen: false)
-                    .go_to_Home();
-              },
-              child: RotatedBox(
-                quarterTurns: 2,
-                child: Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
+            Container(
+              padding: EdgeInsets.all(8),
+              child: InkWell(
+                onTap: () {
+                  // Provider.of<AppStateManager>(context, listen: false)
+                  //     .go_to_Home();
+                  Navigator.pop(context);
+                },
+                child: RotatedBox(
+                  quarterTurns: 2,
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             )
           ],
           elevation: 0,
-          leading: Icon(
-            Icons.menu,
-            color: Colors.black,
-          ),
+          // leading: Icon(
+          //   Icons.menu,
+          //   color: Colors.black,
+          // ),
           backgroundColor: Colors.white,
         ),
         backgroundColor: Colors.grey[300],

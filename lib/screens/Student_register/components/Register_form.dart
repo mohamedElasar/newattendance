@@ -2,10 +2,13 @@ import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/managers/cities_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
+import 'package:attendance/managers/subject_manager.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/city.dart';
 import 'package:attendance/models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants.dart';
@@ -22,7 +25,7 @@ class Register_Form extends StatefulWidget {
 
   final Size size;
   final bool? edit;
-  final StudentModel? student;
+  final StudentModelSearch? student;
 
   @override
   _Register_FormState createState() => _Register_FormState();
@@ -36,7 +39,7 @@ class _Register_FormState extends State<Register_Form> {
       return;
     }
     if (_register_data['gender'] == null ||
-        _register_data['language'] == null ||
+        langname == 'اللغه الثانيه' ||
         cityname == 'المحافظه' ||
         _groups_shown.isEmpty) {
       return;
@@ -63,7 +66,7 @@ class _Register_FormState extends State<Register_Form> {
               parentWhatsController.text,
               _register_data['gender'],
               studyTypeController.text,
-              _register_data['language'],
+              langId_selected,
               discountController.text,
               barCodeController.text,
               passwordcontroller.text,
@@ -89,12 +92,79 @@ class _Register_FormState extends State<Register_Form> {
         _register_data['gender'] = null;
         _register_data['language'] = null;
         cityname = 'المحافظه';
+        langname = 'اللغه الثانيه';
         _groups_id = [];
         _groups_shown = [];
       }).then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 backgroundColor: Colors.green[300],
                 content: Text(
                   'تم اضافه الطالب بنجاح',
+                  style: TextStyle(fontFamily: 'GE-medium'),
+                ),
+                duration: Duration(seconds: 3),
+              )));
+    } on HttpException catch (error) {
+      _showErrorDialog(error.toString());
+    } catch (error) {
+      print(error);
+      const errorMessage = 'حاول مره اخري';
+      _showErrorDialog(errorMessage);
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void _modify() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+    if (_register_data['gender'] == null ||
+        langname == 'اللغه الثانيه' ||
+        cityname == 'المحافظه' ||
+        _groups_shown.isEmpty) {
+      return;
+    }
+    _formKey.currentState!.save();
+    // print('asdasdasd');
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await Provider.of<StudentManager>(context, listen: false)
+          .modify_student(
+              widget.student!.id.toString(),
+              nameController.text,
+              emailController.text,
+              phonecontroller.text,
+              schoolController.text,
+              notesController.text,
+              cityId_selected,
+              _groups_id,
+              parentNameController.text,
+              relationController.text,
+              parentphoneController.text,
+              parentWhatsController.text,
+              _register_data['gender'],
+              studyTypeController.text,
+              langId_selected,
+              discountController.text.toString(),
+              barCodeController.text,
+              passwordcontroller.text,
+              confirmpasswordController.text)
+          .then(
+            (value) => Provider.of<StudentManager>(context, listen: false)
+              ..getMoreDatafilteredId(
+                widget.student!.id.toString(),
+              ),
+          )
+          .then((_) {
+        Navigator.pop(context);
+      }).then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Colors.green[300],
+                content: Text(
+                  'تم تعديل الطالب بنجاح',
                   style: TextStyle(fontFamily: 'GE-medium'),
                 ),
                 duration: Duration(seconds: 3),
@@ -153,9 +223,130 @@ class _Register_FormState extends State<Register_Form> {
     'government': null,
   };
   String cityname = 'المحافظه';
+  String langname = 'اللغه الثانيه';
   late String cityId_selected;
+  late String langId_selected;
   List<String> _groups_id = [];
   List<String> _groups_shown = [];
+
+  void _modalBottomSheetMenulang(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+            height: 250.0,
+            color: Colors.transparent,
+            child: Column(
+              children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: kbackgroundColor3,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'اللغه الثانيه',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GE-bold',
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20.0),
+                            topRight: Radius.circular(20.0))),
+                    child: Consumer<SubjectManager>(
+                      builder: (_, subjectmanager, child) {
+                        if (subjectmanager.subjects!.isEmpty) {
+                          if (subjectmanager.loading) {
+                            return Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: CircularProgressIndicator(),
+                            ));
+                          } else if (subjectmanager.error) {
+                            return Center(
+                                child: InkWell(
+                              onTap: () {
+                                subjectmanager.setloading(true);
+                                subjectmanager.seterror(false);
+                                Provider.of<CitiesManager>(context,
+                                        listen: false)
+                                    .getMoreData();
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Text("error please tap to try again"),
+                              ),
+                            ));
+                          }
+                        } else {
+                          return ListView.builder(
+                            controller: _sc3,
+                            itemCount: subjectmanager.subjects!.length +
+                                (subjectmanager.hasmore ? 1 : 0),
+                            itemBuilder: (BuildContext ctxt, int index) {
+                              if (index == subjectmanager.subjects!.length) {
+                                if (subjectmanager.error) {
+                                  return Center(
+                                      child: InkWell(
+                                    onTap: () {
+                                      subjectmanager.setloading(true);
+                                      subjectmanager.seterror(false);
+                                      Provider.of<CitiesManager>(context,
+                                              listen: false)
+                                          .getMoreData();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child:
+                                          Text("error please tap to try again"),
+                                    ),
+                                  ));
+                                } else {
+                                  return Center(
+                                      child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: CircularProgressIndicator(),
+                                  ));
+                                }
+                              }
+
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    langId_selected = subjectmanager
+                                        .subjects![index].id
+                                        .toString();
+                                    langname =
+                                        subjectmanager.subjects![index].name!;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                child: ListTile(
+                                  title: Text(
+                                      subjectmanager.subjects![index].name!),
+                                ),
+                              );
+                            },
+                          );
+                        }
+                        return Container();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
 
   void _modalBottomSheetMenu(BuildContext context) {
     showModalBottomSheet(
@@ -459,6 +650,7 @@ class _Register_FormState extends State<Register_Form> {
   final focus14 = FocusNode();
   ScrollController _sc = new ScrollController();
   ScrollController _sc2 = new ScrollController();
+  ScrollController _sc3 = new ScrollController();
   @override
   void dispose() {
     _isLoading = false;
@@ -523,7 +715,7 @@ class _Register_FormState extends State<Register_Form> {
         ? schoolController.text = widget.student!.school ?? ''
         : schoolController.text = '';
     widget.edit!
-        ? barCodeController.text = widget.student!.code!.name.toString()
+        ? barCodeController.text = widget.student!.code!.name ?? ''
         : barCodeController.text = '';
     widget.edit!
         ? discountController.text = widget.student!.discount ?? ''
@@ -540,6 +732,9 @@ class _Register_FormState extends State<Register_Form> {
     widget.edit!
         ? phonecontroller.text = widget.student!.phone!
         : phonecontroller.text = '';
+    widget.edit!
+        ? cityId_selected = widget.student!.city!.id!.toString()
+        : cityId_selected = '';
 
     widget.edit!
         ? parentphoneController.text = widget.student!.parentPhone ?? ''
@@ -549,6 +744,9 @@ class _Register_FormState extends State<Register_Form> {
     if (widget.edit! && widget.student!.gender != 'ذكر')
       _register_data['gender'] = 'أنثي';
     if (widget.edit!) cityname = widget.student!.city!.name.toString();
+    if (widget.edit!) cityId_selected = widget.student!.city!.id.toString();
+    if (widget.edit!) langname = widget.student!.secLang!.name.toString();
+    if (widget.edit!) langId_selected = widget.student!.secLang!.id.toString();
     if (widget.edit!) {
       _groups_id = widget.student!.groups!.map((e) => e.id.toString()).toList();
       _groups_shown =
@@ -562,11 +760,14 @@ class _Register_FormState extends State<Register_Form> {
     Future.delayed(Duration.zero, () async {
       Provider.of<CitiesManager>(context, listen: false).resetlist();
       Provider.of<GroupManager>(context, listen: false).resetlist();
+      Provider.of<SubjectManager>(context, listen: false).resetlist();
       try {
         await Provider.of<CitiesManager>(context, listen: false)
             .getMoreData()
             .then((value) =>
                 Provider.of<GroupManager>(context, listen: false).getMoreData())
+            .then((value) => Provider.of<SubjectManager>(context, listen: false)
+                .getMoreData())
             .then((_) {
           setState(() {
             _isLoading = false;
@@ -586,6 +787,13 @@ class _Register_FormState extends State<Register_Form> {
         () {
           if (_sc2.position.pixels == _sc2.position.maxScrollExtent) {
             Provider.of<GroupManager>(context, listen: false).getMoreData();
+          }
+        },
+      );
+      _sc3.addListener(
+        () {
+          if (_sc3.position.pixels == _sc3.position.maxScrollExtent) {
+            Provider.of<SubjectManager>(context, listen: false).getMoreData();
           }
         },
       );
@@ -912,18 +1120,21 @@ class _Register_FormState extends State<Register_Form> {
                               },
                               focus: focus12),
                           Center(
-                            child: Container(
-                              alignment: Alignment.centerRight,
-                              width: widget.size.width / 2 * .9,
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              height: 40,
-                              decoration: BoxDecoration(),
+                            child: InkWell(
+                              onTap: () => scanBarcodeNormal(),
                               child: Container(
-                                child: Row(
-                                  children: [
-                                    Text('scan code  '),
-                                    Icon(Icons.camera_alt_outlined),
-                                  ],
+                                alignment: Alignment.centerRight,
+                                width: widget.size.width / 2 * .9,
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                height: 40,
+                                decoration: BoxDecoration(),
+                                child: Container(
+                                  child: Row(
+                                    children: [
+                                      Text('scan code  '),
+                                      Icon(Icons.camera_alt_outlined),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -947,51 +1158,82 @@ class _Register_FormState extends State<Register_Form> {
                           focus: focus13),
                       Center(
                         child: Container(
+                          alignment: Alignment.centerRight,
                           width: widget.size.width / 2 * .9,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                alignment: Alignment.centerRight,
-                                width: widget.size.width / 2 * .9,
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Colors.grey),
-                                ),
-                                child: Container(
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton(
-                                      style: TextStyle(
-                                          fontFamily: 'GE-medium',
-                                          color: Colors.black),
-                                      value: _register_data['language'],
-                                      hint: Text('اللغة الثانية'),
-                                      isExpanded: true,
-                                      iconSize: 30,
-                                      onChanged: (newval) {
-                                        setState(() {
-                                          _register_data['language'] =
-                                              newval.toString();
-                                        });
-                                      },
-                                      icon: Icon(Icons.keyboard_arrow_down),
-                                      items: ['ألماني', 'فرنساوي']
-                                          .map((item) => DropdownMenuItem(
-                                                child: Text(item),
-                                                value: item,
-                                              ))
-                                          .toList(),
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: Container(
+                            child: InkWell(
+                              onTap: () => _modalBottomSheetMenulang(context),
+                              child: Container(
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      langname,
+                                      style: TextStyle(fontFamily: 'GE-light'),
                                     ),
-                                  ),
+                                    Spacer(),
+                                    Icon(Icons.keyboard_arrow_down)
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
+
+                      // Center(
+                      //   child: Container(
+                      //     width: widget.size.width / 2 * .9,
+                      //     child: Row(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children: [
+                      //         Container(
+                      //           alignment: Alignment.centerRight,
+                      //           width: widget.size.width / 2 * .9,
+                      //           padding: EdgeInsets.symmetric(horizontal: 20),
+                      //           height: 40,
+                      //           decoration: BoxDecoration(
+                      //             color: Colors.white,
+                      //             borderRadius: BorderRadius.circular(20),
+                      //             border: Border.all(color: Colors.grey),
+                      //           ),
+                      //           child: Container(
+                      //             child: DropdownButtonHideUnderline(
+                      //               child: DropdownButton(
+                      //                 style: TextStyle(
+                      //                     fontFamily: 'GE-medium',
+                      //                     color: Colors.black),
+                      //                 value: _register_data['language'],
+                      //                 hint: Text('اللغة الثانية'),
+                      //                 isExpanded: true,
+                      //                 iconSize: 30,
+                      //                 onChanged: (newval) {
+                      //                   setState(() {
+                      //                     _register_data['language'] =
+                      //                         newval.toString();
+                      //                   });
+                      //                 },
+                      //                 icon: Icon(Icons.keyboard_arrow_down),
+                      //                 items: ['ألماني', 'فرنساوي']
+                      //                     .map((item) => DropdownMenuItem(
+                      //                           child: Text(item),
+                      //                           value: item,
+                      //                         ))
+                      //                     .toList(),
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                   build_edit_field(
@@ -1009,10 +1251,11 @@ class _Register_FormState extends State<Register_Form> {
                     width: widget.size.width * .9,
                     child: TextButton(
                       style: ButtonStyle(
-                          elevation: MaterialStateProperty.all(2),
-                          backgroundColor: MaterialStateProperty.all(
-                              widget.edit! ? Colors.red[200] : kbuttonColor2)),
-                      onPressed: _submit,
+                        elevation: MaterialStateProperty.all(2),
+                        backgroundColor: MaterialStateProperty.all(
+                            widget.edit! ? Colors.red[200] : kbuttonColor2),
+                      ),
+                      onPressed: widget.edit! ? _modify : _submit,
                       child: widget.edit!
                           ? Text(
                               'تعديل',
@@ -1030,6 +1273,27 @@ class _Register_FormState extends State<Register_Form> {
               ),
             ),
           );
+  }
+
+  Future<void> scanBarcodeNormal() async {
+    String barcodeScanRes;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+      print(barcodeScanRes);
+    } on PlatformException {
+      barcodeScanRes = 'Failed to get platform version.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+    barCodeController.text = barcodeScanRes;
+    // setState(() {
+    //   _scanBarcode = barcodeScanRes;
+    // });
   }
 
   Center build_edit_field({

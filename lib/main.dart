@@ -6,10 +6,6 @@ import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/stage_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
-import 'package:attendance/screens/Add_academic_year/Academic_year.dart';
-import 'package:attendance/screens/Add_teacher/Add_Teacher_Screen.dart';
-import 'package:attendance/screens/Student_register/Student_register_screen.dart';
-import 'package:attendance/screens/degrees/Degrees_Screen.dart';
 
 import 'package:attendance/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +16,6 @@ import 'navigation/app_router.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'screens/Add_subject/Academic_subject.dart';
-
 void main() {
   runApp(MyApp());
 }
@@ -30,6 +24,7 @@ class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
   final _appStateManager = AppStateManager();
+  // ignore: non_constant_identifier_names
   final _auth_Manager = Auth_manager();
   final _yearManager = YearManager();
   final _stageManager = StageManager();
@@ -41,6 +36,7 @@ class MyApp extends StatelessWidget {
   final _appointmentmanager = AppointmentManager();
   // final _studentmanager = StudentManager();
 
+  // ignore: non_constant_identifier_names
   AppRouter GetRouter() {
     return AppRouter(
       studentManager: _studentsmanager,
@@ -64,38 +60,46 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<Auth_manager, YearManager>(
           create: (ctx) => _yearManager,
           update: (ctx, auth, prevyear) => prevyear!
+            // ignore: unnecessary_null_comparison
             ..receiveToken(auth, prevyear == null ? [] : prevyear.years),
         ),
         ChangeNotifierProxyProvider<Auth_manager, StageManager>(
           create: (ctx) => _stageManager,
           update: (ctx, auth, prevstage) => prevstage!
+            // ignore: unnecessary_null_comparison
             ..receiveToken(auth, prevstage == null ? [] : prevstage.stages!),
         ),
         ChangeNotifierProxyProvider<Auth_manager, SubjectManager>(
           create: (ctx) => _subjectmanager,
           update: (ctx, auth, prevstage) => prevstage!
+            // ignore: unnecessary_null_comparison
             ..receiveToken(auth, prevstage == null ? [] : prevstage.subjects!),
         ),
         ChangeNotifierProxyProvider<Auth_manager, TeacherManager>(
           create: (ctx) => _teachermanager,
           update: (ctx, auth, prevstage) => prevstage!
+            // ignore: unnecessary_null_comparison
             ..receiveToken(auth, prevstage == null ? [] : prevstage.teachers),
         ),
         ChangeNotifierProxyProvider<Auth_manager, GroupManager>(
           create: (ctx) => _groupmanager,
           update: (ctx, auth, prevstage) => prevstage!
+            // ignore: unnecessary_null_comparison
             ..receiveToken(auth, prevstage == null ? [] : prevstage.groups),
         ),
         ChangeNotifierProxyProvider<Auth_manager, StudentManager>(
           create: (ctx) => _studentsmanager,
           update: (ctx, auth, prevstage) => prevstage!
+            // ignore: unnecessary_null_comparison
             ..receiveToken(auth, prevstage == null ? [] : prevstage.students),
         ),
         ChangeNotifierProxyProvider<Auth_manager, AppointmentManager>(
           create: (ctx) => _appointmentmanager,
           update: (ctx, auth, prevstage) => prevstage!
             ..receiveToken(
-                auth, prevstage == null ? [] : prevstage.appointments!),
+                // ignore: unnecessary_null_comparison
+                auth,
+                prevstage == null ? [] : prevstage.appointments!),
         ),
       ],
       child: MaterialApp(

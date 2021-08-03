@@ -6,6 +6,9 @@ import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
+import 'package:attendance/models/appointment.dart';
+import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:attendance/models/student.dart';
 import 'package:attendance/screens/Add_academic_year/Academic_year.dart';
 import 'package:attendance/screens/Add_group/Add_group_Screen.dart';
@@ -18,6 +21,9 @@ import 'package:attendance/screens/Single_Student.dart/Single_Student_Screen.dar
 import 'package:attendance/screens/Student_register/Student_register_screen.dart';
 import 'package:attendance/screens/Students/Students_screen.dart';
 import 'package:attendance/screens/modify_lessons/modify_lessons_screen.dart';
+import 'package:attendance/screens/show_class/show_Class.dart';
+import 'package:attendance/screens/show_group/show_group.dart';
+import 'package:attendance/screens/show_group_presence/show_Presence.dart';
 import 'package:attendance/screens/single_student_attendance/Single_Student_atten.dart';
 import 'package:flutter/material.dart';
 import 'screens.dart';
@@ -46,15 +52,15 @@ class AppRouter extends RouterDelegate
     required this.appStateManager,
     required this.authmanager,
   }) : navigatorKey = GlobalKey<NavigatorState>() {
-    appStateManager.addListener(notifyListeners);
     authmanager.addListener(notifyListeners);
+    appStateManager.addListener(notifyListeners);
     // studentManager.addListener(notifyListeners);
   }
 
   @override
   void dispose() {
-    appStateManager.removeListener(notifyListeners);
     authmanager.removeListener(notifyListeners);
+    appStateManager.removeListener(notifyListeners);
     // studentManager.removeListener(notifyListeners);
 
     super.dispose();
@@ -67,12 +73,33 @@ class AppRouter extends RouterDelegate
       onPopPage: _handlePopPage,
       pages: [
         if (!authmanager.isLoggedIn) Admin_logIn.page(),
-        if (authmanager.isLoggedIn) Home_Screen.page(),
+        if (authmanager.isLoggedIn && authmanager.type != user.student)
+          Home_Screen.page(),
+        if (authmanager.isLoggedIn && authmanager.type == user.student)
+          Single_Student_Screen.page(
+              userstudent: authmanager.studentUser, user: user.student),
         if (authmanager.isLoggedIn && appStateManager.studentRegister)
           Student_Register_Screen.page(
-              editStudent: StudentModel(), edit: false),
+              editStudent: StudentModelSearch(), edit: false),
         if (authmanager.isLoggedIn && appStateManager.teacherRegister)
           Add_Teacher_Screeen.page(),
+        if (authmanager.isLoggedIn && appStateManager.groupscheck)
+          Show_Group.page(),
+        if (authmanager.isLoggedIn &&
+            appStateManager.groupscheck &&
+            appStateManager.singlegroup)
+          Show_Group_Class.page(
+              groupid: appStateManager.mysinglegroup,
+              group: appStateManager.mygroupshow),
+        if (authmanager.isLoggedIn &&
+            appStateManager.groupscheck &&
+            appStateManager.singlegroup &&
+            appStateManager.singlelessonbool)
+          Show_Group_Presence.page(
+              groupid: appStateManager.mysinglegroup,
+              group: appStateManager.mygroupshow,
+              lessonid: appStateManager.singlelessonid,
+              lesson: appStateManager.getsinglelesson),
         if (authmanager.isLoggedIn && appStateManager.groupRegister)
           Add_group_screen.page(),
         if (authmanager.isLoggedIn && appStateManager.communicateStudents)
@@ -89,19 +116,24 @@ class AppRouter extends RouterDelegate
             appStateManager.communicateStudents &&
             appStateManager.singleStudent)
           Single_Student_Screen.page(
-              studentid: appStateManager.studentIdSelected),
+              studentid: appStateManager.studentIdSelected, user: user.center),
         if (authmanager.isLoggedIn &&
             // appStateManager.communicateStudents &&
             appStateManager.singleStudentFromHome)
           Single_Student_Screen.page(
-              studentid: appStateManager.studentIdSelected),
+              studentid: appStateManager.studentIdSelected, user: user.center),
         if (authmanager.isLoggedIn &&
-            appStateManager.singleStudent &&
+            (appStateManager.singleStudent ||
+                appStateManager.singleStudentFromHome) &&
             appStateManager.singleStudentAttend)
-          Single_Student_attend.page(),
+          Single_Student_attend.page(
+              studentid: appStateManager.studentIdSelected,
+              groupid: appStateManager.mysinglegroup),
         if (authmanager.isLoggedIn && appStateManager.geteditstudent)
           Student_Register_Screen.page(
-              editStudent: appStateManager.getstudent, edit: true),
+            editStudent: appStateManager.getstudent,
+            edit: true,
+          ),
       ],
     );
   }
@@ -124,18 +156,21 @@ class AppRouter extends RouterDelegate
     if (route.settings.name == Attendance_Screens.student_registerpath &&
         appStateManager.geteditstudent == true &&
         appStateManager.communicateStudents == true) {
-      appStateManager.studentTapped('', false);
+      appStateManager.studentTapped('', false, StudentModelSearch());
       // appStateManager.goToSingleStudent(false, StudentModel(), '');
     }
     if (route.settings.name == Attendance_Screens.student_registerpath &&
         appStateManager.geteditstudent == true) {
-      appStateManager.studentTapped('', false);
+      appStateManager.studentTapped('', false, StudentModelSearch());
     }
     if (route.settings.name == Attendance_Screens.single_student) {
       appStateManager.goToSingleStudentfromHome(false, '');
     }
     if (route.settings.name == Attendance_Screens.data_students) {
       appStateManager.studentsCommunicate(false);
+    }
+    if (route.settings.name == Attendance_Screens.groupcheck) {
+      appStateManager.gotocheckgroups(false);
     }
     if (route.settings.name == Attendance_Screens.data_students) {
       appStateManager.studentsData(false);
@@ -165,10 +200,16 @@ class AppRouter extends RouterDelegate
     }
     if (route.settings.name == Attendance_Screens.single_student &&
         appStateManager.singleStudentFromHome == false) {
-      appStateManager.goToSingleStudent(false, StudentModel(), '');
+      appStateManager.goToSingleStudent(false, StudentModelSearch(), '');
     }
     if (route.settings.name == Attendance_Screens.single_student_attend) {
-      appStateManager.goToSingleStudentAttend(false);
+      appStateManager.goToSingleStudentAttend(false, '');
+    }
+    if (route.settings.name == Attendance_Screens.groupclasses) {
+      appStateManager.goToSinglegroup(false, '', GroupModelSimple());
+    }
+    if (route.settings.name == Attendance_Screens.classattend) {
+      appStateManager.goToSinglelessonattend(false, '', AppointmentModel());
     }
 
     return true;

@@ -694,7 +694,7 @@ class _group_formState extends State<group_form> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         SizedBox(
-                          height: 5,
+                          height: 1,
                         ),
                         build_edit_field(
                             item: 'name',
@@ -982,6 +982,7 @@ class _group_formState extends State<group_form> {
                   ),
                   Container(
                     width: widget.size.width * .9,
+                    // margin: EdgeInsets.symmetric(vertical: 1),
                     child: TextButton(
                       style: ButtonStyle(
                           elevation: MaterialStateProperty.all(2),
@@ -995,6 +996,9 @@ class _group_formState extends State<group_form> {
                       ),
                     ),
                   ),
+                  // SizedBox(
+                  //   height: .5,
+                  // )
                 ],
               ),
             ),

@@ -42,9 +42,19 @@ class Options extends StatelessWidget {
                       child: Chip_Container(
                           size: size,
                           active: appstatemanager.homeOptions ? true : false,
-                          text: 'بيانات مجموعه'),
+                          text: 'مقارنات المجموعه'),
                     ),
                   ],
+                ),
+                GestureDetector(
+                  onTap: () {
+                    appstatemanager.gotocheckgroups(true);
+                  },
+                  child: Chip_Container(
+                      color: kbuttonColor3,
+                      size: size,
+                      active: true,
+                      text: 'بيانات المجموعات'),
                 ),
               ],
             ),
@@ -59,10 +69,12 @@ class Chip_Container extends StatelessWidget {
     required this.text,
     required this.size,
     required this.active,
+    this.color = kbackgroundColor1,
   }) : super(key: key);
   final String text;
   final Size size;
   final bool active;
+  final Color color;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -72,7 +84,7 @@ class Chip_Container extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 2),
       decoration: BoxDecoration(
         border: Border.all(width: 1, color: Colors.grey),
-        color: active ? kbackgroundColor1 : kbackgroundColor1.withOpacity(.5),
+        color: active ? color : color.withOpacity(.5),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Center(

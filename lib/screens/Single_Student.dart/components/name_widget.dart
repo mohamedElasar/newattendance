@@ -4,13 +4,13 @@ class Name extends StatelessWidget {
   const Name({
     Key? key,
     required this.size,
-    required this.name,
+    this.name,
     this.title = '',
     this.arrow = false,
   }) : super(key: key);
 
   final Size size;
-  final String name;
+  final String? name;
   final bool arrow;
   final String title;
 
@@ -51,7 +51,7 @@ class Name extends StatelessWidget {
               Container(
                 width: size.width * .8 / 2,
                 child: Text(
-                  name,
+                  name ?? '',
                   style: TextStyle(fontFamily: 'GE-medium'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

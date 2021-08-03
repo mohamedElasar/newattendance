@@ -1,14 +1,9 @@
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
+import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/student.dart';
 import 'package:attendance/navigation/screens.dart';
-import 'package:attendance/screens/Add_academic_year/Academic_year.dart';
-import 'package:attendance/screens/Add_group/Add_group_Screen.dart';
-import 'package:attendance/screens/Add_subject/Academic_subject.dart';
-import 'package:attendance/screens/Add_teacher/Add_Teacher_Screen.dart';
-import 'package:attendance/screens/Student_register/Student_register_screen.dart';
-import 'package:attendance/screens/Students/components/Students_Top_Page.dart';
 import 'package:attendance/screens/show_group/show_group.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -66,258 +61,289 @@ class Home_Screen extends StatelessWidget {
         ],
       )),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            Image.asset('assets/images/logo.jpg'),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 0.7,
-                    ),
-                  ),
-                  height: 55,
-                  child: Material(
-                    elevation: 5.0,
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: Center(
-                      child: Text(
-                        "ادخال طالب",
-                        style: TextStyle(
-                            fontSize: 19, fontWeight: FontWeight.bold),
-                      ),
-                    ),
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: AssetImage(
+                    'assets/images/logo.jpg',
+                    // fit: BoxFit.cover,
                   ),
                 ),
               ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Student_Register_Screen()));
-              },
+              height: 200,
             ),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 0.7,
-                    ),
-                  ),
-                  height: 55,
-                  child: Material(
-                    elevation: 5.0,
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: Center(
-                      child: Text(
-                        "ادخال معلم",
-                        style: TextStyle(
-                            fontSize: 19, fontWeight: FontWeight.bold),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.7,
+                          ),
+                        ),
+                        height: 40,
+                        child: Material(
+                          // elevation: 5.0,
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Center(
+                            child: Text(
+                              "ادخال طالب",
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
+                    onTap: () {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .registerStudent(true);
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => Student_Register_Screen()));
+                    },
                   ),
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Add_Teacher_Screeen()));
-              },
-            ),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 0.7,
-                    ),
-                  ),
-                  height: 55,
-                  child: Material(
-                    elevation: 5.0,
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: Center(
-                      child: Text(
-                        "ادخال مجموعة",
-                        style: TextStyle(
-                            fontSize: 19, fontWeight: FontWeight.bold),
+                  ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.7,
+                          ),
+                        ),
+                        height: 40,
+                        child: Material(
+                          // elevation: 5.0,
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Center(
+                            child: Text(
+                              "ادخال معلم",
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
+                    onTap: () {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .registerTeacher(true);
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => Add_Teacher_Screeen()));
+                    },
                   ),
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Add_group_screen()));
-              },
-            ),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 0.7,
-                    ),
-                  ),
-                  height: 55,
-                  child: Material(
-                    elevation: 5.0,
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: Center(
-                      child: Text(
-                        "اظهار مجموعة",
-                        style: TextStyle(
-                            fontSize: 19, fontWeight: FontWeight.bold),
+                  ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.7,
+                          ),
+                        ),
+                        height: 40,
+                        child: Material(
+                          // elevation: 5.0,
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Center(
+                            child: Text(
+                              "ادخال مجموعة",
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
+                    onTap: () {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .registerGroup(true);
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => Add_group_screen()));
+                    },
                   ),
-                ),
-              ),
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Show_Group()));
-              },
-            ),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 0.7,
-                    ),
-                  ),
-                  height: 55,
-                  child: Material(
-                    elevation: 5.0,
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: Center(
-                      child: Text(
-                        "السنوات الدراسية",
-                        style: TextStyle(
-                            fontSize: 19, fontWeight: FontWeight.bold),
+                  ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.7,
+                          ),
+                        ),
+                        height: 40,
+                        child: Material(
+                          // elevation: 5.0,
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Center(
+                            child: Text(
+                              "اظهار مجموعة",
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Show_Group()));
+                    },
                   ),
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Add_academic_year()));
-              },
-            ),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 0.7,
-                    ),
-                  ),
-                  height: 55,
-                  child: Material(
-                    elevation: 5.0,
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: Center(
-                      child: Text(
-                        "المواد الدراسية",
-                        style: TextStyle(
-                            fontSize: 19, fontWeight: FontWeight.bold),
+                  ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.7,
+                          ),
+                        ),
+                        height: 40,
+                        child: Material(
+                          // elevation: 5.0,
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Center(
+                            child: Text(
+                              "السنوات الدراسية",
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
+                    onTap: () {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .addYears(true);
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => Add_academic_year()));
+                    },
                   ),
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Add_academic_subject()));
-              },
-            ),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 0.7,
-                    ),
-                  ),
-                  height: 55,
-                  child: Material(
-                    elevation: 5.0,
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: Center(
-                      child: Text(
-                        "الدرجات",
-                        style: TextStyle(
-                            fontSize: 19, fontWeight: FontWeight.bold),
+                  ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.7,
+                          ),
+                        ),
+                        height: 40,
+                        child: Material(
+                          // elevation: 5.0,
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Center(
+                            child: Text(
+                              "المواد الدراسية",
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
+                    onTap: () {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .modifySubjects(true);
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => Add_academic_subject()));
+                    },
                   ),
-                ),
-              ),
-              onTap: () {
-                // Navigator.push(context,
-                //     MaterialPageRoute(builder: (context) => Degrees_Screen()));
-              },
-            ),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 0.7,
-                    ),
-                  ),
-                  height: 55,
-                  child: Material(
-                    elevation: 5.0,
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: Center(
-                      child: Text(
-                        "تسجيل الخروج",
-                        style: TextStyle(
-                            fontSize: 19, fontWeight: FontWeight.bold),
+                  ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.7,
+                          ),
+                        ),
+                        height: 40,
+                        child: Material(
+                          // elevation: 5.0,
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Center(
+                            child: Text(
+                              "الدرجات",
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
+                    onTap: () {
+                      // Navigator.push(context,
+                      //     MaterialPageRoute(builder: (context) => Degrees_Screen()));
+                    },
                   ),
-                ),
+                  ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.7,
+                          ),
+                        ),
+                        height: 40,
+                        child: Material(
+                          // elevation: 5.0,
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Center(
+                            child: Text(
+                              "تسجيل الخروج",
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    onTap: () {
+                      Provider.of<Auth_manager>(context, listen: false)
+                          .logout();
+                    },
+                  ),
+                ],
               ),
-              onTap: () {
-                Provider.of<Auth_manager>(context, listen: false).logout();
-              },
             ),
           ],
         ),
@@ -384,7 +410,7 @@ class HomeTopPage extends StatelessWidget {
           ),
           InkWell(
             onTap: () async {
-              showSearch(context: context, delegate: StudentSearch());
+              await showSearch(context: context, delegate: StudentSearch());
             },
             child: Row(
               children: [
@@ -401,18 +427,6 @@ class HomeTopPage extends StatelessWidget {
               ],
             ),
           )
-          // InkWell(
-          //   onTap: () {
-          //     Provider.of<AppStateManager>(context, listen: false).go_to_Home();
-          //   },
-          //   child: RotatedBox(
-          //     quarterTurns: 2,
-          //     child: Icon(
-          //       Icons.arrow_back,
-          //       color: Colors.black,
-          //     ),
-          //   ),
-          // )
         ],
       ),
     );
@@ -443,7 +457,7 @@ class StudentSearch extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) =>
-      FutureBuilder<List<StudentModel>>(
+      FutureBuilder<List<StudentModelSearch>>(
         future: Provider.of<StudentManager>(context, listen: false)
             .searchStudent(query),
         builder: (context, snapshot) {
@@ -471,11 +485,11 @@ class StudentSearch extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) => Container(
         // color: Colors.black,
-        child: FutureBuilder<List<StudentModel>>(
+        child: FutureBuilder<List<StudentModelSearch>>(
           future: Provider.of<StudentManager>(context, listen: false)
               .searchStudent(query),
           builder: (context, snapshot) {
-            print(snapshot.error);
+            // print(snapshot.data);
             if (query.isEmpty) return buildNoSuggestions();
 
             switch (snapshot.connectionState) {
@@ -499,7 +513,7 @@ class StudentSearch extends SearchDelegate<String> {
         ),
       );
 
-  Widget buildSuggestionsSuccess(List<StudentModel>? suggestions) =>
+  Widget buildSuggestionsSuccess(List<StudentModelSearch>? suggestions) =>
       ListView.builder(
         itemCount: suggestions!.length,
         itemBuilder: (context, index) {
@@ -539,7 +553,7 @@ class StudentSearch extends SearchDelegate<String> {
         },
       );
 
-  Widget buildResultSuccess(StudentModel student) => Container(
+  Widget buildResultSuccess(StudentModelSearch student) => Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF3279e2), Colors.purple],
