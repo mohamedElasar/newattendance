@@ -6,16 +6,18 @@
     "configurations": [
         
         {
-            "name": "my_app",
-            "cwd": "my_app",
+            "args": [
+                "--no-sound-null-safety"
+               ],
+            "name": "attendance (with listview) - master",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "networking_app",
-            "cwd": "networking_app",
+            "name": "attendance (with listview) - master (profile mode)",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "flutterMode": "profile"
         }
     ]
 }

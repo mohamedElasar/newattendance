@@ -1,0 +1,77 @@
+// import 'package:attendance/managers/App_State_manager.dart';
+// import 'package:attendance/navigation/screens.dart';
+// import 'package:attendance/screens/Add_group/components/group_form.dart';
+// import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+
+// import 'group_form copy.dart';
+
+// class Add extends StatelessWidget {
+//   static MaterialPage page() {
+//     return MaterialPage(
+//       name: Attendance_Screens.group_registerpath,
+//       key: ValueKey(Attendance_Screens.group_registerpath),
+//       child: const Add(),
+//     );
+//   }
+
+//   const Add({Key? key}) : super(key: key);
+//   @override
+//   Widget build(BuildContext context) {
+//     final size = MediaQuery.of(context).size;
+
+//     return SafeArea(
+//       child: Scaffold(
+//         appBar: AppBar(
+//           title: Center(
+//             child: Text(
+//               'تسجيل مجموعه',
+//               style: TextStyle(
+//                   color: Colors.black,
+//                   fontSize: 30,
+//                   fontFamily: 'AraHamah1964B-Bold'),
+//             ),
+//           ),
+//           actions: [
+//             SizedBox(width: 10),
+//             CircleAvatar(
+//               minRadius: 25,
+//               backgroundImage: AssetImage('assets/images/Group.png'),
+//             ),
+//             SizedBox(
+//               width: 30,
+//             ),
+//             Container(
+//               padding: EdgeInsets.all(8),
+//               child: InkWell(
+//                 onTap: () {
+//                   Provider.of<AppStateManager>(context, listen: false)
+//                       .registerGroup(false);
+//                 },
+//                 child: RotatedBox(
+//                   quarterTurns: 2,
+//                   child: Icon(
+//                     Icons.arrow_back,
+//                     color: Colors.black,
+//                   ),
+//                 ),
+//               ),
+//             )
+//           ],
+//           elevation: 0,
+//           // leading:
+//           //  Icon(
+//           //   Icons.menu,
+//           //   color: Colors.black,
+//           // ),
+
+//           backgroundColor: Colors.white,
+//         ),
+//         backgroundColor: Colors.grey[300],
+//         body: SingleChildScrollView(
+//           child: groupToAdd(size: size),
+//         ),
+//       ),
+//     );
+//   }
+// }
