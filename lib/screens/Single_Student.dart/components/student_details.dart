@@ -79,29 +79,47 @@ class Student_details extends StatelessWidget {
                                             true, groups[index].id.toString());
                                   },
                                   child: ListTile(
-                                    trailing: Text(
-                                      '${groups[index].name}',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: 'GE-light',
+                                    trailing: Container(
+                                      width: size.width / 2,
+                                      child: Text(
+                                        '${groups[index].name}',
+                                        overflow: TextOverflow.fade,
+                                        maxLines: 1,
+                                        softWrap: false,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: 'GE-light',
+                                        ),
                                       ),
                                     ),
-                                    subtitle: Text(
-                                      '${groups[index].teacher!.name}',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: 'GE-light',
+                                    subtitle: Container(
+                                      width: size.width / 3,
+                                      child: Text(
+                                        '${groups[index].teacher!.name}',
+                                        overflow: TextOverflow.fade,
+                                        maxLines: 1,
+                                        softWrap: false,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: 'GE-light',
+                                        ),
                                       ),
                                     ),
                                     leading: CircleAvatar(
                                       backgroundColor: kbackgroundColor3,
                                       radius: 10,
                                     ),
-                                    title: Text(
-                                      '${groups[index].subject!.name}',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontFamily: 'GE-bold',
+                                    title: Container(
+                                      width: size.width / 3,
+                                      child: Text(
+                                        '${groups[index].subject!.name}',
+                                        overflow: TextOverflow.fade,
+                                        maxLines: 1,
+                                        softWrap: false,
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontFamily: 'GE-bold',
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -230,18 +248,20 @@ class Student_details extends StatelessWidget {
                   name: myuser == user.center
                       ? studentmanager.singleStudent!.studyType.toString()
                       : studentProfile!.studyType!.toString()),
-              Name(size: size, name: 'السداد'),
+              Name(size: size, title: 'السداد:  '),
               Divider(
                 thickness: 2,
               ),
               if (myuser == user.center)
                 Name(
+                    title: 'الملاحظات :',
                     size: size,
                     name: studentmanager.singleStudent!.note == null
                         ? 'لا يوجد ملاحظات'
                         : studentmanager.singleStudent!.note.toString()),
               if (myuser == user.student)
                 Name(
+                    title: 'الملاحظات :',
                     size: size,
                     name: studentProfile!.note == null
                         ? 'لا يوجد ملاحظات'

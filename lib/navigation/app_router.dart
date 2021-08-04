@@ -123,11 +123,18 @@ class AppRouter extends RouterDelegate
           Single_Student_Screen.page(
               studentid: appStateManager.studentIdSelected, user: user.center),
         if (authmanager.isLoggedIn &&
+            authmanager.type == user.center &&
             (appStateManager.singleStudent ||
                 appStateManager.singleStudentFromHome) &&
             appStateManager.singleStudentAttend)
           Single_Student_attend.page(
               studentid: appStateManager.studentIdSelected,
+              groupid: appStateManager.mysinglegroup),
+        if (authmanager.isLoggedIn &&
+            authmanager.type == user.student &&
+            appStateManager.singleStudentAttend)
+          Single_Student_attend.page(
+              studentid: authmanager.userid.toString(),
               groupid: appStateManager.mysinglegroup),
         if (authmanager.isLoggedIn && appStateManager.geteditstudent)
           Student_Register_Screen.page(
@@ -180,22 +187,29 @@ class AppRouter extends RouterDelegate
     }
     if (route.settings.name == Attendance_Screens.subjects_add) {
       yearManager.resetlist();
+      yearManager.getMoreData();
+
       appStateManager.modifySubjects(false);
     }
     if (route.settings.name == Attendance_Screens.group_registerpath) {
       yearManager.resetlist();
       subjectManager.resetlist();
       teachermanager.resetlist();
+      yearManager.getMoreData();
+      subjectManager.getMoreData();
+      teachermanager.getMoreData();
       appStateManager.registerGroup(false);
     }
     if (route.settings.name == Attendance_Screens.teacher_registerpath) {
       subjectManager.resetlist();
       yearManager.resetlist();
       yearManager.getMoreData();
+      subjectManager.getMoreData();
       appStateManager.registerTeacher(false);
     }
     if (route.settings.name == Attendance_Screens.student_registerpath) {
       groupManager.resetlist();
+      groupManager.getMoreData();
       appStateManager.registerStudent(false);
     }
     if (route.settings.name == Attendance_Screens.single_student &&

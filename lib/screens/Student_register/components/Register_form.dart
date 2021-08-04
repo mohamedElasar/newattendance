@@ -39,7 +39,7 @@ class _Register_FormState extends State<Register_Form> {
       return;
     }
     if (_register_data['gender'] == null ||
-        langname == 'اللغه الثانيه' ||
+        // langname == 'اللغه الثانيه' ||
         cityname == 'المحافظه' ||
         _groups_shown.isEmpty) {
       return;
@@ -121,7 +121,7 @@ class _Register_FormState extends State<Register_Form> {
       return;
     }
     if (_register_data['gender'] == null ||
-        langname == 'اللغه الثانيه' ||
+        // langname == 'اللغه الثانيه' ||
         cityname == 'المحافظه' ||
         _groups_shown.isEmpty) {
       return;
@@ -225,7 +225,7 @@ class _Register_FormState extends State<Register_Form> {
   String cityname = 'المحافظه';
   String langname = 'اللغه الثانيه';
   late String cityId_selected;
-  late String langId_selected;
+  dynamic langId_selected = null;
   List<String> _groups_id = [];
   List<String> _groups_shown = [];
 
@@ -745,7 +745,10 @@ class _Register_FormState extends State<Register_Form> {
       _register_data['gender'] = 'أنثي';
     if (widget.edit!) cityname = widget.student!.city!.name.toString();
     if (widget.edit!) cityId_selected = widget.student!.city!.id.toString();
-    if (widget.edit!) langname = widget.student!.secLang!.name.toString();
+    if (widget.edit!)
+      langname = widget.student!.secLang!.name == null
+          ? 'اللغه الثانيه'
+          : widget.student!.secLang!.name.toString();
     if (widget.edit!) langId_selected = widget.student!.secLang!.id.toString();
     if (widget.edit!) {
       _groups_id = widget.student!.groups!.map((e) => e.id.toString()).toList();

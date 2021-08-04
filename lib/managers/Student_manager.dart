@@ -32,11 +32,14 @@ class StudentManager extends ChangeNotifier {
   get pageNumber => _pageNumber;
   get error => _error;
   get loading => _loading;
+  get isloading => _isloading;
 
   bool _hasMore = false;
   int _pageNumber = 1;
   bool _error = false;
   bool _loading = true;
+
+  bool _isloading = true;
 
   final int _defaultPerPageCount = 15;
 
@@ -54,7 +57,7 @@ class StudentManager extends ChangeNotifier {
     String? parentWhatsapp,
     String? gender,
     String? studyType,
-    String? secondLanguage,
+    dynamic secondLanguage,
     String? discount,
     String? code,
     String? password,
@@ -302,7 +305,7 @@ class StudentManager extends ChangeNotifier {
     _loading = true;
     _pageNumber = 1;
     _error = false;
-    _loading = true;
+    _isloading = true;
     notifyListeners();
   }
 
@@ -388,5 +391,52 @@ class StudentManager extends ChangeNotifier {
       // print(e);
       throw e;
     }
+  }
+
+  Future<void> getDataSearch(String filter1, String filter2) async {
+    // print(_pageNumber);
+    try {
+      var url = Uri.https('development.mrsaidmostafa.com', '/api/students', {
+        "group_id": filter1,
+        "name": filter2,
+        // "page": _pageNumber.toString(),
+      });
+      // print(url);
+      // print(_pageNumber);
+      //
+      print(url);
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+
+      final responseData = json.decode(response.body);
+
+      List<dynamic> studentsList = responseData['data'];
+      // print(studentsList[0]['groups']);
+      // print(StudentModelSearch.fromJson(studentsList[0]).code);
+      // __students.add(StudentModelSearch.fromJson(studentsList[0]));
+
+      List<StudentModelSearch> fetchedstudents = studentsList
+          .map((data) => StudentModelSearch.fromJson(data))
+          .toList();
+      // _hasMore = fetchedstudents.length == _defaultPerPageCount;
+      // _loading = false;
+      // _pageNumber = _pageNumber + 1;
+      _isloading = false;
+
+      __students = (fetchedstudents);
+      notifyListeners();
+    } catch (e) {
+      print(e);
+      // _loading = false;
+      // _error = true;
+      notifyListeners();
+    }
+
+    notifyListeners();
   }
 }

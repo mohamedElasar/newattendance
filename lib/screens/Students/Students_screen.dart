@@ -38,7 +38,7 @@ class Students_Screen extends StatelessWidget {
         backgroundColor: kbackgroundColor2,
         body: (Column(
           children: [
-            Student_Top_Page(size: size),
+            Student_Top_Page(size: size, groupId: groupid),
             Consumer<AppStateManager>(
               builder: (builder, appstatemanager, child) => Students_Page_Title(
                   title: appstatemanager.getGroupSelected.name),

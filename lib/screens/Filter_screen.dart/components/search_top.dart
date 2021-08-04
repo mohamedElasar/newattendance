@@ -3,8 +3,8 @@ import 'package:attendance/managers/Student_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Student_Top_Page extends StatefulWidget {
-  Student_Top_Page(
+class Search_top extends StatefulWidget {
+  Search_top(
       {Key? key, required this.size, this.arrowback = true, this.groupId})
       : super(key: key);
   final Size size;
@@ -12,10 +12,10 @@ class Student_Top_Page extends StatefulWidget {
   final String? groupId;
 
   @override
-  _Student_Top_PageState createState() => _Student_Top_PageState();
+  _Search_topState createState() => _Search_topState();
 }
 
-class _Student_Top_PageState extends State<Student_Top_Page> {
+class _Search_topState extends State<Search_top> {
   TextEditingController searchcontroller = TextEditingController();
 
   @override
@@ -59,20 +59,20 @@ class _Student_Top_PageState extends State<Student_Top_Page> {
                           child: TextFormField(
                             controller: searchcontroller,
                             onChanged: (value) {
-                              if (value.isEmpty) {
-                                Provider.of<StudentManager>(context,
-                                        listen: false)
-                                    .resetlist();
-                                Provider.of<StudentManager>(context,
-                                        listen: false)
-                                    .getMoreDatafiltered(widget.groupId!);
-                                FocusScopeNode currentFocus =
-                                    FocusScope.of(context);
+                              // if (value.isEmpty) {
+                              //   Provider.of<StudentManager>(context,
+                              //           listen: false)
+                              //       .resetlist();
+                              //   Provider.of<StudentManager>(context,
+                              //           listen: false)
+                              //       .getMoreDatafiltered(widget.groupId!);
+                              //   FocusScopeNode currentFocus =
+                              //       FocusScope.of(context);
 
-                                if (!currentFocus.hasPrimaryFocus) {
-                                  currentFocus.unfocus();
-                                }
-                              }
+                              //   if (!currentFocus.hasPrimaryFocus) {
+                              //     currentFocus.unfocus();
+                              //   }
+                              // }
                             },
                             decoration: InputDecoration(
                               hintText: "بحث",
@@ -86,31 +86,31 @@ class _Student_Top_PageState extends State<Student_Top_Page> {
                       ), //test
                       InkWell(
                           onTap: () {
-                            if (searchcontroller.text == '') {
-                              Provider.of<StudentManager>(context,
-                                      listen: false)
-                                  .resetlist();
-                              Provider.of<StudentManager>(context,
-                                      listen: false)
-                                  .getMoreDatafiltered(widget.groupId!);
-                              FocusScopeNode currentFocus =
-                                  FocusScope.of(context);
+                            // if (searchcontroller.text == '') {
+                            //   Provider.of<StudentManager>(context,
+                            //           listen: false)
+                            //       .resetlist();
+                            //   Provider.of<StudentManager>(context,
+                            //           listen: false)
+                            //       .getMoreDatafiltered(widget.groupId!);
+                            //   FocusScopeNode currentFocus =
+                            //       FocusScope.of(context);
 
-                              if (!currentFocus.hasPrimaryFocus) {
-                                currentFocus.unfocus();
-                              }
-                            } else {
-                              Provider.of<StudentManager>(context,
-                                      listen: false)
-                                  .getDataSearch(
-                                      widget.groupId!, searchcontroller.text);
-                              FocusScopeNode currentFocus =
-                                  FocusScope.of(context);
+                            //   if (!currentFocus.hasPrimaryFocus) {
+                            //     currentFocus.unfocus();
+                            //   }
+                            // } else {
+                            //   Provider.of<StudentManager>(context,
+                            //           listen: false)
+                            //       .getDataSearch(
+                            //           widget.groupId!, searchcontroller.text);
+                            //   FocusScopeNode currentFocus =
+                            //       FocusScope.of(context);
 
-                              if (!currentFocus.hasPrimaryFocus) {
-                                currentFocus.unfocus();
-                              }
-                            }
+                            //   if (!currentFocus.hasPrimaryFocus) {
+                            //     currentFocus.unfocus();
+                            //   }
+                            // }
 
                             // Provider.of<StudentManager>(context, listen: false)
                             //     .getDataSearch(groupId!, searchcontroller.text);

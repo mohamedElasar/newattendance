@@ -32,7 +32,7 @@ class TABLE_HEAD_2 extends StatelessWidget {
           CELL_2(
             height: 30,
             width: size.width / 5,
-            text: data[0],
+            text: data[0].toString(),
             head: head,
           ),
           CELL_2(
@@ -56,7 +56,7 @@ class TABLE_HEAD_2 extends StatelessWidget {
           CELL_2(
             height: 30,
             width: size.width / 5,
-            text: data[3],
+            text: data[3].toString(),
             head: head,
           ),
           Spacer(),
@@ -67,20 +67,20 @@ class TABLE_HEAD_2 extends StatelessWidget {
 }
 
 class CELL_2 extends StatelessWidget {
-  const CELL_2(
+  CELL_2(
       {Key? key,
       required this.width,
       required this.height,
-      required this.text,
+      this.text,
       this.head = true})
       : super(key: key);
   final double width;
   final double height;
-  final text;
+  String? text;
   final bool head;
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(fontSize: 18, fontFamily: 'GE-bold');
+    const textStyle = TextStyle(fontSize: 16, fontFamily: 'AraHamah1964R-Bold');
     return Container(
       width: width,
       height: height,
@@ -89,7 +89,10 @@ class CELL_2 extends StatelessWidget {
           color: head ? kbuttonColor3 : Colors.transparent),
       child: Center(
           child: Text(
-        text,
+        text!,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        softWrap: false,
         style: textStyle,
       )),
     );

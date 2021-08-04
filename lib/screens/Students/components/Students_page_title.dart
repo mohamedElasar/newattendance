@@ -14,10 +14,22 @@ class Students_Page_Title extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Text(
-        title,
-        style: TextStyle(
-            fontFamily: 'GE-bold', fontSize: 30, fontWeight: FontWeight.bold),
+      child: Center(
+        child: Container(
+          width: double.infinity,
+          child: Center(
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              softWrap: false,
+              style: TextStyle(
+                  fontFamily: 'GE-bold',
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
       ),
     );
   }
