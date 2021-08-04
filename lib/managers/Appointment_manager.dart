@@ -17,6 +17,8 @@ class AppointmentManager extends ChangeNotifier {
   }
 
   String? authToken;
+  List<StudentModelSimple> _appointments_degree = [];
+  List<StudentModelSimple>? get appointments_degree => _appointments_degree;
   List<AppointmentModel> _appointments = [];
   List<AppointmentModel> _appointmentsshow = [];
   AppointmentModel? _currentApp = AppointmentModel();
@@ -37,6 +39,41 @@ class AppointmentManager extends ChangeNotifier {
   bool _loading = true;
 
   // final int _defaultPerPageCount = 15;
+
+   Future<void> get_degrees(String lesson_id) async {
+    var url = Uri.https(
+        'development.mrsaidmostafa.com', '/api/appointments/$lesson_id');
+    try {
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $authToken'
+        },
+      );
+      final responseData = json.decode(response.body);
+     
+      print(url);
+ 
+      List appointments = responseData['data']['students'];
+      print('appointments');
+      print(appointments);
+    
+      List<StudentModelSimple> list =
+          appointments.map((data) => StudentModelSimple.fromJson(data)).toList();
+      _appointments_degree = list;
+      print("list");
+      print(list);
+      print(_appointments_degree);
+      _loading = false;
+
+     
+
+    } catch (error) {
+      throw (error);
+    }
+  }
+
 
   Future<void> get_appointments(String groupid) async {
     var url =
