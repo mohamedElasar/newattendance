@@ -1,6 +1,7 @@
 import 'package:attendance/constants.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/Filter_screen.dart/components/filters_top.dart';
+import 'package:attendance/screens/Filter_screen.dart/components/search_top.dart';
 import 'package:attendance/screens/Students/components/Students_Top_Page.dart';
 import 'package:flutter/material.dart';
 
@@ -21,15 +22,18 @@ class Filter_Screen_6 extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: kbackgroundColor2,
-        body: Column(
-          children: [
-            Student_Top_Page(size: size),
-            Filters_top(size: size),
-            Tabel_here(
-              size: size,
-            ),
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Search_top(size: size),
+              Filters_top(size: size),
+              Tabel_here(
+                size: size,
+              ),
+            ],
+          ),
         ),
       ),
     );

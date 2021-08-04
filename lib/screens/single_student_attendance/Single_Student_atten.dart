@@ -1,3 +1,4 @@
+import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/models/attendgroupstudent.dart';
 import 'package:attendance/navigation/screens.dart';
@@ -26,22 +27,25 @@ class Single_Student_attend extends StatelessWidget {
       : super(key: key);
 
   Widget build(BuildContext context) {
-    print(grId);
-    print(stId);
-    print(grId);
     final size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
         backgroundColor: kbackgroundColor2,
         appBar: AppBar(
-          leading: Icon(
-            Icons.menu,
-            color: Colors.black,
-          ),
+          // leading: Icon(
+          //   Icons.menu,
+          //   color: Colors.black,
+          // ),
           actions: [
-            Icon(
-              Icons.arrow_forward,
-              color: Colors.black,
+            InkWell(
+              onTap: () {
+                Provider.of<AppStateManager>(context, listen: false)
+                    .goToSingleStudentAttend(false, '');
+              },
+              child: Icon(
+                Icons.arrow_forward,
+                color: Colors.black,
+              ),
             ),
             SizedBox(
               width: 10,
@@ -118,7 +122,12 @@ class Single_Student_attend extends StatelessWidget {
                               attend: snapshot.data,
                               head: false,
                               size: size,
-                              data: ['1', '14/5', true, '50'],
+                              data: [
+                                snapshot.data!.appointments![index].time,
+                                snapshot.data!.appointments![index].date,
+                                true,
+                                snapshot.data!.appointments![index].degree
+                              ],
                             ),
                           ),
                         )

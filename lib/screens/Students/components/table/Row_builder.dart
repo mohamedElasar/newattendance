@@ -68,7 +68,29 @@ class _Rows_BuilderState extends State<Rows_Builder> {
                 child: CircularProgressIndicator(),
               )
             : Consumer<StudentManager>(
-                builder: (builder, studentmanager, child) => ListView.builder(
+                builder: (builder, studentmanager, child) {
+                if (studentmanager.students.isEmpty &&
+                    studentmanager.isloading == false) {
+                  return Center(
+                    child: Container(
+                        child: Text(
+                      'لا يوجد طلبه',
+                      style: TextStyle(fontFamily: 'GE-medium'),
+                    )),
+                  );
+                }
+                if (studentmanager.isloading &&
+                    studentmanager.students.isEmpty) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                // if (studentmanager.isloading) {
+                //   return Center(
+                //     child: CircularProgressIndicator(),
+                //   );
+                // }
+                return ListView.builder(
                   controller: _sc,
                   itemCount: studentmanager.students.length,
                   itemBuilder: (BuildContext context, int index) {
@@ -89,8 +111,8 @@ class _Rows_BuilderState extends State<Rows_Builder> {
                               studentmanager.students[index].id.toString())),
                     );
                   },
-                ),
-              ));
+                );
+              }));
   }
 }
 

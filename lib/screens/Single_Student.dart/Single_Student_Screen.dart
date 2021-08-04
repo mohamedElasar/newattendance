@@ -10,6 +10,8 @@ import '../../constants.dart';
 import 'components/student_details.dart';
 import 'components/student_pic_name.dart';
 
+// final GlobalKey<ScaffoldState> _scaffoldKey2 = new GlobalKey<ScaffoldState>();
+
 class Single_Student_Screen extends StatefulWidget {
   final String? student_id;
   final StudentModelSearch? studentprofile;
@@ -60,6 +62,7 @@ class _Single_Student_ScreenState extends State<Single_Student_Screen> {
     final size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
+        // key: _scaffoldKey2,
         resizeToAvoidBottomInset: false,
         backgroundColor: kbackgroundColor2,
         body: _isLoading
@@ -75,14 +78,17 @@ class _Single_Student_ScreenState extends State<Single_Student_Screen> {
                       children: [
                         if (widget.myuser == user.center) Container(),
                         if (widget.myuser == user.student)
-                          InkWell(
-                            onTap: () {
-                              Provider.of<Auth_manager>(context, listen: false)
-                                  .logout();
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.menu_sharp),
+                          Builder(
+                            builder: (context) => InkWell(
+                              onTap: () {
+                                Scaffold.of(context).openDrawer();
+                                // Provider.of<Auth_manager>(context, listen: false)
+                                //     .logout();
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(Icons.menu_sharp),
+                              ),
                             ),
                           ),
                         Text(
@@ -128,6 +134,66 @@ class _Single_Student_ScreenState extends State<Single_Student_Screen> {
                   )
                 ],
               ),
+        drawer: widget.myuser == user.student
+            ? Drawer(
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: AssetImage(
+                            'assets/images/logo.jpg',
+                            // fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      height: 200,
+                    ),
+                    Expanded(
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        children: <Widget>[
+                          ListTile(
+                            title: Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                    width: 0.7,
+                                  ),
+                                ),
+                                height: 40,
+                                child: Material(
+                                  // elevation: 5.0,
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  child: Center(
+                                    child: Text(
+                                      "تسجيل الخروج",
+                                      style: TextStyle(
+                                          fontSize: 19,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            onTap: () {
+                              Provider.of<Auth_manager>(context, listen: false)
+                                  .logout();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : Container(),
       ),
     );
   }
