@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:attendance/helper/httpexception.dart';
+import 'package:attendance/models/StudentModelCompare.dart';
+import 'package:attendance/models/appointment.dart';
 import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:dio/dio.dart';
 
@@ -15,7 +17,12 @@ class GroupManager extends ChangeNotifier {
   }
 
   String? _authToken;
+  List<StudentModelCompare> _students_compare = [];
+  List<StudentModelCompare>? get students_compare => _students_compare;
+
   List<GroupModelSimple> _groups = [];
+  List<AppointmentModel> _group_students = [];
+  List<AppointmentModel> get group_students => _group_students;
   List<GroupModelSimple> get groups => _groups;
   get hasmore => _hasMore;
   get pageNumber => _pageNumber;
@@ -27,6 +34,71 @@ class GroupManager extends ChangeNotifier {
   bool _error = false;
   bool _loading = true;
   final int _defaultGroupsPerPageCount = 15;
+  // var lesson__id = [];
+  // var i = 0;
+  Future<void> add_compare(
+      lesson__id,
+      student_absence,
+      // String? degree,
+      // // String? year,
+      // String? student_id,
+      int? url
+      // String? teacher,
+      // List<String>? day,
+      // List<String>? time,
+      ) async {
+    try {
+      Dio dio = Dio();
+      String urld =
+          'https://development.mrsaidmostafa.com/api/groups/$url/compare';
+      print(urld);
+
+      var params = {
+        "appointments": [
+          // {"appointment_id": lesson__id[i], "case": "attend"},
+          for (var i = 0; i < lesson__id.length; i++)
+            {"appointment_id": lesson__id[i], "case": student_absence[i]},
+        ]
+      };
+      print('e lesson__idddddddddddddddd');
+      print(lesson__id);
+      print('e student_absenceeeeeeee');
+      print(student_absence);
+      
+      dio.options.headers["Authorization"] = 'Bearer $_authToken';
+      dio.options.headers["Accept"] = 'application/json';
+
+      var response = await dio.post(urld, data: jsonEncode(params));
+      print(response);
+
+      final responseData = response.data;
+      print('responseDataaaaaaaaaaaaaaaaaaaaa');
+      print(responseData);
+
+      // if (responseData['errors'] != null) {
+      //   print(responseData['errors']);
+      //   List<String> errors = [];
+      //   for (var value in responseData['errors'].values) errors.add(value[0]);
+      //   throw HttpException(errors.join('  '));
+     //}
+         List students = responseData['data']['students'];
+      print('students');
+      print(students);
+
+      List<StudentModelCompare> list =
+          students.map((data) => StudentModelCompare.fromJson(data)).toList();
+      _students_compare = list;
+      print("list");
+      print(list);
+      print(_students_compare[1].id);
+      _loading = false;
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+
+    notifyListeners();
+  }
 
   Future<void> add_degree(
       String? degree,
@@ -44,9 +116,7 @@ class GroupManager extends ChangeNotifier {
       print(urld);
       var params = {
         'degree': degree,
-        
         'student_id': student_id,
-       
       };
 
       dio.options.headers["Authorization"] = 'Bearer $_authToken';
@@ -71,7 +141,6 @@ class GroupManager extends ChangeNotifier {
 
     notifyListeners();
   }
-
 
   Future<void> addgroup(
     String? name,
@@ -143,6 +212,39 @@ class GroupManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> get_group_students(int id) async {
+    var url = Uri.https('development.mrsaidmostafa.com', '/api/groups/$id');
+    try {
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+      final responseData = json.decode(response.body);
+      print('responseDataaaaaa');
+      print(responseData);
+      List<dynamic> stagesList = responseData['data']['appointments'];
+      print('stagesListtttttttttt');
+      print(stagesList);
+      var list =
+          stagesList.map((data) => AppointmentModel.fromJson(data)).toList();
+      _group_students = list;
+      _loading = false;
+      // add exception
+      //  for (var i = 0; i < stagesList.length; i++) {
+      //   lesson__id.add(stagesList[i]['id']);
+      //   print('iddddddddddddddddd');
+      //   print(lesson__id);
+      // }
+    } catch (error) {
+      print(error);
+    }
+
+    notifyListeners();
+  }
+
   Future<void> getMoreData() async {
     try {
       var url = Uri.https('development.mrsaidmostafa.com', '/api/groups',
@@ -197,8 +299,12 @@ class GroupManager extends ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
+      print('responseDataaaaaaaaaaaa');
+      print(responseData);
       List<dynamic> groupsList = responseData['data'];
+      print('groupsListtttttttttttt');
+      print(groupsList[0]['id']);
+
       var fetchedgroups =
           groupsList.map((data) => GroupModelSimple.fromJson(data)).toList();
       _hasMore = fetchedgroups.length == _defaultGroupsPerPageCount;

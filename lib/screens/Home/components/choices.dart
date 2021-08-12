@@ -14,18 +14,6 @@ import 'package:provider/provider.dart';
 import '../../../constants.dart';
 import '../Home_Screen.dart';
 
-class Choices extends StatefulWidget {
-  const Choices({
-    Key? key,
-    required this.size,
-  }) : super(key: key);
-
-  final Size size;
-
-  @override
-  _ChoicesState createState() => _ChoicesState();
-}
-
 late String year_id_selected;
 String yearname = 'السنه الدراسيه';
 late String subjectId_selected;
@@ -34,8 +22,33 @@ late String teacher_id_selected;
 String teachername = 'المدرس';
 late String group_id_selected;
 String group_name = 'المجموعه';
+int group_id=0;
 late String app_id_selected;
 String app_name = 'اختر حصه';
+
+class Choices extends StatefulWidget {
+  const Choices({
+    Key? key,
+    required this.size,
+  }) : super(key: key);
+
+  final Size size;
+  static int my_group = group_id;
+
+  @override
+  _ChoicesState createState() => _ChoicesState();
+}
+
+// late String year_id_selected;
+// String yearname = 'السنه الدراسيه';
+// late String subjectId_selected;
+// String subjectname = 'الماده الدراسيه';
+// late String teacher_id_selected;
+// String teachername = 'المدرس';
+// late String group_id_selected;
+// String group_name = 'المجموعه';
+// late String app_id_selected;
+// String app_name = 'اختر حصه';
 
 late String scanResult_code;
 
@@ -551,6 +564,8 @@ class _ChoicesState extends State<Choices> {
                                           subjectId_selected,
                                           teacher_id_selected)
                                       .then((value) {
+                                    // print('valueeeeeeeeeeeeeeeeee');
+                                    // //print(value);
                                     setState(() {
                                       _isloadinggroups = false;
                                     });
@@ -686,8 +701,11 @@ class _ChoicesState extends State<Choices> {
                                         group_id_selected = groupmanager
                                             .groups[index].id
                                             .toString();
-                                        group_name =
-                                            groupmanager.groups[index].name!;
+                                        group_id = 
+                                            groupmanager.groups[index].id!;
+                                       group_name = groupmanager.groups[index].name!;
+                                        print('group_nammmmmme');
+                                        print(groupmanager.groups[index].name!);
                                         group_level = true;
                                         _isloadingappointment = true;
                                         app_name = 'الحصه';
