@@ -1,9 +1,11 @@
 import 'package:attendance/constants.dart';
 import 'package:attendance/helper/httpexception.dart';
+import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
+import 'package:attendance/models/teacher.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -12,9 +14,13 @@ class group_form extends StatefulWidget {
   const group_form({
     Key? key,
     required this.size,
+    this.tuser,
+    this.teacher,
   }) : super(key: key);
 
   final Size size;
+  final user? tuser;
+  final TeacherModel? teacher;
 
   @override
   _group_formState createState() => _group_formState();
@@ -268,6 +274,10 @@ class _group_formState extends State<group_form> {
       Provider.of<SubjectManager>(context, listen: false).resetlist();
       Provider.of<YearManager>(context, listen: false).resetlist();
       Provider.of<TeacherManager>(context, listen: false).resetlist();
+      if (widget.tuser == user.teacher) {
+        teachername = widget.teacher!.name!;
+        teacher_id_selected = widget.teacher!.id!.toString();
+      }
       try {
         await Provider.of<SubjectManager>(context, listen: false)
             .getMoreData()
@@ -741,7 +751,9 @@ class _group_formState extends State<group_form> {
                               border: Border.all(color: Colors.grey),
                             ),
                             child: InkWell(
-                              onTap: () => _modalBottomSheetMenu3(context),
+                              onTap: widget.tuser != user.teacher
+                                  ? () => _modalBottomSheetMenu3(context)
+                                  : () {},
                               child: Container(
                                 child: Row(
                                   children: [

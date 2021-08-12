@@ -6,6 +6,7 @@ import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
+import 'package:attendance/models/teacher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -20,10 +21,12 @@ class Choices extends StatefulWidget {
     Key? key,
     required this.size,
     this.usser,
+    this.teacher,
   }) : super(key: key);
 
   final Size size;
   final user? usser;
+  final TeacherModel? teacher;
   @override
   _ChoicesState createState() => _ChoicesState();
 }
@@ -67,7 +70,11 @@ class _ChoicesState extends State<Choices> {
     Future.delayed(Duration.zero, () async {
       yearname = 'السنه الدراسيه';
       subjectname = 'الماده الدراسيه';
-      teachername = 'المدرس';
+      teachername =
+          widget.usser != user.teacher ? 'المدرس' : widget.teacher!.name!;
+      if (widget.usser == user.teacher) {
+        teacher_id_selected = widget.teacher!.id!.toString();
+      }
       group_name = 'المجموعه';
       app_name = 'الحصه';
       Provider.of<GroupManager>(context, listen: false).resetlist();
@@ -234,10 +241,20 @@ class _ChoicesState extends State<Choices> {
                                     subjectname =
                                         subjectmanager.subjects![index].name!;
                                     subject_level = true;
-                                    teacher_level = false;
+                                    teacher_level = widget.usser != user.teacher
+                                        ? false
+                                        : true;
                                     group_level = false;
-                                    _isloadingteachers = true;
-                                    teachername = 'المدرس';
+                                    _isloadingteachers =
+                                        widget.usser != user.teacher
+                                            ? true
+                                            : false;
+                                    if (widget.usser == user.teacher) {
+                                      _isloadinggroups = true;
+                                    }
+                                    teachername = widget.usser != user.teacher
+                                        ? 'المدرس'
+                                        : widget.teacher!.name!;
                                     group_name = 'المجموعه';
                                     app_name = 'الحصه';
                                   });
@@ -246,15 +263,28 @@ class _ChoicesState extends State<Choices> {
                                       .setHomeOptions(false);
                                   Navigator.pop(context);
 
-                                  await Provider.of<TeacherManager>(context,
-                                          listen: false)
-                                      .getMoreDatafiltered(
-                                          year_id_selected, subjectId_selected)
-                                      .then((value) {
-                                    setState(() {
-                                      _isloadingteachers = false;
-                                    });
-                                  });
+                                  widget.usser != user.teacher
+                                      ? await Provider.of<TeacherManager>(
+                                              context,
+                                              listen: false)
+                                          .getMoreDatafiltered(year_id_selected,
+                                              subjectId_selected)
+                                          .then((value) {
+                                          setState(() {
+                                            _isloadingteachers = false;
+                                          });
+                                        })
+                                      : await Provider.of<GroupManager>(context,
+                                              listen: false)
+                                          .getMoreDatafiltered(
+                                              year_id_selected,
+                                              subjectId_selected,
+                                              teacher_id_selected)
+                                          .then((value) {
+                                          setState(() {
+                                            _isloadinggroups = false;
+                                          });
+                                        });
                                 },
                                 child: ListTile(
                                   title: Text(
@@ -380,7 +410,9 @@ class _ChoicesState extends State<Choices> {
                                     group_level = false;
                                     _isloadingsubjects = true;
                                     subjectname = 'الماده الدراسيه';
-                                    teachername = 'المدرس';
+                                    teachername = widget.usser != user.teacher
+                                        ? 'المدرس'
+                                        : widget.teacher!.name!;
                                     group_name = 'المجموعه';
                                     app_name = 'الحصه';
                                   });
@@ -1043,7 +1075,9 @@ class _ChoicesState extends State<Choices> {
                   color: kbackgroundColor1,
                   items: teachers,
                   size: widget.size,
-                  fnc: () => _modalBottomSheetMenuteacher(context),
+                  fnc: widget.usser != user.teacher
+                      ? () => _modalBottomSheetMenuteacher(context)
+                      : () {},
                   active: subject_level == true,
                   loading: _isloadingteachers,
                 ),

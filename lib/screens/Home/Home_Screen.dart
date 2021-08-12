@@ -4,6 +4,7 @@ import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/student.dart';
+import 'package:attendance/models/teacher.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/show_group/show_group.dart';
 import 'package:flutter/material.dart';
@@ -17,17 +18,19 @@ final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class Home_Screen extends StatelessWidget {
   final user? myuser;
-  static MaterialPage page({required user user}) {
+  final TeacherModel? myteacher;
+  static MaterialPage page({required user user, TeacherModel? teacher}) {
     return MaterialPage(
       name: Attendance_Screens.homepath,
       key: ValueKey(Attendance_Screens.homepath),
       child: Home_Screen(
         myuser: user,
+        myteacher: teacher,
       ),
     );
   }
 
-  const Home_Screen({Key? key, this.myuser}) : super(key: key);
+  const Home_Screen({Key? key, this.myuser, this.myteacher}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +56,7 @@ class Home_Screen extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(height: 10),
-                  Choices(size: size, usser: myuser),
+                  Choices(size: size, usser: myuser, teacher: myteacher),
                   // build_chip_container_down(null, 'مجموعه الحضور'),
                   // SizedBox(
                   //   height: 10,
