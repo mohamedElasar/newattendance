@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
+import 'package:attendance/models/teacher.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum user { center, student }
+enum user { center, student, assistant, teacher }
 
 class Auth_manager extends ChangeNotifier {
   String? token;
@@ -16,15 +17,19 @@ class Auth_manager extends ChangeNotifier {
   String? _userPhone;
   String? _type;
   StudentModelSearch? _studentUser;
+  TeacherModel? _teacherUser;
   late String _name;
 
   int? get userid => _userId;
   bool get isLoggedIn => token != null;
   String get name => _name;
   StudentModelSearch? get userstudent => _studentUser;
+  TeacherModel? get userteacher => _teacherUser;
   user? get type {
     if (_type == 'center') return user.center;
     if (_type == 'student') return user.student;
+    if (_type == 'assistant') return user.assistant;
+    if (_type == 'teacher') return user.teacher;
   }
 
   StudentModelSearch? get studentUser => _studentUser;
@@ -38,6 +43,7 @@ class Auth_manager extends ChangeNotifier {
         headers: {'Accept': 'application/json'},
       );
       final responseData = json.decode(response.body);
+      print(responseData);
 
       if (responseData['errors'] != null) {
         throw HttpException(responseData['errors']['username'][0]);
@@ -55,6 +61,9 @@ class Auth_manager extends ChangeNotifier {
       if (_type == 'student') {
         _studentUser = StudentModelSearch.fromJson(responseData['data']);
       }
+      if (_type == 'teacher') {
+        _teacherUser = TeacherModel.fromJson(responseData['data']);
+      }
     } catch (error) {
       print(error);
       throw (error);
@@ -65,6 +74,7 @@ class Auth_manager extends ChangeNotifier {
 
   Future<void> rememberMe() async {
     final prefs = await SharedPreferences.getInstance();
+
     if (_type == 'student') {
       final userData = json.encode(
         {
@@ -75,6 +85,20 @@ class Auth_manager extends ChangeNotifier {
           'name': _name,
           'type': _type,
           'student': _studentUser!.toJson()
+        },
+      );
+      prefs.setString('userData', userData);
+    }
+    if (_type == 'teacher') {
+      final userData = json.encode(
+        {
+          'token': token,
+          'userId': _userId,
+          'userEmail': _userEmail,
+          'userPhone': _userPhone,
+          'name': _name,
+          'type': _type,
+          'teacher': _teacherUser!.toJson()
         },
       );
       prefs.setString('userData', userData);
@@ -102,6 +126,7 @@ class Auth_manager extends ChangeNotifier {
     _userPhone = null;
     _type = null;
     _studentUser = null;
+    _teacherUser = null;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
@@ -112,10 +137,9 @@ class Auth_manager extends ChangeNotifier {
     if (!prefs.containsKey('userData')) {
       return false;
     }
-    if (_type == 'student') {
-      final extractedData = prefs.getString('userData');
-
-      final data = (json.decode(extractedData!));
+    final extractedData = prefs.getString('userData');
+    final data = (json.decode(extractedData!));
+    if (data['type'] == 'student') {
       token = data['token'];
       _userId = data['userId'];
       _userPhone = data['userPhone'];
@@ -124,10 +148,17 @@ class Auth_manager extends ChangeNotifier {
       _type = data['type'];
       _studentUser = StudentModelSearch.fromJson(data['student']);
     }
-    if (_type == 'center') {
-      final extractedData = prefs.getString('userData');
+    if (data['type'] == 'teacher') {
+      token = data['token'];
+      _userId = data['userId'];
+      _userPhone = data['userPhone'];
+      _userEmail = data['userEmail'];
+      _name = data['name'];
+      _type = data['type'];
+      _teacherUser = TeacherModel.fromJson(data['teacher']);
+    }
 
-      final data = (json.decode(extractedData!));
+    if (data['type'] == 'center') {
       token = data['token'];
       _userId = data['userId'];
       _userPhone = data['userPhone'];

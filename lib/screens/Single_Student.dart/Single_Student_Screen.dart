@@ -96,7 +96,7 @@ class _Single_Student_ScreenState extends State<Single_Student_Screen> {
                               ? 'صفحه طالب '
                               : 'الصفحه الشخصيه ',
                           style: TextStyle(
-                              fontSize: 35,
+                              fontSize: 25,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'AraHamah1964B-Bold'),
                         ),

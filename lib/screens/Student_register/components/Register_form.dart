@@ -746,10 +746,13 @@ class _Register_FormState extends State<Register_Form> {
     if (widget.edit!) cityname = widget.student!.city!.name.toString();
     if (widget.edit!) cityId_selected = widget.student!.city!.id.toString();
     if (widget.edit!)
-      langname = widget.student!.secLang!.name == null
+      langname = widget.student!.secLang == null
           ? 'اللغه الثانيه'
           : widget.student!.secLang!.name.toString();
-    if (widget.edit!) langId_selected = widget.student!.secLang!.id.toString();
+    if (widget.edit!)
+      langId_selected = widget.student!.secLang == null
+          ? null
+          : widget.student!.secLang!.id.toString();
     if (widget.edit!) {
       _groups_id = widget.student!.groups!.map((e) => e.id.toString()).toList();
       _groups_shown =

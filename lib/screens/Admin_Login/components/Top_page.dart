@@ -14,7 +14,7 @@ class Top_Page extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: kTextColor1,
-      height: size.height * .4,
+      height: size.height * .35,
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 60),
       alignment: Alignment.center,
