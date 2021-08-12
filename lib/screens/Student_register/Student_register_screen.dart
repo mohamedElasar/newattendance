@@ -68,7 +68,8 @@ class Student_Register_Screen extends StatelessWidget {
         ),
         backgroundColor: Colors.grey[300],
         body: SingleChildScrollView(
-            child: Register_Form(size: size, edit: myedit, student: myStudent)),
+            child:
+                Register_Form(size: size, edit: myedit, student: myStudent!)),
       ),
     );
   }

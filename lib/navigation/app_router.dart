@@ -74,7 +74,7 @@ class AppRouter extends RouterDelegate
       pages: [
         if (!authmanager.isLoggedIn) Admin_logIn.page(),
         if (authmanager.isLoggedIn && authmanager.type != user.student)
-          Home_Screen.page(),
+          Home_Screen.page(user: authmanager.type!),
         if (authmanager.isLoggedIn && authmanager.type == user.student)
           Single_Student_Screen.page(
               userstudent: authmanager.studentUser, user: user.student),

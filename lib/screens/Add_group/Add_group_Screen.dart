@@ -26,7 +26,7 @@ class Add_group_screen extends StatelessWidget {
               'تسجيل مجموعه',
               style: TextStyle(
                   color: Colors.black,
-                  fontSize: 30,
+                  fontSize: 25,
                   fontFamily: 'AraHamah1964B-Bold'),
             ),
           ),

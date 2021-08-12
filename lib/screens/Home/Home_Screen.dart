@@ -1,5 +1,6 @@
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Auth_manager.dart';
+import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/student.dart';
@@ -15,15 +16,18 @@ import 'components/options_widget.dart';
 final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class Home_Screen extends StatelessWidget {
-  static MaterialPage page() {
+  final user? myuser;
+  static MaterialPage page({required user user}) {
     return MaterialPage(
       name: Attendance_Screens.homepath,
       key: ValueKey(Attendance_Screens.homepath),
-      child: const Home_Screen(),
+      child: Home_Screen(
+        myuser: user,
+      ),
     );
   }
 
-  const Home_Screen({Key? key}) : super(key: key);
+  const Home_Screen({Key? key, this.myuser}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +53,7 @@ class Home_Screen extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(height: 10),
-                  Choices(size: size),
+                  Choices(size: size, usser: myuser),
                   // build_chip_container_down(null, 'مجموعه الحضور'),
                   // SizedBox(
                   //   height: 10,
@@ -114,40 +118,41 @@ class Home_Screen extends StatelessWidget {
                       //         builder: (context) => Student_Register_Screen()));
                     },
                   ),
-                  ListTile(
-                    title: Padding(
-                      padding: const EdgeInsets.all(1.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 0.7,
+                  if (myuser != user.assistant)
+                    ListTile(
+                      title: Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            border: Border.all(
+                              color: Colors.grey,
+                              width: 0.7,
+                            ),
                           ),
-                        ),
-                        height: 40,
-                        child: Material(
-                          // elevation: 5.0,
-                          borderRadius: BorderRadius.circular(5.0),
-                          child: Center(
-                            child: Text(
-                              "ادخال معلم",
-                              style: TextStyle(
-                                  fontSize: 19, fontWeight: FontWeight.bold),
+                          height: 40,
+                          child: Material(
+                            // elevation: 5.0,
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: Center(
+                              child: Text(
+                                "ادخال معلم",
+                                style: TextStyle(
+                                    fontSize: 19, fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                         ),
                       ),
+                      onTap: () {
+                        Provider.of<AppStateManager>(context, listen: false)
+                            .registerTeacher(true);
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => Add_Teacher_Screeen()));
+                      },
                     ),
-                    onTap: () {
-                      Provider.of<AppStateManager>(context, listen: false)
-                          .registerTeacher(true);
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => Add_Teacher_Screeen()));
-                    },
-                  ),
                   ListTile(
                     title: Padding(
                       padding: const EdgeInsets.all(1.0),
@@ -371,7 +376,7 @@ class Scan_button extends StatelessWidget {
         child: Text(
           'Scan',
           style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
         ),
       ),
     );
@@ -404,7 +409,7 @@ class HomeTopPage extends StatelessWidget {
           Text(
             'الصفحه الرئيسيه',
             style: TextStyle(
-                fontSize: 35,
+                fontSize: size.width * .08,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'AraHamah1964B-Bold'),
           ),
@@ -416,12 +421,14 @@ class HomeTopPage extends StatelessWidget {
               children: [
                 Text(
                   'بحث',
-                  style:
-                      TextStyle(fontFamily: 'GE-medium', color: Colors.black87),
+                  style: TextStyle(
+                      fontFamily: 'GE-light',
+                      color: Colors.black87,
+                      fontSize: 20),
                 ),
                 Icon(
                   Icons.search,
-                  size: 30,
+                  size: 20,
                   color: Colors.black87,
                 ),
               ],

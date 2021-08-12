@@ -34,7 +34,7 @@ class CELL extends StatelessWidget {
   final text;
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(fontSize: 18, fontFamily: 'GE-medium');
+    const textStyle = TextStyle(fontSize: 12, fontFamily: 'GE-medium');
     return Container(
       width: width,
       height: height,

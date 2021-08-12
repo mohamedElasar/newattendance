@@ -7,7 +7,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum user { center, student }
+enum user { center, student, assistant }
 
 class Auth_manager extends ChangeNotifier {
   String? token;
@@ -25,6 +25,8 @@ class Auth_manager extends ChangeNotifier {
   user? get type {
     if (_type == 'center') return user.center;
     if (_type == 'student') return user.student;
+    if (_type == 'assistant') return user.assistant;
+    if (_type == 'teacher') return user.assistant;
   }
 
   StudentModelSearch? get studentUser => _studentUser;
@@ -38,6 +40,7 @@ class Auth_manager extends ChangeNotifier {
         headers: {'Accept': 'application/json'},
       );
       final responseData = json.decode(response.body);
+      print(responseData);
 
       if (responseData['errors'] != null) {
         throw HttpException(responseData['errors']['username'][0]);

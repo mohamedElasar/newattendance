@@ -160,7 +160,7 @@ class Student_details extends StatelessWidget {
                         child: Text(
                           'رقم التليفون',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 13,
                             fontFamily: 'GE-bold',
                           ),
                           maxLines: 1,
@@ -169,16 +169,17 @@ class Student_details extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        width: 20,
+                        width: 10,
                       ),
                       Container(
+                        // color: Colors.red,
                         width: size.width / 3,
                         child: Text(
                           myuser == user.center
                               ? studentmanager.singleStudent!.phone!
                               : studentProfile!.phone!,
                           style: TextStyle(
-                              fontSize: 17, fontWeight: FontWeight.bold),
+                              fontSize: 13, fontWeight: FontWeight.bold),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           softWrap: false,
@@ -194,13 +195,24 @@ class Student_details extends StatelessWidget {
                 margin: EdgeInsets.symmetric(vertical: 5),
                 child: Row(
                   children: [
-                    Text(
-                      //رقم تليفون ولى الامر
-                      'رقم تليفون ولى الامر',
-                      style: TextStyle(fontSize: 16, fontFamily: 'GE-bold'),
+                    Container(
+                      // color: Colors.red,
+                      width: size.width * .3,
+                      child: Text(
+                        //رقم تليفون ولى الامر
+                        'رقم تليفون ولى الامر',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontFamily: 'GE-bold',
+                        ),
+                      ),
                     ),
                     SizedBox(
-                      width: 20,
+                      width: 10,
                     ),
                     Container(
                       width: size.width / 3,
@@ -209,7 +221,7 @@ class Student_details extends StatelessWidget {
                             ? studentmanager.singleStudent!.parentPhone!
                             : studentProfile!.parentPhone!,
                         style: TextStyle(
-                            fontSize: 17, fontWeight: FontWeight.bold),
+                            fontSize: 13, fontWeight: FontWeight.bold),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
@@ -226,8 +238,7 @@ class Student_details extends StatelessWidget {
                       ? studentmanager.singleStudent!.groups!
                       : studentProfile!.groups!,
                 ),
-                child:
-                    Name(size: size, name: 'عرض مجموعات الطالب', arrow: true),
+                child: Name(size: size, name: '  المجموعات', arrow: true),
               ),
               Name(
                   title: 'المحافظه :',

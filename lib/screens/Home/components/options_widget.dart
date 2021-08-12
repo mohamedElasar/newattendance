@@ -80,7 +80,7 @@ class Chip_Container extends StatelessWidget {
     return Container(
       width: size.width * .45,
       alignment: Alignment.center,
-      height: 30,
+      height: 25,
       padding: EdgeInsets.symmetric(horizontal: 2),
       decoration: BoxDecoration(
         border: Border.all(width: 1, color: Colors.grey),
@@ -92,7 +92,7 @@ class Chip_Container extends StatelessWidget {
           text,
           style: TextStyle(
             fontFamily: 'AraHamah1964B-Bold',
-            fontSize: 19,
+            fontSize: size.width * .04,
             color: active ? Colors.black : Colors.black38,
           ),
         ),

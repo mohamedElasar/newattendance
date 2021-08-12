@@ -1,6 +1,7 @@
 import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Appointment_manager.dart';
+import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
@@ -18,10 +19,11 @@ class Choices extends StatefulWidget {
   const Choices({
     Key? key,
     required this.size,
+    this.usser,
   }) : super(key: key);
 
   final Size size;
-
+  final user? usser;
   @override
   _ChoicesState createState() => _ChoicesState();
 }
@@ -59,20 +61,6 @@ class _ChoicesState extends State<Choices> {
   bool _isloadingappointment = false;
   bool _scanloading = false;
   bool _isinit = true;
-
-  // @override
-  // void didChangeDependencies() async {
-  //   if (_isinit == true) {
-  //     // Provider.of<GroupManager>(context, listen: false).resetlist();
-  //     // Provider.of<TeacherManager>(context, listen: false).resetlist();
-  //     // // Provider.of<YearManager>(context, listen: false).resetlist();
-  //     // Provider.of<SubjectManager>(context, listen: false).resetlist();
-  //     // Provider.of<YearManager>(context, listen: false).resetlist();
-
-  //   }
-  //   _isinit = false;
-  //   super.didChangeDependencies();
-  // }
 
   @override
   void initState() {
@@ -1088,10 +1076,12 @@ class _ChoicesState extends State<Choices> {
                   color: kbuttonColor3,
                   size: widget.size,
                   text: 'ادخال معلم',
-                  fnc: () async {
-                    Provider.of<AppStateManager>(context, listen: false)
-                        .registerTeacher(true);
-                  },
+                  fnc: widget.usser == user.assistant
+                      ? () {}
+                      : () async {
+                          Provider.of<AppStateManager>(context, listen: false)
+                              .registerTeacher(true);
+                        },
                 ),
               ],
             ),
@@ -1225,6 +1215,19 @@ class _ChoicesState extends State<Choices> {
                             ),
                           );
                         }
+                        if (resp['last_appointment_attend'] ==
+                            'This Group Has not have appointments') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.green[300],
+                              content: Text(
+                                ' تم التسجيل بنجاح',
+                                style: TextStyle(fontFamily: 'GE-medium'),
+                              ),
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        }
                       } on HttpException catch (e) {
                         _showErrorDialog(e.toString(), 'حدث خطأ');
                       } catch (e) {
@@ -1327,7 +1330,8 @@ class Choice_container extends StatelessWidget {
       padding: EdgeInsets.only(right: 6),
       margin: EdgeInsets.all(1),
       alignment: Alignment.center,
-      height: size.height * .6 * .16,
+      height: size.height * .6 * .14,
+      // height: 40,
       width: size.width * .45,
       decoration: BoxDecoration(
         color: active ? color : color.withOpacity(.5),
@@ -1349,7 +1353,7 @@ class Choice_container extends StatelessWidget {
                         softWrap: false,
                         style: TextStyle(
                             fontFamily: 'AraHamah1964B-Bold',
-                            fontSize: 25,
+                            fontSize: 20,
                             color: active ? Colors.black : Colors.black26),
                       ),
                     ),
@@ -1383,7 +1387,8 @@ class Button_Container extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.all(1),
         alignment: Alignment.center,
-        height: size.height * .6 * .16,
+        height: size.height * .6 * .14,
+        // height: 40,
         width: size.width * .45,
         decoration: BoxDecoration(
           color: color,
@@ -1401,8 +1406,9 @@ class Button_Container extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
-                style:
-                    TextStyle(fontFamily: 'AraHamah1964B-Bold', fontSize: 25),
+                style: TextStyle(
+                    fontFamily: 'AraHamah1964B-Bold',
+                    fontSize: size.width * .06),
               ),
             ),
           ],

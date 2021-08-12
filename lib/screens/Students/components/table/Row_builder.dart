@@ -5,6 +5,8 @@ import 'package:attendance/models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
 class Rows_Builder extends StatefulWidget {
   final groupId;
   final size;
@@ -96,6 +98,8 @@ class _Rows_BuilderState extends State<Rows_Builder> {
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                       child: TABLE_ROW(
+                          callfnc: () => launch(
+                              "tel://${studentmanager.students[index].phone.toString()}"),
                           size: widget.size,
                           name: studentmanager.students[index].name!,
                           id: studentmanager.students[index].code?.name ??
@@ -126,6 +130,7 @@ class TABLE_ROW extends StatelessWidget {
     required this.mobile,
     required this.myfnc,
     required this.tapFnc,
+    required this.callfnc,
   }) : super(key: key);
   final size;
   final bool check;
@@ -134,6 +139,7 @@ class TABLE_ROW extends StatelessWidget {
   final String mobile;
   final VoidCallback myfnc;
   final VoidCallback tapFnc;
+  final VoidCallback callfnc;
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +161,9 @@ class TABLE_ROW extends StatelessWidget {
               child: CELL(height: 30, width: size.width / 3, text: name)),
           CELL(height: 30, width: size.width / 6, text: id),
           CELL(height: 30, width: size.width / 5, text: mobile),
-          Phone_Icon(height: 30, width: size.width / 7),
+          InkWell(
+              onTap: callfnc,
+              child: Phone_Icon(height: 30, width: size.width / 7)),
           Spacer(),
         ],
       ),
