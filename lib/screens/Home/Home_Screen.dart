@@ -12,7 +12,8 @@ import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 import 'components/choices.dart';
-import 'components/options_widget.dart';
+ import 'components/options_widget.dart';
+
 
 final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -29,6 +30,7 @@ class Home_Screen extends StatelessWidget {
       ),
     );
   }
+
 
   const Home_Screen({Key? key, this.myuser, this.myteacher}) : super(key: key);
 
@@ -49,13 +51,14 @@ class Home_Screen extends StatelessWidget {
           //   size: size,
           //   arrowback: false,
           // ),
-          Options(size: size),
+          Options(size: size ),
           Container(
             // height: size.height * .75,
             child: SingleChildScrollView(
               child: Column(
                 children: [
                   SizedBox(height: 10),
+
                   Choices(size: size, usser: myuser, teacher: myteacher),
                   // build_chip_container_down(null, 'مجموعه الحضور'),
                   // SizedBox(
