@@ -22,7 +22,7 @@ late String teacher_id_selected;
 String teachername = 'المدرس';
 late String group_id_selected;
 String group_name = 'المجموعه';
-int group_id=0;
+int group_id = 0;
 late String app_id_selected;
 String app_name = 'اختر حصه';
 
@@ -34,6 +34,7 @@ class Choices extends StatefulWidget {
 
   final Size size;
   static int my_group = group_id;
+  static String mygroup_name = group_name;
 
   @override
   _ChoicesState createState() => _ChoicesState();
@@ -701,9 +702,10 @@ class _ChoicesState extends State<Choices> {
                                         group_id_selected = groupmanager
                                             .groups[index].id
                                             .toString();
-                                        group_id = 
+                                        group_id =
                                             groupmanager.groups[index].id!;
-                                       group_name = groupmanager.groups[index].name!;
+                                        group_name =
+                                            groupmanager.groups[index].name!;
                                         print('group_nammmmmme');
                                         print(groupmanager.groups[index].name!);
                                         group_level = true;

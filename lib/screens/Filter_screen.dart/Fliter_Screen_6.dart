@@ -48,7 +48,11 @@ class Filter_Screen_6 extends StatelessWidget {
           child: Column(
             children: [
               Search_top(size: size),
+             
               Filters_top(size: size),
+              //  SizedBox(
+              //   height: 8,
+              // ),
               Tabel_here(
                 size: size,
               ),
@@ -148,14 +152,14 @@ class _Tabel_hereState extends State<Tabel_here> {
     setState(() => _selectedIndexAbsence = index);
   }
 
-  existing(int selected) {
-    for (i in list__index) {
-      if (selected == i) {
-        return 1;
-      }
-      return 0;
-    }
-  }
+  //existing(int selected) {
+  //   for (i in list__index) {
+  //     if (selected == i) {
+  //       return 1;
+  //     }
+  //     return 0;
+  //   }
+  // }
 
   @override
   void initState() {
@@ -809,7 +813,7 @@ class _MyListItemState extends State<MyListItem> {
                 ? null
                 : () {
                     // _onTap();
-                    _onSelected(widget.index);
+                   // _onSelected(widget.index);
                     print('indexxxxxxxxxxx');
                     print(widget.index);
                     print('_selectedIndexXXX');

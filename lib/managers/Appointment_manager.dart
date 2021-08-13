@@ -24,6 +24,7 @@ class AppointmentManager extends ChangeNotifier {
   AppointmentModel? _currentApp = AppointmentModel();
   List<StudentModelSimple> _students_attend = [];
   List<StudentModelSimple> get student_attend => _students_attend;
+  static List<StudentModelSimple> myattend = [];
 
   List<AppointmentModel>? get appointments => _appointments;
   List<AppointmentModel>? get appointmentsshow => _appointmentsshow;
@@ -40,7 +41,7 @@ class AppointmentManager extends ChangeNotifier {
 
   // final int _defaultPerPageCount = 15;
 
-   Future<void> get_degrees(String lesson_id) async {
+  Future<void> get_degrees(String lesson_id) async {
     var url = Uri.https(
         'development.mrsaidmostafa.com', '/api/appointments/$lesson_id');
     try {
@@ -52,28 +53,25 @@ class AppointmentManager extends ChangeNotifier {
         },
       );
       final responseData = json.decode(response.body);
-     
+
       print(url);
- 
+
       List appointments = responseData['data']['students'];
       print('appointments');
       print(appointments);
-    
-      List<StudentModelSimple> list =
-          appointments.map((data) => StudentModelSimple.fromJson(data)).toList();
+
+      List<StudentModelSimple> list = appointments
+          .map((data) => StudentModelSimple.fromJson(data))
+          .toList();
       _appointments_degree = list;
       print("list");
       print(list);
       print(_appointments_degree);
       _loading = false;
-
-     
-
     } catch (error) {
       throw (error);
     }
   }
-
 
   Future<void> get_appointments(String groupid) async {
     var url =
@@ -158,6 +156,7 @@ class AppointmentManager extends ChangeNotifier {
 
       List<StudentModelSimple>? studentsattend = ourApp.students;
       _students_attend = studentsattend!;
+      myattend = _students_attend;
       _loading = false;
       print(_students_attend);
 
