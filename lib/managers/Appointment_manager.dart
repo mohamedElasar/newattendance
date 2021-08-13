@@ -182,13 +182,7 @@ class AppointmentManager extends ChangeNotifier {
       final responseData = json.decode(response.body);
       AppointmentModel appo = AppointmentModel.fromJson(responseData['data']);
       _currentApp = appo;
-      // final responseData = json.decode(response.body);
-      // print(responseData['data']['appointments']);
-      // List<dynamic> appointments = responseData['data']['appointments'];
-      // List<AppointmentModel> list =
-      //     appointments.map((data) => AppointmentModel.fromJson(data)).toList();
-      // _appointments = list;
-      // _loading = false;
+
       print(response.body);
 
       // add exception
@@ -210,6 +204,7 @@ class AppointmentManager extends ChangeNotifier {
     try {
       var response = await http.post(url, headers: {
         'Accept': 'application/json',
+        'x-accept-language': 'ar',
         HttpHeaders.authorizationHeader: 'Bearer $authToken'
       }, body: {
         'code': code,
@@ -221,12 +216,19 @@ class AppointmentManager extends ChangeNotifier {
       print(code);
       print(lessonid);
 
-      if (responseData['errors'] != null) {
+      if (responseData['errors']['code'] != null) {
         // print(responseData['errors']);
         List<String> errors = [];
         for (var value in responseData['errors'].values) errors.add(value[0]);
         throw HttpException(errors.join('  '));
       }
+      if (responseData['errors']['group'] != null) {
+        // print(responseData['errors']);
+        // List<String> errors = [];
+        // for (var value in responseData['errors'].values) errors.add(value[0]);
+        throw HttpException(responseData['errors']['group']);
+      }
+
       return responseData;
       // return (responseData);
 

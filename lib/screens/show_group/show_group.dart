@@ -25,13 +25,6 @@ class Show_Group extends StatefulWidget {
 }
 
 class _Show_GroupState extends State<Show_Group> {
-  List<String> items = [
-    'مجموعة الياسمين1',
-    'مجموعة الياسمين2',
-    'مجموعة الياسمين3',
-    'مجموعة الياسمين4',
-    'مجموعة الياسمين5'
-  ];
   var colors = [
     Colors.grey[600],
     Colors.white,

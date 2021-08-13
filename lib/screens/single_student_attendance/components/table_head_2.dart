@@ -52,7 +52,8 @@ class TABLE_HEAD_2 extends StatelessWidget {
                   height: 30,
                   width: size.width / 5,
                   attend: attend!.appointments![myindex!].attend!,
-                ),
+                  compensation: attend!.appointments![myindex!].compensationId
+                      .toString()),
           CELL_2(
             height: 30,
             width: size.width / 5,
@@ -101,11 +102,16 @@ class CELL_2 extends StatelessWidget {
 
 class CELL_Icon extends StatelessWidget {
   const CELL_Icon(
-      {Key? key, required this.width, required this.height, this.attend = true})
+      {Key? key,
+      required this.width,
+      required this.height,
+      this.attend = true,
+      this.compensation})
       : super(key: key);
   final double width;
   final double height;
   final bool attend;
+  final String? compensation;
   @override
   Widget build(BuildContext context) {
     const textStyle = TextStyle(fontSize: 18, fontFamily: 'GE-bold');
@@ -119,7 +125,7 @@ class CELL_Icon extends StatelessWidget {
         child: attend
             ? Icon(
                 Icons.done,
-                color: Colors.green,
+                color: compensation == '' ? Colors.green : Colors.blue,
               )
             : Icon(
                 Icons.cancel_outlined,

@@ -24,7 +24,7 @@ late String teacher_id_selected;
 String teachername = 'المدرس';
 late String group_id_selected;
 String group_name = 'المجموعه';
-int group_id=0;
+int group_id = 0;
 late String app_id_selected;
 String app_name = 'اختر حصه';
 
@@ -722,9 +722,10 @@ class _ChoicesState extends State<Choices> {
                                         group_id_selected = groupmanager
                                             .groups[index].id
                                             .toString();
-                                        group_id = 
+                                        group_id =
                                             groupmanager.groups[index].id!;
-                                       group_name = groupmanager.groups[index].name!;
+                                        group_name =
+                                            groupmanager.groups[index].name!;
                                         print('group_nammmmmme');
                                         print(groupmanager.groups[index].name!);
                                         group_level = true;
@@ -1227,7 +1228,7 @@ class _ChoicesState extends State<Choices> {
           ),
           Consumer<AppStateManager>(
             builder: (context, appstatemanager, child) => GestureDetector(
-              onTap: app_name != 'الحصه'
+              onTap: app_name != 'الحصه' && _loadingscann == false
                   ? () async {
                       setState(() {
                         _loadingscann = true;
@@ -1268,19 +1269,19 @@ class _ChoicesState extends State<Choices> {
                             ),
                           );
                         }
-                        if (resp['last_appointment_attend'] ==
-                            'This Group Has not have appointments') {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: Colors.green[300],
-                              content: Text(
-                                ' تم التسجيل بنجاح',
-                                style: TextStyle(fontFamily: 'GE-medium'),
-                              ),
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                        }
+                        // if (resp['last_appointment_attend'] ==
+                        //     'This Group Has not have appointments') {
+                        //   ScaffoldMessenger.of(context).showSnackBar(
+                        //     SnackBar(
+                        //       backgroundColor: Colors.green[300],
+                        //       content: Text(
+                        //         ' تم التسجيل بنجاح',
+                        //         style: TextStyle(fontFamily: 'GE-medium'),
+                        //       ),
+                        //       duration: Duration(seconds: 3),
+                        //     ),
+                        //   );
+                        // }
                       } on HttpException catch (e) {
                         _showErrorDialog(e.toString(), 'حدث خطأ');
                       } catch (e) {

@@ -189,6 +189,7 @@ class AppRouter extends RouterDelegate
       appStateManager.studentsCommunicate(false);
     }
     if (route.settings.name == Attendance_Screens.groupcheck) {
+      groupManager.resetlist();
       appStateManager.gotocheckgroups(false);
     }
     if (route.settings.name == Attendance_Screens.data_students) {
