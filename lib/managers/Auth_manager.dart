@@ -19,7 +19,7 @@ class Auth_manager extends ChangeNotifier {
   StudentModelSearch? _studentUser;
   TeacherModel? _teacherUser;
   late String _name;
-
+  static String? group__name;
   int? get userid => _userId;
   bool get isLoggedIn => token != null;
   String get name => _name;
@@ -53,9 +53,11 @@ class Auth_manager extends ChangeNotifier {
       _userEmail = responseData['data']['email'];
       _userPhone = responseData['data']['phone'];
       _name = responseData['data']['name'];
+       group__name = _name;
       _type = responseData['data']['type'];
       print(_type);
-      print(_type);
+      print("_name");
+      print(group__name);
       print(_type);
 
       if (_type == 'student') {

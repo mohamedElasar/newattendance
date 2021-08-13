@@ -24,6 +24,7 @@ class AppointmentManager extends ChangeNotifier {
   AppointmentModel? _currentApp = AppointmentModel();
   List<StudentModelSimple> _students_attend = [];
   List<StudentModelSimple> get student_attend => _students_attend;
+  static List<StudentModelSimple> myattend = [];
 
   List<AppointmentModel>? get appointments => _appointments;
   List<AppointmentModel>? get appointmentsshow => _appointmentsshow;
@@ -156,6 +157,7 @@ class AppointmentManager extends ChangeNotifier {
 
       List<StudentModelSimple>? studentsattend = ourApp.students;
       _students_attend = studentsattend!;
+      myattend = _students_attend;
       _loading = false;
       print(_students_attend);
 

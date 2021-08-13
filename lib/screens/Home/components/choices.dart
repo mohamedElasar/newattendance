@@ -38,6 +38,7 @@ class Choices extends StatefulWidget {
 
   final Size size;
   static int my_group = group_id;
+  static String mygroup_name = group_name;
 
   final user? usser;
   final TeacherModel? teacher;

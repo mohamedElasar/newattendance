@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 
 import 'components/default_form_field.dart';
 
+bool show_select = false;
 bool is_true = false;
 bool _is = true;
 List<String> userChecked = [];
@@ -153,16 +154,16 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
   String button_text = 'أضافة درجة';
   bool show_text = false;
 
-  List<String> items = [
-    'محمد أحمد',
-    'أحمد الكاشف',
-    'ايه محمد',
-    'عمرو الشرقاوي',
-    'محمد أحمد',
-    'أحمد الكاشف',
-    'ايه محمد',
-    'عمرو الشرقاوي'
-  ];
+  // List<String> items = [
+  //   'محمد أحمد',
+  //   'أحمد الكاشف',
+  //   'ايه محمد',
+  //   'عمرو الشرقاوي',
+  //   'محمد أحمد',
+  //   'أحمد الكاشف',
+  //   'ايه محمد',
+  //   'عمرو الشرقاوي'
+  // ];
   var colors = [
     kbuttonColor3.withOpacity(.8),
     kbuttonColor3.withOpacity(.6),
@@ -214,7 +215,19 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
             //search_list_all = search_list;
             //isLoading = false;
           });
-        });
+         // AppointmentManager j =new AppointmentManager();
+         // if (j.student_attend.length > 0) {
+          //  setState(() {
+              //show_select = true;
+
+              print('j.student_attend.length');
+              print(AppointmentManager.myattend.length);
+           // });
+         // }
+       });
+        // AppointmentManager j = AppointmentManager();
+        // print('j.student_attend.length');
+        //       print(j.student_attend.length);
       } catch (e) {}
       if (!mounted) return;
     });
@@ -262,45 +275,51 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
                 SizedBox(
                   height: 20,
                 ),
-                FlatButton(
-                    // my selectAll button
-                    onPressed: () {},
-                    child: Row(children: [
-                      SizedBox(),
-                      Spacer(),
-                      Row(
-                        children: [
-                          Checkbox(
-                              activeColor: Colors.black,
-                              value:
-                                  // _is_checked[widget.Index]
-                                  // userChecked.contains(search_list[l_index]),
-                                  _checked,
-                              onChanged: (val) {
-                                setState(() {
-                                  _checked = val!;
-                                  if (_checked == true) {
-                                    // for (var i in _is_checked) {
-                                    //   i = true;
-                                    // }
-                                    _is_checked = List<bool>.filled(
-                                        mysearch_list.length, true);
-                                  } else {
-                                    // for (var i in _is_checked) {
-                                    //   i = false;
-                                    // }
-                                    _is_checked = List<bool>.filled(
-                                        mysearch_list.length, false);
-                                  }
-                                });
-                              }),
-                          Text(
-                            'selecct all',
-                            style: TextStyle(color: Colors.black, fontSize: 27),
-                          )
-                        ],
-                      ),
-                    ])),
+                Visibility(
+                  visible: AppointmentManager.myattend.length >0 ? true : false,
+                  child: FlatButton(
+                      // my selectAll button
+                      onPressed: () {},
+                      child: Row(children: [
+                        SizedBox(),
+                        Spacer(),
+                        Row(
+                          children: [
+                            Checkbox(
+                                activeColor: Colors.black,
+                                value:
+                                    // _is_checked[widget.Index]
+                                    // userChecked.contains(search_list[l_index]),
+                                    _checked,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _checked = val!;
+                                    if (_checked == true) {
+                                      // for (var i in _is_checked) {
+                                      //   i = true;
+                                      // }
+                                      _is_checked = List<bool>.filled(
+                                          mysearch_list.length, true);
+                                    } else {
+                                      // for (var i in _is_checked) {
+                                      //   i = false;
+                                      // }
+                                      _is_checked = List<bool>.filled(
+                                          mysearch_list.length, false);
+                                    }
+                                  });
+                                }),
+                            Text(
+                              'selecct all',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 27),
+                            )
+                          ],
+                        ),
+                      ])),
+                ),
+                //  :
+                //           SizedBox(),
                 Expanded(
                   child: Center(
                     child: Padding(
@@ -312,66 +331,72 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
                       child: Container(
                         // color: kbackgroundColor2,
                         child: Consumer<AppointmentManager>(
-                          builder: (builder, appmgr, child) => appmgr
-                                      .student_attend.isEmpty ||
-                                  _isLoading
-                              ? Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Text(
-                                    'لا يوجد طلاب',
-                                    //  حضرو الحصه',
-                                    style: TextStyle(fontFamily: 'GE-Bold'),
-                                  ),
-                                )
-                              : ListView.separated(
-                                  separatorBuilder:
-                                      (BuildContext ctxt, int Index) => Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 15),
-                                            child: Divider(
-                                              color: Colors.black,
-                                              height: 3,
-                                              //thickness: 3,
-                                            ),
+                            builder: (builder, appmgr, child) {
+                          if (appmgr.student_attend.isEmpty || _isLoading) {
+                            //show_select = false;
+                            return Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Text(
+                                'لا يوجد طلاب',
+                                //  حضرو الحصه',
+                                style: TextStyle(fontFamily: 'GE-Bold'),
+                              ),
+                            );
+                          } else {
+                            // show_select = true;
+                            return ListView.separated(
+                                separatorBuilder:
+                                    (BuildContext ctxt, int Index) => Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 15),
+                                          child: Divider(
+                                            color: Colors.black,
+                                            height: 3,
+                                            //thickness: 3,
                                           ),
-                                  // controller: _sc,
-                                  itemCount: appmgr.student_attend.length,
-                                  itemBuilder: (BuildContext ctxt, int Index) {
-                                    add = true;
-                                    l_index = Index;
-                                    list_index.add(Index);
-                                    print('list_indexxxxxxxxxxx');
-                                    print(list_index);
-                                    // _onSelected(Index);
-                                    if (!mysearch_list.contains(
-                                        appmgr.student_attend[Index].name)) {
-                                      mysearch_list.add(
-                                          appmgr.student_attend[Index].name!);
-                                      //_isChecked.length = search_list.length;
-                                      print("my search_listtttttttt");
-                                      print(mysearch_list);
-                                    }
-                                    search_list.add(
+                                        ),
+                                // controller: _sc,
+                                itemCount: appmgr.student_attend.length,
+                                itemBuilder: (BuildContext ctxt, int Index) {
+                                  // if(appmgr.student_attend.length>0){
+                                  //        show_select = true;
+                                  // }
+
+                                  add = true;
+                                  l_index = Index;
+                                  list_index.add(Index);
+                                  print('list_indexxxxxxxxxxx');
+                                  print(list_index);
+                                  // _onSelected(Index);
+                                  if (!mysearch_list.contains(
+                                      appmgr.student_attend[Index].name)) {
+                                    mysearch_list.add(
                                         appmgr.student_attend[Index].name!);
-                                    _isChecked.length = search_list.length;
+                                    //_isChecked.length = search_list.length;
+                                    print("my search_listtttttttt");
+                                    print(mysearch_list);
+                                  }
+                                  search_list
+                                      .add(appmgr.student_attend[Index].name!);
+                                  _isChecked.length = search_list.length;
 
-                                    print('_isCheckeddddddddddd');
-                                    print(_isChecked);
+                                  print('_isCheckeddddddddddd');
+                                  print(_isChecked);
 
-                                    print('isCheckeddddddddddd');
-                                    print(_isChecked);
-                                    print("search_listtttttttt");
-                                    print(search_list);
-                                    // key:
+                                  print('isCheckeddddddddddd');
+                                  print(_isChecked);
+                                  print("search_listtttttttt");
+                                  print(search_list);
+                                  // key:
 
-                                    Student__id =
-                                        appmgr.student_attend[Index].id;
-                                    print('Student__id');
-                                    print(Student__id);
+                                  Student__id = appmgr.student_attend[Index].id;
+                                  print('Student__id');
+                                  print(Student__id);
 
-                                    return ListItem(Index, appmgr);
-                                  }),
-                        ),
+                                  return ListItem(Index, appmgr);
+                                });
+                          }
+                        }),
                       ),
                     ),
                   ),
