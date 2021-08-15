@@ -212,23 +212,18 @@ class AppointmentManager extends ChangeNotifier {
         'code': code,
       });
       final responseData = json.decode(response.body);
-      // print(code);
-      // print(code);
-      // print(code);
+
       print(code);
       print(lessonid);
-
-      if (responseData['errors']['code'] != null) {
-        // print(responseData['errors']);
-        List<String> errors = [];
-        for (var value in responseData['errors'].values) errors.add(value[0]);
-        throw HttpException(errors.join('  '));
-      }
-      if (responseData['errors']['group'] != null) {
-        // print(responseData['errors']);
-        // List<String> errors = [];
-        // for (var value in responseData['errors'].values) errors.add(value[0]);
-        throw HttpException(responseData['errors']['group']);
+      if (response.statusCode == 422) {
+        if (responseData['errors']['code'] != null) {
+          List<String> errors = [];
+          for (var value in responseData['errors'].values) errors.add(value[0]);
+          throw HttpException(errors.join('  '));
+        }
+        if (responseData['errors']['group'] != null) {
+          throw HttpException(responseData['errors']['group']);
+        }
       }
 
       return responseData;
@@ -237,6 +232,7 @@ class AppointmentManager extends ChangeNotifier {
       // add exception
 
     } catch (error) {
+      print(error);
       throw (error);
     }
 

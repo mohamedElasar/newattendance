@@ -148,6 +148,7 @@ class TeacherManager extends ChangeNotifier {
 
       _teachers.addAll(fetched);
     } catch (e) {
+      print(e);
       _loading = false;
       _error = true;
       notifyListeners();
