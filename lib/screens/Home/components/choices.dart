@@ -1127,17 +1127,25 @@ class _ChoicesState extends State<Choices> {
                         .registerStudent(true);
                   },
                 ),
-                Button_Container(
-                  color: kbuttonColor3,
-                  size: widget.size,
-                  text: 'ادخال معلم',
-                  fnc: widget.usser == user.assistant
-                      ? () {}
-                      : () async {
+                (widget.usser == user.assistant || widget.usser == user.teacher)
+                    ? Button_Container(
+                        color: kbuttonColor3,
+                        size: widget.size,
+                        text: 'المواد الدراسيه',
+                        fnc: () async {
+                          Provider.of<AppStateManager>(context, listen: false)
+                              .modifySubjects(true);
+                        },
+                      )
+                    : Button_Container(
+                        color: kbuttonColor3,
+                        size: widget.size,
+                        text: 'ادخال معلم',
+                        fnc: () async {
                           Provider.of<AppStateManager>(context, listen: false)
                               .registerTeacher(true);
                         },
-                ),
+                      ),
               ],
             ),
           ),
@@ -1146,13 +1154,16 @@ class _ChoicesState extends State<Choices> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Button_Container(
-                  color: kbackgroundColor3,
+                  color: kbackgroundColor1,
                   size: widget.size,
-                  text: 'الدرجات ',
-                  fnc: () {},
+                  text: 'السنوات الدراسيه',
+                  fnc: () async {
+                    Provider.of<AppStateManager>(context, listen: false)
+                        .addYears(true);
+                  },
                 ),
                 Button_Container(
-                  color: kbuttonColor2,
+                  color: kbackgroundColor3,
                   size: widget.size,
                   text: 'ادخال مجموعه',
                   fnc: () async {
@@ -1163,31 +1174,27 @@ class _ChoicesState extends State<Choices> {
               ],
             ),
           ),
-          Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Button_Container(
-                  color: kbuttonColor2,
-                  size: widget.size,
-                  text: 'المواد الدراسيه',
-                  fnc: () async {
-                    Provider.of<AppStateManager>(context, listen: false)
-                        .modifySubjects(true);
-                  },
+          (widget.usser == user.assistant || widget.usser == user.teacher)
+              ? Container()
+              : Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Button_Container(
+                        color: kbuttonColor3,
+                        size: widget.size,
+                        text: 'المواد الدراسيه',
+                        fnc: () async {
+                          Provider.of<AppStateManager>(context, listen: false)
+                              .modifySubjects(true);
+                        },
+                      ),
+                      Container(
+                        width: widget.size.width * .45,
+                      )
+                    ],
+                  ),
                 ),
-                Button_Container(
-                  color: kbackgroundColor1,
-                  size: widget.size,
-                  text: 'السنوات الدراسيه',
-                  fnc: () async {
-                    Provider.of<AppStateManager>(context, listen: false)
-                        .addYears(true);
-                  },
-                ),
-              ],
-            ),
-          ),
           Container(
             // padding: EdgeInsets.only(right: 6),
             margin: EdgeInsets.all(10),
