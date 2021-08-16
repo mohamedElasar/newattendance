@@ -36,7 +36,7 @@ var _isLoading = false;
 String? Group_Id;
 int? Student__id;
 String Lesson_Id = '';
-List<String> search_list = [];
+//List<String> search_list = [];
 List<String> mysearch_list = [];
 
 List<int> list_index = [0, 1, 2, 3];
@@ -181,7 +181,7 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
   String text_value = '';
 
   bool _isloading = true;
-  List<bool> _isChecked = [];
+  //List<bool> _isChecked = [];
   int search_list_length = 0;
   // for(var i=0 ; i< search_list_length ;i++){
   //   _isChecked[i]= false;
@@ -215,16 +215,16 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
             //search_list_all = search_list;
             //isLoading = false;
           });
-         // AppointmentManager j =new AppointmentManager();
-         // if (j.student_attend.length > 0) {
+          // AppointmentManager j =new AppointmentManager();
+          // if (j.student_attend.length > 0) {
           //  setState(() {
-              //show_select = true;
+          //show_select = true;
 
-              print('j.student_attend.length');
-              print(AppointmentManager.myattend.length);
-           // });
-         // }
-       });
+          print('j.student_attend.length');
+          print(AppointmentManager.myattend.length);
+          // });
+          // }
+        });
         // AppointmentManager j = AppointmentManager();
         // print('j.student_attend.length');
         //       print(j.student_attend.length);
@@ -272,11 +272,12 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
                 SizedBox(
                   height: 30,
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                // SizedBox(
+                //   height: 20,
+                // ),
                 Visibility(
-                  visible: AppointmentManager.myattend.length >0 ? true : false,
+                  visible:
+                      AppointmentManager.myattend.length > 0 ? true : false,
                   child: FlatButton(
                       // my selectAll button
                       onPressed: () {},
@@ -362,36 +363,37 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
                                   //        show_select = true;
                                   // }
 
-                                  add = true;
-                                  l_index = Index;
-                                  list_index.add(Index);
-                                  print('list_indexxxxxxxxxxx');
-                                  print(list_index);
+                                  // add = true;
+                                  // l_index = Index;
+                                  // list_index.add(Index);
+                                  // search_list
+                                  //     .add(appmgr.student_attend[Index].name!);
+                                  // _isChecked.length = search_list.length;
+                                  // print('list_indexxxxxxxxxxx');
+                                  // print(list_index);
                                   // _onSelected(Index);
                                   if (!mysearch_list.contains(
                                       appmgr.student_attend[Index].name)) {
                                     mysearch_list.add(
                                         appmgr.student_attend[Index].name!);
                                     //_isChecked.length = search_list.length;
-                                    print("my search_listtttttttt");
-                                    print(mysearch_list);
+                                    // print("my search_listtttttttt");
+                                    // print(mysearch_list);
                                   }
-                                  search_list
-                                      .add(appmgr.student_attend[Index].name!);
-                                  _isChecked.length = search_list.length;
+                                  
 
-                                  print('_isCheckeddddddddddd');
-                                  print(_isChecked);
+                                  // print('_isCheckeddddddddddd');
+                                  // print(_isChecked);
 
-                                  print('isCheckeddddddddddd');
-                                  print(_isChecked);
-                                  print("search_listtttttttt");
-                                  print(search_list);
+                                  // print('isCheckeddddddddddd');
+                                  // print(_isChecked);
+                                  // print("search_listtttttttt");
+                                  // print(search_list);
                                   // key:
 
                                   Student__id = appmgr.student_attend[Index].id;
-                                  print('Student__id');
-                                  print(Student__id);
+                                  // print('Student__id');
+                                  // print(Student__id);
 
                                   return ListItem(Index, appmgr);
                                 });
@@ -434,71 +436,71 @@ class ListItem extends StatefulWidget {
 }
 
 class _ListItemState extends State<ListItem> {
-  FocusNode _usernameFocusNode = FocusNode();
+  // FocusNode _usernameFocusNode = FocusNode();
   bool show_text = false;
-  List<bool> checkBoxValues = [];
-  String? Group_Id;
+  //List<bool> checkBoxValues = [];
+  //String? Group_Id;
   // int? Student__id;
   var added_degrees = [];
-  int i = 0;
-  bool isLoading = false;
-  bool checked = false;
-  bool select_all = false;
+  // int i = 0;
+  // bool isLoading = false;
+  // bool checked = false;
+  // bool select_all = false;
   var colors = [
     kbuttonColor3.withOpacity(.8),
     kbuttonColor3.withOpacity(.6),
   ];
-  var yearController = TextEditingController();
+  // var yearController = TextEditingController();
   var degreeController = TextEditingController();
 
-  String text_value = '';
+  // String text_value = '';
 
-  bool _isloading = true;
+  // bool _isloading = true;
   List<bool> _isChecked = [];
-  int search_list_length = 0;
+  // int search_list_length = 0;
   var text_colors = [Colors.black, Colors.black];
-  String text = '';
+  // String text = '';
 
-  Map<String, dynamic> _add_data = {
-    'year': null,
-  };
+  // Map<String, dynamic> _add_data = {
+  //   'year': null,
+  // };
   // List<String> search_list = [];
   // String result = '';
 
-  List<StudentModelSimple> search_list_all = [];
-  TextEditingController searchController = new TextEditingController();
+  // List<StudentModelSimple> search_list_all = [];
+  // TextEditingController searchController = new TextEditingController();
   // int _selectedIndex = 0;
 
   _onSelected(int index) {
     setState(() => _selectedIndex = index);
   }
 
-  Icon _searchIcon = new Icon(Icons.search);
-  void fieldFocusChange(
-    BuildContext context,
-    FocusNode currentFocus,
-//FocusNode nextFocus
-  ) {
-    currentFocus.unfocus();
-    //FocusScope.of(context).requestFocus(nextFocus);
-  }
+//   Icon _searchIcon = new Icon(Icons.search);
+//   void fieldFocusChange(
+//     BuildContext context,
+//     FocusNode currentFocus,
+// //FocusNode nextFocus
+//   ) {
+//     currentFocus.unfocus();
+//     //FocusScope.of(context).requestFocus(nextFocus);
+//   }
 
-  void _Selected(bool selected, String dataName) {
-    if (selected == true) {
-      setState(() {
-        userChecked.add(dataName);
-      });
-    } else {
-      setState(() {
-        userChecked.remove(dataName);
-      });
-    }
-  }
+  // void _Selected(bool selected, String dataName) {
+  //   if (selected == true) {
+  //     setState(() {
+  //       userChecked.add(dataName);
+  //     });
+  //   } else {
+  //     setState(() {
+  //       userChecked.remove(dataName);
+  //     });
+  //   }
+  // }
 
-  bool sent = false;
+ // bool sent = false;
 
-  final GlobalKey<FormState> _formKey = GlobalKey();
-  FocusNode fnode = FocusNode();
+  // final GlobalKey<FormState> _formKey = GlobalKey();
+  // FocusNode fnode = FocusNode();
   // var _isLoading = false;
   void _submit(Student__id) async {
     setState(() {
@@ -513,7 +515,7 @@ class _ListItemState extends State<ListItem> {
           .then((_) {
             result = '';
             setState(() {
-              sent = true;
+              //sent = true;
             });
           })
           .then((value) => setState(() {
@@ -563,8 +565,8 @@ class _ListItemState extends State<ListItem> {
   void initState() {
     super.initState();
     _is_checked = List<bool>.filled(mysearch_list.length, false);
-    print('okkkk');
-    print(mysearch_list);
+    // print('okkkk');
+    // print(mysearch_list);
   }
 
   @override
@@ -578,8 +580,8 @@ class _ListItemState extends State<ListItem> {
         // userChecked.contains(search_list[widget.Index]),
         onChanged: (val) {
           //  _Selected(val!, search_list[widget.Index]);
-          print('vallllllllllllllllll');
-          print(val);
+          // print('vallllllllllllllllll');
+          // print(val);
           // checked = val;
           setState(() {
             _is_checked[widget.Index] = val!;
@@ -621,14 +623,14 @@ class _ListItemState extends State<ListItem> {
                 ),
               ),
             ),
-            _selectedIndex != null &&
+            // _selectedIndex != null &&
                     // _selectedIndex == widget.Index &&
                     _is_checked[widget.Index] == true
                 //checked == true
                 //list_index[index]
-                ? Visibility(
+                ? 
                     // visible: _checked == false  ? false : true,
-                    child: Row(children: [
+                     Row(children: [
                       Text(
                         'الدرجة ',
                         style: TextStyle(
@@ -637,9 +639,8 @@ class _ListItemState extends State<ListItem> {
                       SizedBox(
                         width: 10,
                       ),
-                      Visibility(
-                        visible: true,
-                        child: Align(
+                      
+                         Align(
                           alignment: Alignment.bottomRight,
                           child: Container(
                             width: 90,
@@ -681,7 +682,7 @@ class _ListItemState extends State<ListItem> {
                                     //   _is=false;
                                     // }
                                     _is_checked[widget.Index] = false;
-                                    sent;
+                                  
                                     print('nammmmmmmmmmmmmmmme');
                                     print(widget.appmgr
                                         .student_attend[widget.Index].name);
@@ -691,7 +692,7 @@ class _ListItemState extends State<ListItem> {
                                         .parentPhone);
 
                                     added_degrees;
-                                    i;
+                                   
                                     Lesson_Id;
 
                                     print('degreeeeeeeeee');
@@ -714,9 +715,9 @@ class _ListItemState extends State<ListItem> {
                             ),
                           ),
                         ),
-                      ),
-                    ]),
-                  )
+                     
+                    ])
+                 
                 //Text(result)
                 : SizedBox(),
           ],
