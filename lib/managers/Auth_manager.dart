@@ -1,14 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/teacher.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+// import 'dart:_http';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum user { center, student, assistant, teacher }
+enum user { center, student, assistant, teacher, parent }
 
 class Auth_manager extends ChangeNotifier {
   String? token;
@@ -30,6 +32,7 @@ class Auth_manager extends ChangeNotifier {
     if (_type == 'student') return user.student;
     if (_type == 'assistant') return user.assistant;
     if (_type == 'teacher') return user.teacher;
+    if (_type == 'parent') return user.parent;
   }
 
   StudentModelSearch? get studentUser => _studentUser;
@@ -53,7 +56,7 @@ class Auth_manager extends ChangeNotifier {
       _userEmail = responseData['data']['email'];
       _userPhone = responseData['data']['phone'];
       _name = responseData['data']['name'];
-       group__name = _name;
+      group__name = _name;
       _type = responseData['data']['type'];
       print(_type);
       print("_name");
@@ -66,6 +69,11 @@ class Auth_manager extends ChangeNotifier {
       if (_type == 'teacher') {
         _teacherUser = TeacherModel.fromJson(responseData['data']);
       }
+      if (_type == 'parent') {
+        String idstudent = responseData['data']['student']['id'].toString();
+        _studentUser = await searchStudent(idstudent, token!);
+        _userId = responseData['data']['student']['id'];
+      }
     } catch (error) {
       print(error);
       throw (error);
@@ -77,7 +85,7 @@ class Auth_manager extends ChangeNotifier {
   Future<void> rememberMe() async {
     final prefs = await SharedPreferences.getInstance();
 
-    if (_type == 'student') {
+    if (_type == 'student' || _type == 'parent') {
       final userData = json.encode(
         {
           'token': token,
@@ -141,7 +149,7 @@ class Auth_manager extends ChangeNotifier {
     }
     final extractedData = prefs.getString('userData');
     final data = (json.decode(extractedData!));
-    if (data['type'] == 'student') {
+    if (data['type'] == 'student' || data['type'] == 'parent') {
       token = data['token'];
       _userId = data['userId'];
       _userPhone = data['userPhone'];
@@ -172,5 +180,35 @@ class Auth_manager extends ChangeNotifier {
 
     notifyListeners();
     return true;
+  }
+
+  Future<StudentModelSearch> searchStudent(String filter1, String token) async {
+    // print(_pageNumber);
+    try {
+      var url =
+          Uri.https('development.mrsaidmostafa.com', '/api/students/$filter1');
+      // print(_pageNumber);
+      //
+      print(url);
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token'
+        },
+      );
+
+      final responseData = json.decode(response.body);
+      // print(responseData);
+      dynamic student = responseData['data'];
+      // print(studentsList[0]);
+      // print(studentsList);
+      StudentModelSearch parentStudent = StudentModelSearch.fromJson(student);
+
+      return parentStudent;
+    } catch (e) {
+      // print(e);
+      throw e;
+    }
   }
 }

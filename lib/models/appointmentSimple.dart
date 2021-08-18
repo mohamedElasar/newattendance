@@ -4,6 +4,7 @@ class AppointmentModelSimple {
   String? degree;
   String? time;
   String? date;
+  String? name;
   String? compensationId;
 
   AppointmentModelSimple(
@@ -12,6 +13,7 @@ class AppointmentModelSimple {
       this.degree,
       this.compensationId,
       this.time,
+      this.name,
       this.date});
 
   AppointmentModelSimple.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class AppointmentModelSimple {
     degree = json['degree'];
     time = json['time'];
     date = json['date'];
+    name = json['name'];
     compensationId = json['compensation_id'];
   }
 
@@ -30,6 +33,7 @@ class AppointmentModelSimple {
     data['degree'] = this.degree;
     data['time'] = this.time;
     data['date'] = this.date;
+    data['name'] = this.name;
     data['compensation_id'] = this.compensationId;
     return data;
   }

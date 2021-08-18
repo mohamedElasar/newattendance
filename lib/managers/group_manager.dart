@@ -64,7 +64,7 @@ class GroupManager extends ChangeNotifier {
       print(lesson__id);
       print('e student_absenceeeeeeee');
       print(student_absence);
-      
+
       dio.options.headers["Authorization"] = 'Bearer $_authToken';
       dio.options.headers["Accept"] = 'application/json';
 
@@ -80,8 +80,8 @@ class GroupManager extends ChangeNotifier {
       //   List<String> errors = [];
       //   for (var value in responseData['errors'].values) errors.add(value[0]);
       //   throw HttpException(errors.join('  '));
-     //}
-         List students = responseData['data']['students'];
+      //}
+      List students = responseData['data']['students'];
       print('students');
       print(students);
 

@@ -80,7 +80,9 @@ class AppRouter extends RouterDelegate
         if (authmanager.isLoggedIn && authmanager.type == user.teacher)
           Home_Screen.page(
               user: authmanager.type!, teacher: authmanager.userteacher),
-        if (authmanager.isLoggedIn && authmanager.type == user.student)
+        if (authmanager.isLoggedIn &&
+            (authmanager.type == user.student ||
+                authmanager.type == user.parent))
           Single_Student_Screen.page(
               userstudent: authmanager.studentUser, user: user.student),
         if (authmanager.isLoggedIn && appStateManager.studentRegister)
@@ -143,7 +145,8 @@ class AppRouter extends RouterDelegate
               studentid: appStateManager.studentIdSelected,
               groupid: appStateManager.mysinglegroup),
         if (authmanager.isLoggedIn &&
-            authmanager.type == user.student &&
+            (authmanager.type == user.student ||
+                authmanager.type == user.parent) &&
             appStateManager.singleStudentAttend)
           Single_Student_attend.page(
               studentid: authmanager.userid.toString(),
@@ -189,7 +192,9 @@ class AppRouter extends RouterDelegate
       appStateManager.studentsCommunicate(false);
     }
     if (route.settings.name == Attendance_Screens.groupcheck) {
+      // print('object');
       groupManager.resetlist();
+      groupManager.getMoreData();
       appStateManager.gotocheckgroups(false);
     }
     if (route.settings.name == Attendance_Screens.data_students) {
