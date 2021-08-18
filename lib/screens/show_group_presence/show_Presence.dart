@@ -1,24 +1,26 @@
-import 'dart:ui';
+import 'dart:async';
 
 import 'package:attendance/constants.dart';
 import 'package:attendance/helper/httpexception.dart';
-import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Appointment_manager.dart';
-// import 'package:attendance/managers/degree_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
-import 'package:attendance/models/StudentModelSimple.dart';
 import 'package:attendance/models/appointment.dart';
-import 'package:attendance/models/group.dart';
 import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:attendance/navigation/screens.dart';
-import 'package:attendance/screens/Student_register/components/Register_form.dart';
 import 'package:attendance/screens/show_group_presence/components/Presence_top_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:sqflite/sqflite.dart';
+import 'components/connectivity.dart';
 
-import 'components/default_form_field.dart';
-
+String path = '';
+//int count_deree = 0;
+List degree_list = [];
+List id_list = [];
+var degree_value = '';
 bool show_select = false;
 bool is_true = false;
 bool _is = true;
@@ -110,10 +112,11 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
 
   @override
   void dispose() {
+    _connectivity.disposeStream();
     super.dispose();
   }
 
-  void _showErrorDialog(String message, String title) {
+  void _showErrorDialog(String message, String title, context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -175,9 +178,10 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
     'year': null,
   };
 
-  var yearController = TextEditingController();
+  //var yearController = TextEditingController();
   var degreeController = TextEditingController();
-
+  Map _source = {ConnectivityResult.none: false};
+  final MyConnectivity _connectivity = MyConnectivity.instance;
   String text_value = '';
 
   bool _isloading = true;
@@ -186,10 +190,20 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
   // for(var i=0 ; i< search_list_length ;i++){
   //   _isChecked[i]= false;
   // }
+  void deleteAll() async {
+    await deleteDatabase(path);
+  }
 
   @override
   void initState() {
     super.initState();
+    //deleteDatabase(path);
+
+    _connectivity.initialise();
+
+    _connectivity.myStream.listen((source) {
+      setState(() => _source = source);
+    });
     //if (ok == true) {
     _is_checked = List<bool>.filled(mysearch_list.length, false);
     print('ok my search_listtttttttttt');
@@ -198,7 +212,7 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
     Future.delayed(Duration.zero, () async {
       // Provider.of<AppointmentManager>(context, listen: false).resetlist();
       try {
-        await Provider.of<AppointmentManager>(context, listen: false)
+        await Provider.of<AppointmentManager>(this.context, listen: false)
             .get_students_attending_lesson(widget.group_id!, widget.mylessonid!)
             .then((_) {
           setState(() {
@@ -256,17 +270,101 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
                       end: 20,
                       top: 20,
                     ),
-                    child: Wrap(
-                        spacing: 10.0,
-                        runSpacing: 10.0,
-                        children: <Widget>[
-                          buildChip(widget.mygroup!.name!),
-                          buildChip(widget.mygroup!.subject!.name!),
-                          // buildChip('مجموعة الياسمين 2'),
-                          buildChip(widget.mygroup!.teacher!.name!),
-                          buildChip('معاد الحصه :  ${widget.mylesson!.time}'),
-                          buildChip('تاريخ الحصه :  ${widget.mylesson!.date}'),
-                        ]),
+                    child: Wrap(spacing: 10.0, runSpacing: 10.0, children: <
+                        Widget>[
+                      buildChip(widget.mygroup!.name!),
+                      buildChip(widget.mygroup!.subject!.name!),
+                      // buildChip('مجموعة الياسمين 2'),
+                      buildChip(widget.mygroup!.teacher!.name!),
+                      buildChip('معاد الحصه :  ${widget.mylesson!.time}'),
+                      buildChip('تاريخ الحصه :  ${widget.mylesson!.date}'),
+                      AppointmentManager.myattend.length > 0
+                          ? IconButton(
+                              icon: Icon(Icons.refresh),
+                              onPressed: () async {
+                                if (_ListItemState._connectionStatus ==
+                                    ConnectivityResult.none) {
+                                  print("no connection again");
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: Colors.red[400],
+                                      content: Text(
+                                        'لا يوجد اتصال بالانترنت',
+                                        style:
+                                            TextStyle(fontFamily: 'GE-medium'),
+                                      ),
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                } else {
+                                  print("reconnected");
+                                  for (var i = 0; i < degree_list.length; i++) {
+                                    try {
+                                      setState(() {
+                                        Group_Id;
+                                      });
+
+                                      await Provider.of<GroupManager>(context,
+                                              listen: false)
+                                          .add_degree(degree_list[i]['degree'],
+                                              id_list[i]['id_value'], Lesson_Id)
+                                          //                           .then((_) {
+                                          //   result = '';
+                                          //   setState(() {
+                                          //     //sent = true;
+                                          //   });
+                                          // })
+                                          .then((value) => setState(() {
+                                                _isLoading = false;
+                                              }))
+                                          .then(
+                                            (_) => ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                backgroundColor:
+                                                    Colors.green[300],
+                                                content: Text(
+                                                  'تم اضافه الدرجة بنجاح',
+                                                  style: TextStyle(
+                                                      fontFamily: 'GE-medium'),
+                                                ),
+                                                duration: Duration(seconds: 3),
+                                              ),
+                                            ),
+                                          );
+                                      deleteAll();
+                                    } on HttpException catch (error) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          backgroundColor: Colors.green[300],
+                                          content: Text(
+                                            'ادخل  درجة لاضافتها',
+                                            style: TextStyle(
+                                                fontFamily: 'GE-medium'),
+                                          ),
+                                          duration: Duration(seconds: 3),
+                                        ),
+                                      );
+                                    } catch (error) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          backgroundColor: Colors.red[400],
+                                          content: Text(
+                                            'ادخل  درجة لاضافتها',
+                                            style: TextStyle(
+                                                fontFamily: 'GE-medium'),
+                                          ),
+                                          duration: Duration(seconds: 3),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                }
+                              })
+                          : SizedBox()
+                    ]),
                   ),
                 ),
                 SizedBox(
@@ -380,7 +478,6 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
                                     // print("my search_listtttttttt");
                                     // print(mysearch_list);
                                   }
-                                  
 
                                   // print('_isCheckeddddddddddd');
                                   // print(_isChecked);
@@ -436,6 +533,10 @@ class ListItem extends StatefulWidget {
 }
 
 class _ListItemState extends State<ListItem> {
+  static late ConnectivityResult _connectionStatus;
+  Connectivity? connectivity;
+  StreamSubscription<ConnectivityResult>? subscription;
+
   // FocusNode _usernameFocusNode = FocusNode();
   bool show_text = false;
   //List<bool> checkBoxValues = [];
@@ -497,76 +598,160 @@ class _ListItemState extends State<ListItem> {
   //   }
   // }
 
- // bool sent = false;
+  // bool sent = false;
 
   // final GlobalKey<FormState> _formKey = GlobalKey();
   // FocusNode fnode = FocusNode();
   // var _isLoading = false;
-  void _submit(Student__id) async {
+
+  void _submit(Student__id, context) async {
     setState(() {
       _isLoading = true;
+      ConnectivityResult.wifi;
     });
-    try {
-      setState(() {
-        Group_Id;
-      });
-      await Provider.of<GroupManager>(context, listen: false)
-          .add_degree(result, '$Student__id', Lesson_Id)
-          .then((_) {
-            result = '';
-            setState(() {
-              //sent = true;
-            });
-          })
-          .then((value) => setState(() {
-                _isLoading = false;
-              }))
-          .then(
-            (_) => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: Colors.green[300],
-                content: Text(
-                  'تم اضافه الدرجة بنجاح',
-                  style: TextStyle(fontFamily: 'GE-medium'),
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.wifi) {
+      try {
+        setState(() {
+          Group_Id;
+        });
+
+        await Provider.of<GroupManager>(context, listen: false)
+            .add_degree(result, '$Student__id', Lesson_Id)
+            .then((_) {
+              result = '';
+              setState(() {
+                //sent = true;
+              });
+            })
+            .then((value) => setState(() {
+                  _isLoading = false;
+                }))
+            .then(
+              (_) => ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.green[300],
+                  content: Text(
+                    'تم اضافه الدرجة بنجاح',
+                    style: TextStyle(fontFamily: 'GE-medium'),
+                  ),
+                  duration: Duration(seconds: 3),
                 ),
-                duration: Duration(seconds: 3),
               ),
+            );
+      } on HttpException catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green[300],
+            content: Text(
+              'ادخل  درجة لاضافتها',
+              style: TextStyle(fontFamily: 'GE-medium'),
             ),
-          );
-    } on HttpException catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.green[300],
-          content: Text(
-            'ادخل  درجة لاضافتها',
-            style: TextStyle(fontFamily: 'GE-medium'),
+            duration: Duration(seconds: 3),
           ),
-          duration: Duration(seconds: 3),
-        ),
-      );
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red[400],
-          content: Text(
-            'ادخل  درجة لاضافتها',
-            style: TextStyle(fontFamily: 'GE-medium'),
+        );
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red[400],
+            content: Text(
+              'ادخل  درجة لاضافتها',
+              style: TextStyle(fontFamily: 'GE-medium'),
+            ),
+            duration: Duration(seconds: 3),
           ),
-          duration: Duration(seconds: 3),
-        ),
-      );
+        );
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        connectivityResult;
+      });
+      print("no connection");
+
+      var databasesPath = await getDatabasesPath();
+      path = join(databasesPath, 'student.db');
+
+//Delete the database
+      //await deleteDatabase(path);
+
+// open the database
+      Database database = await openDatabase(path, version: 1,
+          onCreate: (Database db, int version) async {
+        // When creating the db, create the table
+        await db.execute(
+            'CREATE TABLE Test (id INTEGER PRIMARY KEY, degree TEXT, id_value TEXT)');
+      });
+
+      await database.transaction((txn) async {
+        int id1 = await txn.rawInsert(
+            'INSERT INTO Test(degree, id_value) VALUES($result, $Student__id)');
+        print('inserted1: $id1');
+        // count_deree + 1;
+
+        //
+      });
+      // // Update some record
+      // if (count_deree > 1) {
+      //   int count = await database.rawUpdate(
+      //       'UPDATE Test SET degree = ?, id_value = ? WHERE id_value = ?',
+      //       ['$result', '$Student__id', '$Student__id']);
+      //   print('updated: $count');
+      // }
+
+      // Get the records
+      List<Map> list = await database.rawQuery('SELECT * FROM Test');
+      degree_list = await database.rawQuery('SELECT degree FROM Test');
+      id_list = await database.rawQuery('SELECT id_value FROM Test');
+
+      print('sqflite degree');
+      print(degree_list[0]['degree']);
+      print('sqflite list');
+      print(list);
+
+      //for(true){}
+      print('_connectionStatus');
+      print(_connectionStatus.toString());
+      // setState(() {
+      //   if (_connectionStatus == ConnectivityResult.none) {
+      //     print("no connection again");
+      //   } else {
+      //     print("reconnected");
+      //   }
+      // });
+
+// assert(const DeepCollectionEquality().equals(list, expectedList));
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
   void initState() {
     super.initState();
     _is_checked = List<bool>.filled(mysearch_list.length, false);
+
     // print('okkkk');
     // print(mysearch_list);
+    connectivity = new Connectivity();
+    subscription = connectivity!.onConnectivityChanged
+        .listen((ConnectivityResult myresult) {
+      _connectionStatus = myresult;
+      print('_connectionStatus');
+      print(_connectionStatus);
+      if (myresult == ConnectivityResult.wifi)
+      // ||
+      //     result == ConnectivityResult.mobile)
+      {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    subscription!.cancel();
+    super.dispose();
   }
 
   @override
@@ -624,100 +809,111 @@ class _ListItemState extends State<ListItem> {
               ),
             ),
             // _selectedIndex != null &&
-                    // _selectedIndex == widget.Index &&
-                    _is_checked[widget.Index] == true
+            // _selectedIndex == widget.Index &&
+            _is_checked[widget.Index] == true
                 //checked == true
                 //list_index[index]
-                ? 
-                    // visible: _checked == false  ? false : true,
-                     Row(children: [
-                      Text(
-                        'الدرجة ',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      
-                         Align(
-                          alignment: Alignment.bottomRight,
-                          child: Container(
-                            width: 90,
-                            color: colors[widget.Index % colors.length],
-                            child: TextFormField(
-                              // focusNode: _usernameFocusNode,
-                              // autofocus: true,
-                              keyboardType: TextInputType.number,
-                              // onFieldSubmitted: (val) {
-                              //   print('v_vallllll');
-                              //   print(val);
-                              // },
-                              style: TextStyle(
-                                  // color: Colors
-                                  //     .white,
-                                  fontWeight: FontWeight.bold),
-                              onFieldSubmitted: (String str) {
-                                // fieldFocusChange(context, _usernameFocusNode);
-                                if (str == '') {
-                                  print('noooooooooooooooooo');
-                                }
+                ?
+                // visible: _checked == false  ? false : true,
+                Row(children: [
+                    Text(
+                      'الدرجة ',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Container(
+                        width: 90,
+                        color: colors[widget.Index % colors.length],
+                        child: TextFormField(
+                          // focusNode: _usernameFocusNode,
+                          // autofocus: true,
+                          keyboardType: TextInputType.number,
+                          // onFieldSubmitted: (val) {
+                          //   print('v_vallllll');
+                          //   print(val);
+                          // },
+                          style: TextStyle(
+                              // color: Colors
+                              //     .white,
+                              fontWeight: FontWeight.bold),
+                          onFieldSubmitted: (String str) {
+                            // fieldFocusChange(context, _usernameFocusNode);
+                            if (str == '') {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Colors.red[400],
+                                  content: Text(
+                                    'ادخل  درجة لاضافتها',
+                                    style: TextStyle(fontFamily: 'GE-medium'),
+                                  ),
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+
+                              print('noooooooooooooooooo');
+                            }
+                            print('nammmmmmmmmmmmmmmme');
+                            print(widget
+                                .appmgr.student_attend[widget.Index].name);
+                            print(
+                                widget.appmgr.student_attend[widget.Index].id);
+                            setState(() {
+                              result = str;
+                              print('ressssssssult');
+                              print(result);
+
+                              // if (_selectedIndex == widget.Index) {
+                              setState(() {
+                                show_text = !show_text;
+
+                                _selectedIndex;
+                                // if (_checked == true) {
+                                _submit(
+                                    widget
+                                        .appmgr.student_attend[widget.Index].id,
+                                    context);
+                                // _checked = false;
+                                //   _is=false;
+                                // }
+                                _is_checked[widget.Index] = false;
+
                                 print('nammmmmmmmmmmmmmmme');
                                 print(widget
                                     .appmgr.student_attend[widget.Index].name);
-                                setState(() {
-                                  result = str;
-                                  print('ressssssssult');
-                                  print(result);
+                                added_degrees.add(widget.appmgr
+                                    .student_attend[widget.Index].parentPhone);
 
-                                  // if (_selectedIndex == widget.Index) {
-                                  setState(() {
-                                    show_text = !show_text;
+                                added_degrees;
 
-                                    _selectedIndex;
-                                    // if (_checked == true) {
-                                    _submit(widget.appmgr
-                                        .student_attend[widget.Index].id);
-                                    // _checked = false;
-                                    //   _is=false;
-                                    // }
-                                    _is_checked[widget.Index] = false;
-                                  
-                                    print('nammmmmmmmmmmmmmmme');
-                                    print(widget.appmgr
-                                        .student_attend[widget.Index].name);
-                                    added_degrees.add(widget
-                                        .appmgr
-                                        .student_attend[widget.Index]
-                                        .parentPhone);
+                                Lesson_Id;
 
-                                    added_degrees;
-                                   
-                                    Lesson_Id;
+                                print('degreeeeeeeeee');
+                                // print( appmgr
+                                //       .appointment[Index].students![Index].degree!);
+                              });
+                            }
 
-                                    print('degreeeeeeeeee');
-                                    // print( appmgr
-                                    //       .appointment[Index].students![Index].degree!);
-                                  });
-                                }
+                                // _submit();
+                                // }
+                                );
+                            degreeController.clear();
+                          },
+                          // onSaved: (v) {
 
-                                    // _submit();
-                                    // }
-                                    );
-                                degreeController.clear();
-                              },
-                              // onSaved: (v) {
-
-                              //    print('v_vvvvvvvvv');
-                              //   print(v);
-                              // },
-                              controller: degreeController,
-                            ),
-                          ),
+                          //    print('v_vvvvvvvvv');
+                          //   print(v);
+                          // },
+                          controller: degreeController,
                         ),
-                     
-                    ])
-                 
+                      ),
+                    ),
+                  ])
+
                 //Text(result)
                 : SizedBox(),
           ],
