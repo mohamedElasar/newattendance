@@ -62,6 +62,8 @@ class StudentManager extends ChangeNotifier {
     String? code,
     String? password,
     String? passwordconfirmation,
+    String? parentemail,
+    String? parentpassword,
   ) async {
     try {
       Dio dio = Dio();
@@ -86,6 +88,8 @@ class StudentManager extends ChangeNotifier {
         'discount': discount,
         'code': code,
         'second_language': secondLanguage,
+        'parent_email': parentemail,
+        'parent_password': parentpassword,
       };
       dio.options.headers["Authorization"] = 'Bearer $_authToken';
       dio.options.headers["Accept"] = 'application/json';

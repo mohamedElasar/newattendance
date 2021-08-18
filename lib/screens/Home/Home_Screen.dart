@@ -12,8 +12,7 @@ import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 import 'components/choices.dart';
- import 'components/options_widget.dart';
-
+import 'components/options_widget.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -30,7 +29,6 @@ class Home_Screen extends StatelessWidget {
       ),
     );
   }
-
 
   const Home_Screen({Key? key, this.myuser, this.myteacher}) : super(key: key);
 
@@ -51,7 +49,7 @@ class Home_Screen extends StatelessWidget {
           //   size: size,
           //   arrowback: false,
           // ),
-          Options(size: size ),
+          Options(size: size),
           Container(
             // height: size.height * .75,
             child: SingleChildScrollView(
@@ -219,10 +217,8 @@ class Home_Screen extends StatelessWidget {
                       ),
                     ),
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Show_Group()));
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .gotocheckgroups(true);
                     },
                   ),
                   ListTile(
@@ -293,36 +289,36 @@ class Home_Screen extends StatelessWidget {
                       //         builder: (context) => Add_academic_subject()));
                     },
                   ),
-                  ListTile(
-                    title: Padding(
-                      padding: const EdgeInsets.all(1.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 0.7,
-                          ),
-                        ),
-                        height: 40,
-                        child: Material(
-                          // elevation: 5.0,
-                          borderRadius: BorderRadius.circular(5.0),
-                          child: Center(
-                            child: Text(
-                              "الدرجات",
-                              style: TextStyle(
-                                  fontSize: 19, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    onTap: () {
-                      // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (context) => Degrees_Screen()));
-                    },
-                  ),
+                  // ListTile(
+                  //   title: Padding(
+                  //     padding: const EdgeInsets.all(1.0),
+                  //     child: Container(
+                  //       decoration: BoxDecoration(
+                  //         borderRadius: BorderRadius.all(Radius.circular(5)),
+                  //         border: Border.all(
+                  //           color: Colors.grey,
+                  //           width: 0.7,
+                  //         ),
+                  //       ),
+                  //       height: 40,
+                  //       child: Material(
+                  //         // elevation: 5.0,
+                  //         borderRadius: BorderRadius.circular(5.0),
+                  //         child: Center(
+                  //           child: Text(
+                  //             "الدرجات",
+                  //             style: TextStyle(
+                  //                 fontSize: 19, fontWeight: FontWeight.bold),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  //   onTap: () {
+                  //     // Navigator.push(context,
+                  //     //     MaterialPageRoute(builder: (context) => Degrees_Screen()));
+                  //   },
+                  // ),
                   ListTile(
                     title: Padding(
                       padding: const EdgeInsets.all(1.0),
