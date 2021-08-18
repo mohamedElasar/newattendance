@@ -142,6 +142,50 @@ class GroupManager extends ChangeNotifier {
     notifyListeners();
   }
 
+
+  // Future<void> add_degree_off(
+  //     var? degree,
+  //     // String? year,
+  //     var ? student_id,
+  //     String? url
+  //     // String? teacher,
+  //     // List<String>? day,
+  //     // List<String>? time,
+  //     ) async {
+  //   try {
+  //     Dio dio = Dio();
+  //     String urld =
+  //         'https://development.mrsaidmostafa.com/api/degree/appointments/$url';
+  //     print(urld);
+  //     var params = {
+  //       'degree': degree,
+  //       'student_id': student_id,
+  //     };
+
+  //     dio.options.headers["Authorization"] = 'Bearer $_authToken';
+  //     dio.options.headers["Accept"] = 'application/json';
+
+  //     var response = await dio.post(urld, data: jsonEncode(params));
+  //     print(response);
+
+  //     final responseData = response.data;
+  //     print(responseData);
+
+  //     if (responseData['errors'] != null) {
+  //       print(responseData['errors']);
+  //       List<String> errors = [];
+  //       for (var value in responseData['errors'].values) errors.add(value[0]);
+  //       throw HttpException(errors.join('  '));
+  //     }
+  //   } catch (error) {
+  //     print(error);
+  //     throw (error);
+  //   }
+
+  //   notifyListeners();
+  // }
+
+
   Future<void> addgroup(
     String? name,
     String? year,
