@@ -155,6 +155,10 @@ class _ChoicesState extends State<Choices> {
     return [format.format(dt), dateformate.format(dt)];
   }
 
+  String code_from_windows = '';
+  String newLessonTime = '';
+  String newLessonDate = '';
+
   void _modalBottomSheetMenusubject(BuildContext context) {
     FocusScope.of(context).unfocus();
     showModalBottomSheet(
@@ -684,8 +688,6 @@ class _ChoicesState extends State<Choices> {
                                 itemBuilder: (BuildContext ctxt, int index) {
                                   if (index == groupmanager.groups.length) {
                                     if (groupmanager.error) {
-                                      print('2');
-
                                       return Center(
                                           child: InkWell(
                                         onTap: () {
@@ -705,7 +707,6 @@ class _ChoicesState extends State<Choices> {
                                         ),
                                       ));
                                     } else {
-                                      print('1');
                                       return Center(
                                           child: Padding(
                                         padding: const EdgeInsets.all(8),
@@ -730,8 +731,6 @@ class _ChoicesState extends State<Choices> {
                                             groupmanager.groups[index].id!;
                                         group_name =
                                             groupmanager.groups[index].name!;
-                                        print('group_nammmmmme');
-                                        print(groupmanager.groups[index].name!);
                                         group_level = true;
                                         _isloadingappointment = true;
                                         app_name = 'الحصه';
@@ -881,7 +880,6 @@ class _ChoicesState extends State<Choices> {
                     builder: (_, appointmentmanager, child) {
                       if (appointmentmanager.appointments!.isEmpty) {
                         if (!appointmentmanager.loading) {
-                          // print('1');
                           return Center(
                             child: Container(
                               padding: const EdgeInsets.all(8),
@@ -894,8 +892,6 @@ class _ChoicesState extends State<Choices> {
                             ),
                           );
                         } else if (appointmentmanager.error) {
-                          // print('2');
-
                           return Center(
                               child: InkWell(
                             onTap: () {
@@ -912,8 +908,6 @@ class _ChoicesState extends State<Choices> {
                           ));
                         }
                       } else {
-                        // print('3');
-
                         return Column(
                           children: [
                             Expanded(
@@ -1069,6 +1063,174 @@ class _ChoicesState extends State<Choices> {
         ],
       ),
     );
+  }
+
+  void _add_lesson(String message, String title) {
+    // final format = TimeOfDayFormat('hh:mm'); //"6:00 AM"
+    final dateformate = DateFormat('y-M-d');
+
+    showDialog(
+        context: context,
+        builder: (ctx) => StatefulBuilder(
+            builder: (context, setState) => (AlertDialog(
+                  title: Text(
+                    'اضافه حصه',
+                    style: TextStyle(fontFamily: 'GE-Bold'),
+                  ),
+                  content: Container(
+                    height: 80,
+                    child: Column(
+                      children: [
+                        InkWell(
+                          onTap: () async {
+                            final TimeOfDay? newTime = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (newTime != null) {
+                              setState(() {
+                                // _isloadingappointment = true;
+                                // group_level = false;
+                                newLessonTime =
+                                    formatTimeOfDay(newTime)[0].toString();
+                              });
+                            }
+                          },
+                          child: Row(
+                            children: [
+                              Container(
+                                color: kbuttonColor3.withOpacity(.8),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.add),
+                                    Text('Time'),
+                                  ],
+                                ),
+                              ),
+                              Spacer(),
+                              Text(newLessonTime)
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            final newDate = await showDatePicker(
+                              firstDate: DateTime(2021),
+                              lastDate: DateTime(2030),
+                              context: context,
+                              initialDate: DateTime.now(),
+                            );
+                            if (newDate != null) {
+                              setState(() {
+                                // _isloadingappointment = true;
+                                // group_level = false;
+                                newLessonDate =
+                                    dateformate.format(newDate).toString();
+                              });
+                            }
+                          },
+                          child: Row(
+                            children: [
+                              Container(
+                                color: kbuttonColor3.withOpacity(.8),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.add),
+                                    Text('Date'),
+                                  ],
+                                ),
+                              ),
+                              Spacer(),
+                              Text(newLessonDate)
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    Center(
+                      child: TextButton(
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(kbackgroundColor1)),
+                          // color: kbackgroundColor1,
+                          child: Text(
+                            'اضافه',
+                            style: TextStyle(
+                                fontFamily: 'GE-medium', color: Colors.black),
+                          ),
+                          onPressed: () async {
+                            if (newLessonDate != '' && newLessonTime != '') {
+                              setState(() {
+                                _isloadingappointment = true;
+                                group_level = false;
+                              });
+
+                              try {
+                                await Provider.of<AppointmentManager>(context,
+                                        listen: false)
+                                    .add_appointment(
+                                      group_id_selected,
+                                      newLessonTime,
+                                      newLessonDate,
+                                    )
+                                    .then((value) =>
+                                        Provider.of<AppointmentManager>(context,
+                                                listen: false)
+                                            .get_appointments(
+                                                group_id_selected))
+                                    .then((value) => setState(() {
+                                          _isloadingappointment = false;
+                                          group_level = true;
+                                        }))
+                                    .then((value) => setState(() {
+                                          app_id_selected =
+                                              Provider.of<AppointmentManager>(
+                                                      context,
+                                                      listen: false)
+                                                  .currentapp!
+                                                  .id
+                                                  .toString();
+                                          app_name =
+                                              Provider.of<AppointmentManager>(
+                                                      context,
+                                                      listen: false)
+                                                  .currentapp!
+                                                  .name!;
+                                        }))
+                                    .then(
+                                      (_) => ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          backgroundColor: Colors.black38,
+                                          content: Text(
+                                            'تم اضافه الحصه بنجاح',
+                                            style: TextStyle(
+                                                fontFamily: 'GE-medium'),
+                                          ),
+                                          duration: Duration(seconds: 3),
+                                        ),
+                                      ),
+                                    );
+                              } catch (e) {
+                                _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
+                              }
+                              Navigator.of(ctx).pop();
+                              setState(() {
+                                newLessonDate = '';
+                                newLessonTime = '';
+                              });
+                            }
+
+                            ;
+                          }),
+                    )
+                  ],
+                ))));
   }
 
   List<String> years_levels = [];
@@ -1240,66 +1402,70 @@ class _ChoicesState extends State<Choices> {
                       ),
                       onPressed: group_level
                           ? () async {
-                              final TimeOfDay? newTime = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-                              if (newTime != null) {
-                                print('object');
-                                setState(() {
-                                  _isloadingappointment = true;
-                                  group_level = false;
-                                });
-                                try {
-                                  await Provider.of<AppointmentManager>(context,
-                                          listen: false)
-                                      .add_appointment(
-                                        group_id_selected,
-                                        formatTimeOfDay(newTime)[0],
-                                        formatTimeOfDay(TimeOfDay.now())[1],
-                                      )
-                                      .then((value) => Provider.of<
-                                                  AppointmentManager>(context,
-                                              listen: false)
-                                          .get_appointments(group_id_selected))
-                                      .then((value) => setState(() {
-                                            _isloadingappointment = false;
-                                            group_level = true;
-                                          }))
-                                      .then((value) => setState(() {
-                                            app_id_selected =
-                                                Provider.of<AppointmentManager>(
-                                                        context,
-                                                        listen: false)
-                                                    .currentapp!
-                                                    .id
-                                                    .toString();
-                                            app_name =
-                                                Provider.of<AppointmentManager>(
-                                                        context,
-                                                        listen: false)
-                                                    .currentapp!
-                                                    .name!;
-                                          }))
-                                      .then(
-                                        (_) => ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            backgroundColor: Colors.black38,
-                                            content: Text(
-                                              'تم اضافه الحصه بنجاح',
-                                              style: TextStyle(
-                                                  fontFamily: 'GE-medium'),
-                                            ),
-                                            duration: Duration(seconds: 3),
-                                          ),
-                                        ),
-                                      );
-                                } catch (e) {
-                                  _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
-                                }
-                              }
+
+                              _add_lesson('message', 'title');
                             }
+
+                          // () async {
+                          //     final TimeOfDay? newTime = await showTimePicker(
+                          //       context: context,
+                          //       initialTime: TimeOfDay.now(),
+                          //     );
+                          //     if (newTime != null) {
+                          //       setState(() {
+                          //         _isloadingappointment = true;
+                          //         group_level = false;
+                          //       });
+                          //       try {
+                          //         await Provider.of<AppointmentManager>(context,
+                          //                 listen: false)
+                          //             .add_appointment(
+                          //               group_id_selected,
+                          //               formatTimeOfDay(newTime)[0],
+                          //               formatTimeOfDay(TimeOfDay.now())[1],
+                          //             )
+                          //             .then((value) => Provider.of<
+                          //                         AppointmentManager>(context,
+                          //                     listen: false)
+                          //                 .get_appointments(group_id_selected))
+                          //             .then((value) => setState(() {
+                          //                   _isloadingappointment = false;
+                          //                   group_level = true;
+                          //                 }))
+                          //             .then((value) => setState(() {
+                          //                   app_id_selected =
+                          //                       Provider.of<AppointmentManager>(
+                          //                               context,
+                          //                               listen: false)
+                          //                           .currentapp!
+                          //                           .id
+                          //                           .toString();
+                          //                   app_name =
+                          //                       Provider.of<AppointmentManager>(
+                          //                               context,
+                          //                               listen: false)
+                          //                           .currentapp!
+                          //                           .name!;
+                          //                 }))
+                          //             .then(
+                          //               (_) => ScaffoldMessenger.of(context)
+                          //                   .showSnackBar(
+                          //                 SnackBar(
+                          //                   backgroundColor: Colors.black38,
+                          //                   content: Text(
+                          //                     'تم اضافه الحصه بنجاح',
+                          //                     style: TextStyle(
+                          //                         fontFamily: 'GE-medium'),
+                          //                   ),
+                          //                   duration: Duration(seconds: 3),
+                          //                 ),
+                          //               ),
+                          //             );
+                          //       } catch (e) {
+                          //         _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
+                          //       }
+                          //     }
+                          //   }
                           : () {},
                       icon: Icon(Icons.add),
                       label: Container(
@@ -1372,12 +1538,13 @@ class _ChoicesState extends State<Choices> {
                         try {
                           String res = await FlutterBarcodeScanner.scanBarcode(
                               '#ff6666', 'Cancel', true, ScanMode.BARCODE);
-                          print(app_id_selected);
+
                           print(res);
                           dynamic resp = await Provider.of<AppointmentManager>(
                                   context,
                                   listen: false)
                               .attendlesson(res, app_id_selected!);
+
 
                           if (resp['last_appointment_attend'] == false) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -1442,103 +1609,217 @@ class _ChoicesState extends State<Choices> {
               String inputK = "";
               FocusNode focusNode = FocusNode();
               return RawKeyboardListener(
-                autofocus: true,
-                focusNode: focusNode,
-                onKey: (RawKeyEvent event) async {
-                  if (event.runtimeType.toString() == 'RawKeyDownEvent' &&
-                      (app_name != 'الحصه' && _loadingscann == false)) {
-                    //   if (event.isKeyPressed(LogicalKeyboardKey.space)) {
-                    String key = event.logicalKey.keyLabel;
-                    // print(key);
-                    // print('object');
-                    if (key != null) {
-                      setState(() {
-                        inputK += key;
-                      });
+                  autofocus: true,
+                  focusNode: focusNode,
+                  onKey: (RawKeyEvent event) {
+                    if (event.runtimeType.toString() == 'RawKeyDownEvent' &&
+                        (app_name != 'الحصه' && _loadingscann == false)) {
+                      print(event.logicalKey.keyLabel);
+                      code_from_windows += event.logicalKey.keyLabel;
+
+                      print(code_from_windows);
                     }
+                    setState(() {});
 
-                    setState(() {
-                      _loadingscann = true;
-                    });
-                    if (app_id_selected == null) {
-                      _showErrorDialog('اختر حصه', 'حدث خطأ');
-                      return;
-                    }
+                    // if (a != null) {
+                    //   setState(() {
+                    //     inputK += a;
+                    //   });
+                    // }
+                    // print(inputK);
 
-                    try {
-                      String res = inputK;
-                      dynamic resp = await Provider.of<AppointmentManager>(
-                              context,
-                              listen: false)
-                          .attendlesson(res, app_id_selected!);
+                    // if (
+                    //     // event.runtimeType.toString() == 'RawKeyDownEvent' &&
+                    //     (app_name != 'الحصه' && _loadingscann == false)) {
+                    //   // print(event.logicalKey.keyLabel);
+                    //   // List<String> test = [];
+                    //   // var a = event.physicalKey.debugName;
+                    //   // test.add(a!);
+                    //   // print(test);
+                    //   //   if (event.isKeyPressed(LogicalKeyboardKey.space)) {
+                    //   String key = event.logicalKey.keyLabel;
+                    //   // String key2 = keyEvent.data.logicalKey;
 
-                      if (resp['last_appointment_attend'] == false) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: Colors.orange[200],
-                            content: Text(
-                              ' تم التسجيل بنجاح والحصه السابقه لم يحضرها',
-                              style: TextStyle(fontFamily: 'GE-medium'),
-                            ),
-                            duration: Duration(seconds: 3),
-                          ),
-                        );
-                      }
-                      if (resp['last_appointment_attend'] == true) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: Colors.green[300],
-                            content: Text(
-                              ' تم التسجيل بنجاح',
-                              style: TextStyle(fontFamily: 'GE-medium'),
-                            ),
-                            duration: Duration(seconds: 3),
-                          ),
-                        );
-                      }
-                    } on HttpException catch (e) {
-                      setState(() {
-                        _loadingscann = false;
-                      });
-                      // _showErrorDialog(e.toString(), 'حدث خطأ');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: Colors.red[300],
-                          content: Text(
-                            e.toString(),
-                            style: TextStyle(fontFamily: 'GE-medium'),
-                          ),
-                          duration: Duration(seconds: 3),
+                    //   if (key != null) {
+                    //     setState(() {
+                    //       inputK += key;
+                    //     });
+                    //   }
+                    //   _showErrorDialog('message', inputK);
+
+                    //   setState(() {
+                    //     _loadingscann = true;
+                    //   });
+                    //   if (app_id_selected == null) {
+                    //     _showErrorDialog('اختر حصه', 'حدث خطأ');
+                    //     return;
+                    //   }
+
+                    //   try {
+                    //     String res = inputK;
+                    //     dynamic resp = await Provider.of<AppointmentManager>(
+                    //             context,
+                    //             listen: false)
+                    //         .attendlesson(res, app_id_selected!);
+
+                    //     if (resp['last_appointment_attend'] == false) {
+                    //       ScaffoldMessenger.of(context).showSnackBar(
+                    //         SnackBar(
+                    //           backgroundColor: Colors.orange[200],
+                    //           content: Text(
+                    //             ' تم التسجيل بنجاح والحصه السابقه لم يحضرها',
+                    //             style: TextStyle(fontFamily: 'GE-medium'),
+                    //           ),
+                    //           duration: Duration(seconds: 3),
+                    //         ),
+                    //       );
+                    //     }
+                    //     if (resp['last_appointment_attend'] == true) {
+                    //       ScaffoldMessenger.of(context).showSnackBar(
+                    //         SnackBar(
+                    //           backgroundColor: Colors.green[300],
+                    //           content: Text(
+                    //             ' تم التسجيل بنجاح',
+                    //             style: TextStyle(fontFamily: 'GE-medium'),
+                    //           ),
+                    //           duration: Duration(seconds: 3),
+                    //         ),
+                    //       );
+                    //     }
+                    //   } on HttpException catch (e) {
+                    //     setState(() {
+                    //       _loadingscann = false;
+                    //     });
+                    //     // _showErrorDialog(e.toString(), 'حدث خطأ');
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       SnackBar(
+                    //         backgroundColor: Colors.red[300],
+                    //         content: Text(
+                    //           e.toString(),
+                    //           style: TextStyle(fontFamily: 'GE-medium'),
+                    //         ),
+                    //         duration: Duration(seconds: 3),
+                    //       ),
+                    //     );
+                    //   } catch (e) {
+                    //     setState(() {
+                    //       _loadingscann = false;
+                    //     });
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       SnackBar(
+                    //         backgroundColor: Colors.red[300],
+                    //         content: Text(
+                    //           'حدث خطأ',
+                    //           style: TextStyle(fontFamily: 'GE-medium'),
+                    //         ),
+                    //         duration: Duration(seconds: 3),
+                    //       ),
+                    //     );
+                    //   }
+                    //   setState(() {
+                    //     _loadingscann = false;
+                    //   });
+                    // }
+                    // ;
+                  },
+                  child: Column(
+                    children: [
+                      InkWell(
+                        onTap: app_name != 'الحصه' && _loadingscann == false
+                            ? () async {
+                                setState(() {
+                                  _loadingscann = true;
+                                });
+                                if (app_id_selected == null) {
+                                  _showErrorDialog('اختر حصه', 'حدث خطأ');
+                                  return;
+                                }
+
+                                try {
+                                  dynamic resp =
+                                      await Provider.of<AppointmentManager>(
+                                              context,
+                                              listen: false)
+                                          .attendlesson(code_from_windows,
+                                              app_id_selected!);
+
+                                  if (resp['last_appointment_attend'] ==
+                                      false) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor: Colors.orange[200],
+                                        content: Text(
+                                          ' تم التسجيل بنجاح والحصه السابقه لم يحضرها',
+                                          style: TextStyle(
+                                              fontFamily: 'GE-medium'),
+                                        ),
+                                        duration: Duration(seconds: 3),
+                                      ),
+                                    );
+                                  }
+                                  if (resp['last_appointment_attend'] == true) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor: Colors.green[300],
+                                        content: Text(
+                                          ' تم التسجيل بنجاح',
+                                          style: TextStyle(
+                                              fontFamily: 'GE-medium'),
+                                        ),
+                                        duration: Duration(seconds: 3),
+                                      ),
+                                    );
+                                  }
+                                } on HttpException catch (e) {
+                                  setState(() {
+                                    _loadingscann = false;
+                                  });
+                                  // _showErrorDialog(e.toString(), 'حدث خطأ');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: Colors.red[300],
+                                      content: Text(
+                                        e.toString(),
+                                        style:
+                                            TextStyle(fontFamily: 'GE-medium'),
+                                      ),
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  setState(() {
+                                    _loadingscann = false;
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: Colors.red[300],
+                                      content: Text(
+                                        'حدث خطأ',
+                                        style:
+                                            TextStyle(fontFamily: 'GE-medium'),
+                                      ),
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                }
+                                setState(() {
+                                  _loadingscann = false;
+                                  code_from_windows = '';
+                                });
+                              }
+                            : null,
+                        child: Scan_button(
+                          active: app_name != 'الحصه' && _loadingscann == false,
                         ),
-                      );
-                    } catch (e) {
-                      setState(() {
-                        _loadingscann = false;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: Colors.red[300],
-                          content: Text(
-                            'حدث خطأ',
-                            style: TextStyle(fontFamily: 'GE-medium'),
-                          ),
-                          duration: Duration(seconds: 3),
+                      ),
+                      Container(
+                        width: 300,
+                        child: Center(
+                          child: Text(code_from_windows),
                         ),
-                      );
-                    }
-                    setState(() {
-                      _loadingscann = false;
-                    });
-                  }
-                  ;
-                }
-
-                // },
-                ,
-                child: Scan_button(
-                  active: app_name != 'الحصه' && _loadingscann == false,
-                ),
-              );
+                      )
+                    ],
+                  ));
             })
         ],
       ),

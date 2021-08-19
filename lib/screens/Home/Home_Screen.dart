@@ -17,6 +17,8 @@ import 'components/options_widget.dart';
 final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class Home_Screen extends StatefulWidget {
+
+
   final user? myuser;
   final TeacherModel? myteacher;
   static MaterialPage page({required user user, TeacherModel? teacher}) {
@@ -66,6 +68,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                       size: size,
                       usser: widget.myuser,
                       teacher: widget.myteacher),
+
                   // build_chip_container_down(null, 'مجموعه الحضور'),
                   // SizedBox(
                   //   height: 10,
@@ -161,6 +164,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                     },
                   ),
                   if (widget.myuser != user.assistant)
+
                     ListTile(
                       title: Padding(
                         padding: const EdgeInsets.all(1.0),
@@ -461,6 +465,7 @@ class HomeTopPage extends StatelessWidget {
               children: [
                 Text(
                   'بحث بالاسم',
+
                   style: TextStyle(
                       fontFamily: 'GE-light',
                       color: Colors.black87,
@@ -483,16 +488,31 @@ class HomeTopPage extends StatelessWidget {
 class StudentSearch extends SearchDelegate<String> {
   @override
   List<Widget> buildActions(BuildContext context) => [
-        IconButton(
-          icon: Icon(Icons.clear),
-          onPressed: () {
-            if (query.isEmpty) {
-              close(context, '');
-            } else {
-              query = '';
-              showSuggestions(context);
-            }
-          },
+        Row(
+          children: [
+            IconButton(
+              icon: Icon(Icons.clear),
+              onPressed: () {
+                if (query.isEmpty) {
+                  close(context, '');
+                } else {
+                  query = '';
+                  showSuggestions(context);
+                }
+              },
+            ),
+            // IconButton(
+            //   icon: Icon(Icons.clear),
+            //   onPressed: () {
+            //     if (query.isEmpty) {
+            //       close(context, '');
+            //     } else {
+            //       query = '';
+            //       showSuggestions(context);
+            //     }
+            //   },
+            // ),
+          ],
         )
       ];
 
