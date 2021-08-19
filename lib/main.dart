@@ -13,10 +13,19 @@ import 'package:provider/provider.dart';
 import 'managers/App_State_manager.dart';
 import 'managers/year_manager.dart';
 import 'navigation/app_router.dart';
+import 'dart:io';
+import 'package:desktop_window/desktop_window.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    // setWindowTitle('App title');
+    DesktopWindow.setWindowSize(Size(700, 900));
+    DesktopWindow.setMinWindowSize(Size(700, 900));
+    DesktopWindow.setMaxWindowSize(Size(700, 900));
+  }
   runApp(MyApp());
 }
 

@@ -1,9 +1,11 @@
 import 'package:attendance/constants.dart';
 import 'package:attendance/helper/httpexception.dart';
+import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
+import 'package:attendance/models/teacher.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -12,9 +14,13 @@ class group_form extends StatefulWidget {
   const group_form({
     Key? key,
     required this.size,
+    this.tuser,
+    this.teacher,
   }) : super(key: key);
 
   final Size size;
+  final user? tuser;
+  final TeacherModel? teacher;
 
   @override
   _group_formState createState() => _group_formState();
@@ -268,6 +274,10 @@ class _group_formState extends State<group_form> {
       Provider.of<SubjectManager>(context, listen: false).resetlist();
       Provider.of<YearManager>(context, listen: false).resetlist();
       Provider.of<TeacherManager>(context, listen: false).resetlist();
+      if (widget.tuser == user.teacher) {
+        teachername = widget.teacher!.name!;
+        teacher_id_selected = widget.teacher!.id!.toString();
+      }
       try {
         await Provider.of<SubjectManager>(context, listen: false)
             .getMoreData()
@@ -328,7 +338,7 @@ class _group_formState extends State<group_form> {
             child: Column(
               children: [
                 Container(
-                  height: 40,
+                  height: 30,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: kbackgroundColor3,
@@ -449,7 +459,7 @@ class _group_formState extends State<group_form> {
             child: Column(
               children: [
                 Container(
-                  height: 40,
+                  height: 30,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: kbackgroundColor1,
@@ -566,7 +576,7 @@ class _group_formState extends State<group_form> {
             child: Column(
               children: [
                 Container(
-                  height: 40,
+                  height: 30,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: kbuttonColor2,
@@ -689,9 +699,9 @@ class _group_formState extends State<group_form> {
               child: Column(
                 children: [
                   Container(
-                    height: widget.size.height * .4,
+                    height: widget.size.height * .3,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         SizedBox(
                           height: 1,
@@ -706,7 +716,7 @@ class _group_formState extends State<group_form> {
                             alignment: Alignment.centerRight,
                             width: widget.size.width * .9,
                             padding: EdgeInsets.symmetric(horizontal: 20),
-                            height: 40,
+                            height: 35,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
@@ -734,14 +744,16 @@ class _group_formState extends State<group_form> {
                             alignment: Alignment.centerRight,
                             width: widget.size.width * .9,
                             padding: EdgeInsets.symmetric(horizontal: 20),
-                            height: 40,
+                            height: 35,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(color: Colors.grey),
                             ),
                             child: InkWell(
-                              onTap: () => _modalBottomSheetMenu3(context),
+                              onTap: widget.tuser != user.teacher
+                                  ? () => _modalBottomSheetMenu3(context)
+                                  : () {},
                               child: Container(
                                 child: Row(
                                   children: [
@@ -762,7 +774,7 @@ class _group_formState extends State<group_form> {
                             alignment: Alignment.centerRight,
                             width: widget.size.width * .9,
                             padding: EdgeInsets.symmetric(horizontal: 20),
-                            height: 40,
+                            height: 35,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
@@ -789,11 +801,11 @@ class _group_formState extends State<group_form> {
                     ),
                   ),
                   SizedBox(
-                    height: 10,
+                    height: 3,
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  // SizedBox(
+                  //   height: 10,
+                  // ),
                   Container(
                     height: widget.size.height * .4,
                     child: SingleChildScrollView(
@@ -812,8 +824,8 @@ class _group_formState extends State<group_form> {
                             },
                             child: Center(
                               child: Container(
-                                width: widget.size.width * .4,
-                                height: 25,
+                                width: widget.size.width * .6,
+                                height: 30,
                                 decoration: BoxDecoration(
                                     border: Border.all(color: Colors.grey),
                                     color: kbuttonColor2.withOpacity(.7),
@@ -826,7 +838,7 @@ class _group_formState extends State<group_form> {
                                       Text(
                                         'اضافه موعد',
                                         style:
-                                            TextStyle(fontFamily: 'GE-medium'),
+                                            TextStyle(fontFamily: 'GE-light'),
                                       ),
                                       Icon(Icons.add)
                                     ],
@@ -837,7 +849,7 @@ class _group_formState extends State<group_form> {
                             ),
                           ),
                           SizedBox(
-                            height: 20,
+                            height: 5,
                           ),
                           Dismissible(
                             background: Container(
@@ -876,7 +888,7 @@ class _group_formState extends State<group_form> {
                               });
                             },
                             child: Container(
-                              height: widget.size.height * .4,
+                              height: widget.size.height * .3,
                               child: ListView(
                                   children: days
                                       .map(
@@ -891,13 +903,15 @@ class _group_formState extends State<group_form> {
                                                   child: Container(
                                                     alignment:
                                                         Alignment.centerRight,
-                                                    width: widget.size.width /
-                                                        3 *
-                                                        .9,
+                                                    width:
+                                                        widget.size.width / 2.5,
+                                                    // width: widget.size.width /
+                                                    //     3 *
+                                                    //     .9,
                                                     padding:
                                                         EdgeInsets.symmetric(
                                                             horizontal: 20),
-                                                    height: 40,
+                                                    height: 30,
                                                     decoration: BoxDecoration(
                                                       color: Colors.white,
                                                       // borderRadius:
@@ -906,6 +920,8 @@ class _group_formState extends State<group_form> {
                                                           color: Colors.grey),
                                                     ),
                                                     child: Container(
+                                                      // color: Colors.red,
+                                                      // width: 50,
                                                       child:
                                                           DropdownButtonHideUnderline(
                                                         child: DropdownButton(
@@ -917,7 +933,7 @@ class _group_formState extends State<group_form> {
                                                           value: _data[e - 1],
                                                           hint: Text('اليوم'),
                                                           isExpanded: true,
-                                                          iconSize: 30,
+                                                          iconSize: 20,
                                                           onChanged: (newval) {
                                                             setState(() {
                                                               _data[
@@ -952,7 +968,7 @@ class _group_formState extends State<group_form> {
                                                     padding:
                                                         EdgeInsets.symmetric(
                                                             horizontal: 20),
-                                                    height: 40,
+                                                    height: 30,
                                                     decoration: BoxDecoration(
                                                       color: kbackgroundColor3,
                                                       border: Border.all(
@@ -980,20 +996,31 @@ class _group_formState extends State<group_form> {
                       ),
                     ),
                   ),
+
                   Container(
-                    width: widget.size.width * .9,
-                    // margin: EdgeInsets.symmetric(vertical: 1),
-                    child: TextButton(
-                      style: ButtonStyle(
-                          elevation: MaterialStateProperty.all(2),
-                          backgroundColor:
-                              MaterialStateProperty.all(kbuttonColor2)),
-                      onPressed: _submit,
-                      child: Text(
-                        'تسجيل',
-                        style: TextStyle(
-                            fontFamily: 'GE-Bold', color: Colors.black),
-                      ),
+                    // height: widget.size.height*,
+                    height: 50,
+                    child: Column(
+                      children: [
+                        Spacer(),
+                        Container(
+                          // color: Colors.red,
+                          width: widget.size.width * .9,
+                          // margin: EdgeInsets.symmetric(vertical: 1),
+                          child: TextButton(
+                            style: ButtonStyle(
+                                elevation: MaterialStateProperty.all(2),
+                                backgroundColor:
+                                    MaterialStateProperty.all(kbuttonColor2)),
+                            onPressed: _submit,
+                            child: Text(
+                              'تسجيل',
+                              style: TextStyle(
+                                  fontFamily: 'GE-light', color: Colors.black),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   // SizedBox(
@@ -1017,7 +1044,7 @@ class _group_formState extends State<group_form> {
         alignment: Alignment.centerRight,
         width: small ? widget.size.width * .9 / 2 : widget.size.width * .9,
         padding: EdgeInsets.symmetric(horizontal: 20),
-        height: 55,
+        height: 50,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),

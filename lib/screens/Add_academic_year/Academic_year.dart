@@ -216,33 +216,38 @@ class _Add_academic_yearState extends State<Add_academic_year> {
                               ),
                             ),
                           ),
-                          Center(
+                          Container(
+                            // color: Colors.green,
                             child: Container(
                               alignment: Alignment.centerRight,
                               width: size.width / 2,
-                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              padding: EdgeInsets.symmetric(horizontal: 4),
                               height: 40,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                // color: Colors.green,
                                 // borderRadius: BorderRadius.circular(20),
                                 border: Border.all(color: Colors.grey),
                               ),
-                              child: Container(
-                                child: InkWell(
-                                  onTap: () => _modalBottomSheetMenu(context),
-                                  child: Container(
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          defaultstagename,
-                                          style:
-                                              TextStyle(fontFamily: 'GE-light'),
-                                        ),
-                                        Spacer(),
-                                        Icon(Icons.keyboard_arrow_down)
-                                      ],
+                              child: InkWell(
+                                onTap: () => _modalBottomSheetMenu(context),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      // color: Colors.red,
+                                      width: (size.width / 2) * .7,
+                                      child: Text(
+                                        defaultstagename,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style:
+                                            TextStyle(fontFamily: 'GE-light'),
+                                      ),
                                     ),
-                                  ),
+                                    Spacer(),
+                                    Icon(Icons.keyboard_arrow_down)
+                                  ],
                                 ),
                               ),
                             ),

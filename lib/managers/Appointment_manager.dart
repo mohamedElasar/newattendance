@@ -107,6 +107,7 @@ class AppointmentManager extends ChangeNotifier {
   Future<void> get_appointmentsshow(String groupid) async {
     var url =
         Uri.https('development.mrsaidmostafa.com', '/api/groups/$groupid');
+    print(url);
     try {
       var response = await http.get(
         url,
@@ -183,13 +184,7 @@ class AppointmentManager extends ChangeNotifier {
       final responseData = json.decode(response.body);
       AppointmentModel appo = AppointmentModel.fromJson(responseData['data']);
       _currentApp = appo;
-      // final responseData = json.decode(response.body);
-      // print(responseData['data']['appointments']);
-      // List<dynamic> appointments = responseData['data']['appointments'];
-      // List<AppointmentModel> list =
-      //     appointments.map((data) => AppointmentModel.fromJson(data)).toList();
-      // _appointments = list;
-      // _loading = false;
+
       print(response.body);
 
       // add exception
@@ -211,29 +206,33 @@ class AppointmentManager extends ChangeNotifier {
     try {
       var response = await http.post(url, headers: {
         'Accept': 'application/json',
+        'x-accept-language': 'ar',
         HttpHeaders.authorizationHeader: 'Bearer $authToken'
       }, body: {
         'code': code,
       });
       final responseData = json.decode(response.body);
-      // print(code);
-      // print(code);
-      // print(code);
+
       print(code);
       print(lessonid);
-
-      if (responseData['errors'] != null) {
-        // print(responseData['errors']);
-        List<String> errors = [];
-        for (var value in responseData['errors'].values) errors.add(value[0]);
-        throw HttpException(errors.join('  '));
+      if (response.statusCode == 422) {
+        if (responseData['errors']['code'] != null) {
+          List<String> errors = [];
+          for (var value in responseData['errors'].values) errors.add(value[0]);
+          throw HttpException(errors.join('  '));
+        }
+        if (responseData['errors']['group'] != null) {
+          throw HttpException(responseData['errors']['group']);
+        }
       }
+
       return responseData;
       // return (responseData);
 
       // add exception
 
     } catch (error) {
+      print(error);
       throw (error);
     }
 

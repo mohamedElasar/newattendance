@@ -35,7 +35,8 @@ class Name extends StatelessWidget {
             children: [
               if (!arrow)
                 Container(
-                  width: size.width * .8 / 4,
+                  // color: Colors.red,
+                  width: 100,
                   child: Text(
                     title,
                     style: TextStyle(fontFamily: 'GE-medium'),
@@ -49,7 +50,7 @@ class Name extends StatelessWidget {
                 width: 10,
               ),
               Container(
-                width: size.width * .8 / 2,
+                width: size.width * .8 / 2.5,
                 child: Text(
                   name ?? '',
                   style: TextStyle(fontFamily: 'GE-medium'),

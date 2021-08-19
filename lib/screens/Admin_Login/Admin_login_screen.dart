@@ -25,7 +25,7 @@ class Admin_logIn extends StatelessWidget {
           child: Column(
             children: [
               Top_Page(size: size),
-              Page_Title(title: 'Admin Log in'),
+              Page_Title(title: 'Log in'),
               Login_Form(),
             ],
           ),

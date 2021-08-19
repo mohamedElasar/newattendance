@@ -1,8 +1,10 @@
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Auth_manager.dart';
+import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/student.dart';
+import 'package:attendance/models/teacher.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/show_group/show_group.dart';
 import 'package:flutter/material.dart';
@@ -10,22 +12,31 @@ import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 import 'components/choices.dart';
- import 'components/options_widget.dart';
-
+import 'components/options_widget.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-class Home_Screen extends StatelessWidget {
-  static MaterialPage page() {
+class Home_Screen extends StatefulWidget {
+  final user? myuser;
+  final TeacherModel? myteacher;
+  static MaterialPage page({required user user, TeacherModel? teacher}) {
     return MaterialPage(
       name: Attendance_Screens.homepath,
       key: ValueKey(Attendance_Screens.homepath),
-      child: const Home_Screen(),
+      child: Home_Screen(
+        myuser: user,
+        myteacher: teacher,
+      ),
     );
   }
 
-  const Home_Screen({Key? key }) : super(key: key);
+  const Home_Screen({Key? key, this.myuser, this.myteacher}) : super(key: key);
 
+  @override
+  _Home_ScreenState createState() => _Home_ScreenState();
+}
+
+class _Home_ScreenState extends State<Home_Screen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -43,14 +54,18 @@ class Home_Screen extends StatelessWidget {
           //   size: size,
           //   arrowback: false,
           // ),
-          Options(size: size ),
+          Options(size: size),
           Container(
             // height: size.height * .75,
             child: SingleChildScrollView(
               child: Column(
                 children: [
                   SizedBox(height: 10),
-                  Choices(size: size ),
+
+                  Choices(
+                      size: size,
+                      usser: widget.myuser,
+                      teacher: widget.myteacher),
                   // build_chip_container_down(null, 'مجموعه الحضور'),
                   // SizedBox(
                   //   height: 10,
@@ -76,6 +91,36 @@ class Home_Screen extends StatelessWidget {
                 ),
               ),
               height: 200,
+            ),
+            InkWell(
+              onTap: () async {
+                await showSearch(
+                    context: context, delegate: StudentCodeSearch());
+              },
+              child: Container(
+                height: 40,
+                color: Colors.grey[200],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'بحث بالكود   ',
+                      style: TextStyle(
+                          fontFamily: 'GE-light',
+                          color: Colors.black87,
+                          fontSize: 20),
+                    ),
+                    Icon(
+                      Icons.search,
+                      size: 20,
+                      color: Colors.black87,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 15,
             ),
             Expanded(
               child: ListView(
@@ -115,40 +160,41 @@ class Home_Screen extends StatelessWidget {
                       //         builder: (context) => Student_Register_Screen()));
                     },
                   ),
-                  ListTile(
-                    title: Padding(
-                      padding: const EdgeInsets.all(1.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 0.7,
+                  if (widget.myuser != user.assistant)
+                    ListTile(
+                      title: Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            border: Border.all(
+                              color: Colors.grey,
+                              width: 0.7,
+                            ),
                           ),
-                        ),
-                        height: 40,
-                        child: Material(
-                          // elevation: 5.0,
-                          borderRadius: BorderRadius.circular(5.0),
-                          child: Center(
-                            child: Text(
-                              "ادخال معلم",
-                              style: TextStyle(
-                                  fontSize: 19, fontWeight: FontWeight.bold),
+                          height: 40,
+                          child: Material(
+                            // elevation: 5.0,
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: Center(
+                              child: Text(
+                                "ادخال معلم",
+                                style: TextStyle(
+                                    fontSize: 19, fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                         ),
                       ),
+                      onTap: () {
+                        Provider.of<AppStateManager>(context, listen: false)
+                            .registerTeacher(true);
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => Add_Teacher_Screeen()));
+                      },
                     ),
-                    onTap: () {
-                      Provider.of<AppStateManager>(context, listen: false)
-                          .registerTeacher(true);
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => Add_Teacher_Screeen()));
-                    },
-                  ),
                   ListTile(
                     title: Padding(
                       padding: const EdgeInsets.all(1.0),
@@ -209,10 +255,8 @@ class Home_Screen extends StatelessWidget {
                       ),
                     ),
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Show_Group()));
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .gotocheckgroups(true);
                     },
                   ),
                   ListTile(
@@ -283,36 +327,36 @@ class Home_Screen extends StatelessWidget {
                       //         builder: (context) => Add_academic_subject()));
                     },
                   ),
-                  ListTile(
-                    title: Padding(
-                      padding: const EdgeInsets.all(1.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 0.7,
-                          ),
-                        ),
-                        height: 40,
-                        child: Material(
-                          // elevation: 5.0,
-                          borderRadius: BorderRadius.circular(5.0),
-                          child: Center(
-                            child: Text(
-                              "الدرجات",
-                              style: TextStyle(
-                                  fontSize: 19, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    onTap: () {
-                      // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (context) => Degrees_Screen()));
-                    },
-                  ),
+                  // ListTile(
+                  //   title: Padding(
+                  //     padding: const EdgeInsets.all(1.0),
+                  //     child: Container(
+                  //       decoration: BoxDecoration(
+                  //         borderRadius: BorderRadius.all(Radius.circular(5)),
+                  //         border: Border.all(
+                  //           color: Colors.grey,
+                  //           width: 0.7,
+                  //         ),
+                  //       ),
+                  //       height: 40,
+                  //       child: Material(
+                  //         // elevation: 5.0,
+                  //         borderRadius: BorderRadius.circular(5.0),
+                  //         child: Center(
+                  //           child: Text(
+                  //             "الدرجات",
+                  //             style: TextStyle(
+                  //                 fontSize: 19, fontWeight: FontWeight.bold),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  //   onTap: () {
+                  //     // Navigator.push(context,
+                  //     //     MaterialPageRoute(builder: (context) => Degrees_Screen()));
+                  //   },
+                  // ),
                   ListTile(
                     title: Padding(
                       padding: const EdgeInsets.all(1.0),
@@ -372,7 +416,7 @@ class Scan_button extends StatelessWidget {
         child: Text(
           'Scan',
           style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
         ),
       ),
     );
@@ -405,7 +449,7 @@ class HomeTopPage extends StatelessWidget {
           Text(
             'الصفحه الرئيسيه',
             style: TextStyle(
-                fontSize: 35,
+                fontSize: size.width * .08,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'AraHamah1964B-Bold'),
           ),
@@ -416,13 +460,15 @@ class HomeTopPage extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'بحث',
-                  style:
-                      TextStyle(fontFamily: 'GE-medium', color: Colors.black87),
+                  'بحث بالاسم',
+                  style: TextStyle(
+                      fontFamily: 'GE-light',
+                      color: Colors.black87,
+                      fontSize: 20),
                 ),
                 Icon(
                   Icons.search,
-                  size: 30,
+                  size: 20,
                   color: Colors.black87,
                 ),
               ],
@@ -462,6 +508,161 @@ class StudentSearch extends SearchDelegate<String> {
         future: Provider.of<StudentManager>(context, listen: false)
             .searchStudent(query),
         builder: (context, snapshot) {
+          print('snapshot.data![0]');
+          print(snapshot.data![0]);
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Center(child: CircularProgressIndicator());
+            default:
+              if (snapshot.hasError) {
+                // print(snapshot.error);
+                return Container(
+                  // color: Colors.black,
+                  alignment: Alignment.center,
+                  child: Text(
+                    'يوجد خطأ',
+                    style: TextStyle(fontSize: 28, color: Colors.white),
+                  ),
+                );
+              } else {
+                return buildResultSuccess(snapshot.data![0]);
+              }
+          }
+        },
+      );
+
+  @override
+  Widget buildSuggestions(BuildContext context) => Container(
+        child: FutureBuilder<List<StudentModelSearch>>(
+          future: Provider.of<StudentManager>(context, listen: false)
+              .searchStudent(query),
+          builder: (context, snapshot) {
+            print('snapshot.data');
+            print(snapshot.data);
+
+            if (query.isEmpty) return buildNoSuggestions();
+
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+              default:
+                if (snapshot.hasError || snapshot.data!.isEmpty) {
+                  return buildNoSuggestions();
+                } else {
+                  return buildSuggestionsSuccess(snapshot.data);
+                }
+            }
+          },
+        ),
+      );
+
+  Widget buildNoSuggestions() => Center(
+        child: Text(
+          'لا يوجد اقتراحات',
+          style: TextStyle(fontSize: 28, color: Colors.black),
+        ),
+      );
+
+  Widget buildSuggestionsSuccess(List<StudentModelSearch>? suggestions) {
+    return ListView.builder(
+        itemCount: suggestions!.length,
+        itemBuilder: (context, index) {
+          final name_suggestion = suggestions[index].name;
+          print('suggestion');
+          //print(suggestion);
+          final name_queryText = name_suggestion!.substring(0, query.length);
+          print('queryText[0');
+          // print(queryText[0]);
+          final name_remainingText = name_suggestion.substring(query.length);
+
+          return ListTile(
+            onTap: () {
+              Provider.of<AppStateManager>(context, listen: false)
+                  .setstudent(suggestions[index]);
+              Provider.of<AppStateManager>(context, listen: false)
+                  .goToSingleStudentfromHome(
+                      true, suggestions[index].id.toString());
+            },
+            leading: Icon(Icons.person),
+            title: RichText(
+              text: TextSpan(
+                text: name_queryText,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                children: [
+                  TextSpan(
+                    text: name_remainingText,
+                    style: TextStyle(
+                      color: Colors.black45,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  Widget buildResultSuccess(StudentModelSearch student) => Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF3279e2), Colors.purple],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: ListView(
+          padding: EdgeInsets.all(64),
+          children: [
+            Text(
+              student.name!,
+              style: TextStyle(
+                fontSize: 32,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 72),
+            const SizedBox(height: 32),
+          ],
+        ),
+      );
+}
+
+class StudentCodeSearch extends SearchDelegate<String> {
+  @override
+  List<Widget> buildActions(BuildContext context) => [
+        IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () {
+            if (query.isEmpty) {
+              close(context, '');
+            } else {
+              query = '';
+              showSuggestions(context);
+            }
+          },
+        )
+      ];
+
+  @override
+  Widget buildLeading(BuildContext context) => IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () => close(context, ''),
+      );
+
+  @override
+  Widget buildResults(BuildContext context) =>
+      FutureBuilder<List<StudentModelSearch>>(
+        future: Provider.of<StudentManager>(context, listen: false)
+            .searchcodeStudent(query),
+        builder: (context, snapshot) {
+          print('snapshot.data![0]');
+          print(snapshot.data![0]);
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
               return Center(child: CircularProgressIndicator());
@@ -488,8 +689,10 @@ class StudentSearch extends SearchDelegate<String> {
         // color: Colors.black,
         child: FutureBuilder<List<StudentModelSearch>>(
           future: Provider.of<StudentManager>(context, listen: false)
-              .searchStudent(query),
+              .searchcodeStudent(query),
           builder: (context, snapshot) {
+            print('snapshot.data');
+            print(snapshot.data);
             // print(snapshot.data);
             if (query.isEmpty) return buildNoSuggestions();
 
@@ -514,13 +717,20 @@ class StudentSearch extends SearchDelegate<String> {
         ),
       );
 
-  Widget buildSuggestionsSuccess(List<StudentModelSearch>? suggestions) =>
-      ListView.builder(
+  Widget buildSuggestionsSuccess(List<StudentModelSearch>? suggestions) {
+    // if (code == true) {
+    return ListView.builder(
         itemCount: suggestions!.length,
         itemBuilder: (context, index) {
-          final suggestion = suggestions[index].name;
-          final queryText = suggestion!.substring(0, query.length);
+          final suggestion = '${suggestions[index].code!.name}';
+          print('c suggestion');
+          print(suggestion);
+          final queryText = suggestion.substring(0, query.length);
+          print('c queryText');
+          print(queryText);
           final remainingText = suggestion.substring(query.length);
+          print('c remainning');
+          print(remainingText);
 
           return ListTile(
             onTap: () {
@@ -551,8 +761,8 @@ class StudentSearch extends SearchDelegate<String> {
               ),
             ),
           );
-        },
-      );
+        });
+  }
 
   Widget buildResultSuccess(StudentModelSearch student) => Container(
         decoration: BoxDecoration(
@@ -566,7 +776,7 @@ class StudentSearch extends SearchDelegate<String> {
           padding: EdgeInsets.all(64),
           children: [
             Text(
-              student.name!,
+              student.code!.name!,
               style: TextStyle(
                 fontSize: 32,
                 color: Colors.white,

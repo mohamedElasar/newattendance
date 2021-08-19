@@ -53,24 +53,27 @@ class _Register_FormState extends State<Register_Form> {
     try {
       await Provider.of<StudentManager>(context, listen: false)
           .add_student(
-              nameController.text,
-              emailController.text,
-              phonecontroller.text,
-              schoolController.text,
-              notesController.text,
-              cityId_selected,
-              _groups_id,
-              parentNameController.text,
-              relationController.text,
-              parentphoneController.text,
-              parentWhatsController.text,
-              _register_data['gender'],
-              studyTypeController.text,
-              langId_selected,
-              discountController.text,
-              barCodeController.text,
-              passwordcontroller.text,
-              confirmpasswordController.text)
+        nameController.text,
+        emailController.text,
+        phonecontroller.text,
+        schoolController.text,
+        notesController.text,
+        cityId_selected,
+        _groups_id,
+        parentNameController.text,
+        relationController.text,
+        parentphoneController.text,
+        parentWhatsController.text,
+        _register_data['gender'],
+        studyTypeController.text,
+        langId_selected,
+        discountController.text,
+        barCodeController.text,
+        passwordcontroller.text,
+        confirmpasswordController.text,
+        parentemailController.text,
+        parentpasswordController.text,
+      )
           .then((_) {
         nameController.text = '';
         parentNameController.text = '';
@@ -89,6 +92,8 @@ class _Register_FormState extends State<Register_Form> {
         passwordcontroller.text = '';
         confirmpasswordController.text = '';
         parentphoneController.text = '';
+        parentemailController.text = '';
+        parentpasswordController.text = '';
         _register_data['gender'] = null;
         _register_data['language'] = null;
         cityname = 'المحافظه';
@@ -631,6 +636,8 @@ class _Register_FormState extends State<Register_Form> {
   var passwordcontroller = TextEditingController();
   var confirmpasswordController = TextEditingController();
   var parentphoneController = TextEditingController();
+  var parentemailController = TextEditingController();
+  var parentpasswordController = TextEditingController();
   late int _selectedCity;
 
   List<String> _groups = [];
@@ -648,6 +655,8 @@ class _Register_FormState extends State<Register_Form> {
   final focus12 = FocusNode();
   final focus13 = FocusNode();
   final focus14 = FocusNode();
+  final focus15 = FocusNode();
+  final focus16 = FocusNode();
   ScrollController _sc = new ScrollController();
   ScrollController _sc2 = new ScrollController();
   ScrollController _sc3 = new ScrollController();
@@ -671,6 +680,8 @@ class _Register_FormState extends State<Register_Form> {
     passwordcontroller.dispose();
     confirmpasswordController.dispose();
     parentphoneController.dispose();
+    parentemailController.dispose();
+    parentpasswordController.dispose();
     focus1.dispose();
     focus2.dispose();
     focus3.dispose();
@@ -746,10 +757,13 @@ class _Register_FormState extends State<Register_Form> {
     if (widget.edit!) cityname = widget.student!.city!.name.toString();
     if (widget.edit!) cityId_selected = widget.student!.city!.id.toString();
     if (widget.edit!)
-      langname = widget.student!.secLang!.name == null
+      langname = widget.student!.secLang == null
           ? 'اللغه الثانيه'
           : widget.student!.secLang!.name.toString();
-    if (widget.edit!) langId_selected = widget.student!.secLang!.id.toString();
+    if (widget.edit!)
+      langId_selected = widget.student!.secLang == null
+          ? null
+          : widget.student!.secLang!.id.toString();
     if (widget.edit!) {
       _groups_id = widget.student!.groups!.map((e) => e.id.toString()).toList();
       _groups_shown =
@@ -920,6 +934,33 @@ class _Register_FormState extends State<Register_Form> {
                       ),
                     ),
                   ),
+                  if (!widget.edit!)
+                    build_edit_field(
+                      item: 'parentemail',
+                      hint: 'ايميل ولى الامر',
+                      inputType: TextInputType.emailAddress,
+                      controller: parentemailController,
+                      validate: (value) {
+                        if (value.isEmpty) {
+                          return '*';
+                        }
+                      },
+                      focus: focus15,
+                    ),
+                  if (!widget.edit!)
+                    build_edit_field(
+                      item: 'passwordparent',
+                      hint: 'parent password',
+                      // small: true,
+                      inputType: TextInputType.name,
+                      controller: parentpasswordController,
+                      validate: (value) {
+                        if (value.isEmpty) {
+                          return '*';
+                        }
+                      },
+                      focus: focus16,
+                    ),
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -1114,7 +1155,7 @@ class _Register_FormState extends State<Register_Form> {
                               item: 'code',
                               hint: 'الكود الخاص',
                               small: true,
-                              inputType: TextInputType.number,
+                              inputType: TextInputType.text,
                               controller: barCodeController,
                               validate: (value) {
                                 if (value.isEmpty) {

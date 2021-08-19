@@ -11,7 +11,10 @@ class Filter_Container extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        // horizontal: 10,
+        vertical: 10,
+      ),
       child: Column(
         children: [
           Row(
@@ -51,10 +54,10 @@ class Filter_Container extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Filter_Chip(
-                title: 'whatsapp الى طالب',
+                title: 'واتس الى طالب',
               ),
               Filter_Chip(
-                title: 'whatsapp الى ولى الامر',
+                title: 'واتس الى ولى الامر',
               ),
             ],
           ),

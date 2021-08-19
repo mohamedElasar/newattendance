@@ -35,6 +35,7 @@ class _Teacher_FormState extends State<Teacher_Form> {
   final focus12 = FocusNode();
   final focus13 = FocusNode();
   final focus14 = FocusNode();
+  final focus15 = FocusNode();
 
   var nameController = TextEditingController();
   var emailController = TextEditingController();
@@ -87,6 +88,10 @@ class _Teacher_FormState extends State<Teacher_Form> {
     focus9.dispose();
     focus10.dispose();
     focus11.dispose();
+    focus12.dispose();
+    focus13.dispose();
+    focus14.dispose();
+    focus15.dispose();
     _sc.dispose();
     _sc2.dispose();
     _sc3.dispose();
@@ -696,6 +701,14 @@ class _Teacher_FormState extends State<Teacher_Form> {
                     focus: focus3,
                   ),
                   build_edit_field(
+                    item: 'password2',
+                    hint: 'password confirmation',
+                    controller: pass2Controller,
+                    inputType: TextInputType.name,
+                    validate: (value) {},
+                    focus: focus15,
+                  ),
+                  build_edit_field(
                     item: 'assistant_name',
                     hint: 'اسم المساعد ',
                     controller: assistantnamecontroller,
@@ -704,7 +717,7 @@ class _Teacher_FormState extends State<Teacher_Form> {
                     focus: focus12,
                   ),
                   build_edit_field(
-                    item: 'assitant_password',
+                    item: 'assitant_email',
                     hint: 'Assistant email',
                     controller: assistantemailcontroller,
                     inputType: TextInputType.name,
@@ -712,7 +725,7 @@ class _Teacher_FormState extends State<Teacher_Form> {
                     focus: focus13,
                   ),
                   build_edit_field(
-                    item: 'password2',
+                    item: 'password_assistant',
                     hint: 'Assistant Password',
                     controller: assistantpasscontrooller,
                     inputType: TextInputType.name,

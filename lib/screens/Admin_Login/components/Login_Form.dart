@@ -150,7 +150,7 @@ class _Login_FormState extends State<Login_Form> {
             ),
           ),
           SizedBox(
-            height: 20,
+            height: 10,
           ),
           Container(
             alignment: Alignment.center,
@@ -201,20 +201,22 @@ class _Login_FormState extends State<Login_Form> {
             ),
           ),
           if (!_isLoading)
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * .2),
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                child: CheckboxListTile(
-                  title: Text('? Remember Me'),
-                  value: _rememberme,
-                  onChanged: (newval) {
-                    setState(() {
-                      _rememberme = newval!;
-                    });
-                  },
-                  // selected: _rememberme,
+            Container(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * .1),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: CheckboxListTile(
+                    title: Text('? Remember Me'),
+                    value: _rememberme,
+                    onChanged: (newval) {
+                      setState(() {
+                        _rememberme = newval!;
+                      });
+                    },
+                    // selected: _rememberme,
+                  ),
                 ),
               ),
             ),
