@@ -445,16 +445,31 @@ class HomeTopPage extends StatelessWidget {
 class StudentSearch extends SearchDelegate<String> {
   @override
   List<Widget> buildActions(BuildContext context) => [
-        IconButton(
-          icon: Icon(Icons.clear),
-          onPressed: () {
-            if (query.isEmpty) {
-              close(context, '');
-            } else {
-              query = '';
-              showSuggestions(context);
-            }
-          },
+        Row(
+          children: [
+            IconButton(
+              icon: Icon(Icons.clear),
+              onPressed: () {
+                if (query.isEmpty) {
+                  close(context, '');
+                } else {
+                  query = '';
+                  showSuggestions(context);
+                }
+              },
+            ),
+            // IconButton(
+            //   icon: Icon(Icons.clear),
+            //   onPressed: () {
+            //     if (query.isEmpty) {
+            //       close(context, '');
+            //     } else {
+            //       query = '';
+            //       showSuggestions(context);
+            //     }
+            //   },
+            // ),
+          ],
         )
       ];
 
