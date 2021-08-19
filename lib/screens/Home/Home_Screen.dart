@@ -16,7 +16,9 @@ import 'components/options_widget.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-class Home_Screen extends StatelessWidget {
+class Home_Screen extends StatefulWidget {
+
+
   final user? myuser;
   final TeacherModel? myteacher;
   static MaterialPage page({required user user, TeacherModel? teacher}) {
@@ -32,6 +34,11 @@ class Home_Screen extends StatelessWidget {
 
   const Home_Screen({Key? key, this.myuser, this.myteacher}) : super(key: key);
 
+  @override
+  _Home_ScreenState createState() => _Home_ScreenState();
+}
+
+class _Home_ScreenState extends State<Home_Screen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -57,7 +64,11 @@ class Home_Screen extends StatelessWidget {
                 children: [
                   SizedBox(height: 10),
 
-                  Choices(size: size, usser: myuser, teacher: myteacher),
+                  Choices(
+                      size: size,
+                      usser: widget.myuser,
+                      teacher: widget.myteacher),
+
                   // build_chip_container_down(null, 'مجموعه الحضور'),
                   // SizedBox(
                   //   height: 10,
@@ -83,6 +94,36 @@ class Home_Screen extends StatelessWidget {
                 ),
               ),
               height: 200,
+            ),
+            InkWell(
+              onTap: () async {
+                await showSearch(
+                    context: context, delegate: StudentCodeSearch());
+              },
+              child: Container(
+                height: 40,
+                color: Colors.grey[200],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'بحث بالكود   ',
+                      style: TextStyle(
+                          fontFamily: 'GE-light',
+                          color: Colors.black87,
+                          fontSize: 20),
+                    ),
+                    Icon(
+                      Icons.search,
+                      size: 20,
+                      color: Colors.black87,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 15,
             ),
             Expanded(
               child: ListView(
@@ -122,7 +163,8 @@ class Home_Screen extends StatelessWidget {
                       //         builder: (context) => Student_Register_Screen()));
                     },
                   ),
-                  if (myuser != user.assistant)
+                  if (widget.myuser != user.assistant)
+
                     ListTile(
                       title: Padding(
                         padding: const EdgeInsets.all(1.0),
@@ -422,7 +464,8 @@ class HomeTopPage extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'بحث',
+                  'بحث بالاسم',
+
                   style: TextStyle(
                       fontFamily: 'GE-light',
                       color: Colors.black87,
@@ -485,6 +528,161 @@ class StudentSearch extends SearchDelegate<String> {
         future: Provider.of<StudentManager>(context, listen: false)
             .searchStudent(query),
         builder: (context, snapshot) {
+          print('snapshot.data![0]');
+          print(snapshot.data![0]);
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Center(child: CircularProgressIndicator());
+            default:
+              if (snapshot.hasError) {
+                // print(snapshot.error);
+                return Container(
+                  // color: Colors.black,
+                  alignment: Alignment.center,
+                  child: Text(
+                    'يوجد خطأ',
+                    style: TextStyle(fontSize: 28, color: Colors.white),
+                  ),
+                );
+              } else {
+                return buildResultSuccess(snapshot.data![0]);
+              }
+          }
+        },
+      );
+
+  @override
+  Widget buildSuggestions(BuildContext context) => Container(
+        child: FutureBuilder<List<StudentModelSearch>>(
+          future: Provider.of<StudentManager>(context, listen: false)
+              .searchStudent(query),
+          builder: (context, snapshot) {
+            print('snapshot.data');
+            print(snapshot.data);
+
+            if (query.isEmpty) return buildNoSuggestions();
+
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+              default:
+                if (snapshot.hasError || snapshot.data!.isEmpty) {
+                  return buildNoSuggestions();
+                } else {
+                  return buildSuggestionsSuccess(snapshot.data);
+                }
+            }
+          },
+        ),
+      );
+
+  Widget buildNoSuggestions() => Center(
+        child: Text(
+          'لا يوجد اقتراحات',
+          style: TextStyle(fontSize: 28, color: Colors.black),
+        ),
+      );
+
+  Widget buildSuggestionsSuccess(List<StudentModelSearch>? suggestions) {
+    return ListView.builder(
+        itemCount: suggestions!.length,
+        itemBuilder: (context, index) {
+          final name_suggestion = suggestions[index].name;
+          print('suggestion');
+          //print(suggestion);
+          final name_queryText = name_suggestion!.substring(0, query.length);
+          print('queryText[0');
+          // print(queryText[0]);
+          final name_remainingText = name_suggestion.substring(query.length);
+
+          return ListTile(
+            onTap: () {
+              Provider.of<AppStateManager>(context, listen: false)
+                  .setstudent(suggestions[index]);
+              Provider.of<AppStateManager>(context, listen: false)
+                  .goToSingleStudentfromHome(
+                      true, suggestions[index].id.toString());
+            },
+            leading: Icon(Icons.person),
+            title: RichText(
+              text: TextSpan(
+                text: name_queryText,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                children: [
+                  TextSpan(
+                    text: name_remainingText,
+                    style: TextStyle(
+                      color: Colors.black45,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  Widget buildResultSuccess(StudentModelSearch student) => Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF3279e2), Colors.purple],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: ListView(
+          padding: EdgeInsets.all(64),
+          children: [
+            Text(
+              student.name!,
+              style: TextStyle(
+                fontSize: 32,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 72),
+            const SizedBox(height: 32),
+          ],
+        ),
+      );
+}
+
+class StudentCodeSearch extends SearchDelegate<String> {
+  @override
+  List<Widget> buildActions(BuildContext context) => [
+        IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () {
+            if (query.isEmpty) {
+              close(context, '');
+            } else {
+              query = '';
+              showSuggestions(context);
+            }
+          },
+        )
+      ];
+
+  @override
+  Widget buildLeading(BuildContext context) => IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () => close(context, ''),
+      );
+
+  @override
+  Widget buildResults(BuildContext context) =>
+      FutureBuilder<List<StudentModelSearch>>(
+        future: Provider.of<StudentManager>(context, listen: false)
+            .searchcodeStudent(query),
+        builder: (context, snapshot) {
+          print('snapshot.data![0]');
+          print(snapshot.data![0]);
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
               return Center(child: CircularProgressIndicator());
@@ -511,8 +709,10 @@ class StudentSearch extends SearchDelegate<String> {
         // color: Colors.black,
         child: FutureBuilder<List<StudentModelSearch>>(
           future: Provider.of<StudentManager>(context, listen: false)
-              .searchStudent(query),
+              .searchcodeStudent(query),
           builder: (context, snapshot) {
+            print('snapshot.data');
+            print(snapshot.data);
             // print(snapshot.data);
             if (query.isEmpty) return buildNoSuggestions();
 
@@ -537,13 +737,20 @@ class StudentSearch extends SearchDelegate<String> {
         ),
       );
 
-  Widget buildSuggestionsSuccess(List<StudentModelSearch>? suggestions) =>
-      ListView.builder(
+  Widget buildSuggestionsSuccess(List<StudentModelSearch>? suggestions) {
+    // if (code == true) {
+    return ListView.builder(
         itemCount: suggestions!.length,
         itemBuilder: (context, index) {
-          final suggestion = suggestions[index].name;
-          final queryText = suggestion!.substring(0, query.length);
+          final suggestion = '${suggestions[index].code!.name}';
+          print('c suggestion');
+          print(suggestion);
+          final queryText = suggestion.substring(0, query.length);
+          print('c queryText');
+          print(queryText);
           final remainingText = suggestion.substring(query.length);
+          print('c remainning');
+          print(remainingText);
 
           return ListTile(
             onTap: () {
@@ -574,8 +781,8 @@ class StudentSearch extends SearchDelegate<String> {
               ),
             ),
           );
-        },
-      );
+        });
+  }
 
   Widget buildResultSuccess(StudentModelSearch student) => Container(
         decoration: BoxDecoration(
@@ -589,7 +796,7 @@ class StudentSearch extends SearchDelegate<String> {
           padding: EdgeInsets.all(64),
           children: [
             Text(
-              student.name!,
+              student.code!.name!,
               style: TextStyle(
                 fontSize: 32,
                 color: Colors.white,

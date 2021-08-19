@@ -1402,6 +1402,7 @@ class _ChoicesState extends State<Choices> {
                       ),
                       onPressed: group_level
                           ? () async {
+
                               _add_lesson('message', 'title');
                             }
 
@@ -1537,11 +1538,13 @@ class _ChoicesState extends State<Choices> {
                         try {
                           String res = await FlutterBarcodeScanner.scanBarcode(
                               '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+
                           print(res);
                           dynamic resp = await Provider.of<AppointmentManager>(
                                   context,
                                   listen: false)
                               .attendlesson(res, app_id_selected!);
+
 
                           if (resp['last_appointment_attend'] == false) {
                             ScaffoldMessenger.of(context).showSnackBar(

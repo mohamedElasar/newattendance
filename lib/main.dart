@@ -23,6 +23,7 @@ void main() {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     // setWindowTitle('App title');
     DesktopWindow.setWindowSize(Size(700, 900));
+
     DesktopWindow.setMinWindowSize(Size(700, 800));
     DesktopWindow.setMaxWindowSize(Size(700, 800));
   }

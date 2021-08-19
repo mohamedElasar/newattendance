@@ -324,13 +324,13 @@ class StudentManager extends ChangeNotifier {
   }
 
   Future<List<StudentModelSearch>> searchStudent(String filter1) async {
-    // print(_pageNumber);
     try {
+      print('cooooooooooooode');
+      print(filter1);
       var url = Uri.https('development.mrsaidmostafa.com', '/api/students', {
         "name": filter1,
       });
-      // print(_pageNumber);
-      //
+
       print(url);
       var response = await http.get(
         url,
@@ -341,6 +341,8 @@ class StudentManager extends ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+      print('coddddddddde');
+      print(responseData);
       // print(responseData);
       List<dynamic> studentsList = responseData['data'];
       // print(studentsList[0]);
@@ -353,7 +355,46 @@ class StudentManager extends ChangeNotifier {
 
       return list;
     } catch (e) {
-      // print(e);
+      print('errrrrrrrrrr');
+      print(e);
+      throw e;
+    }
+  }
+
+  Future<List<StudentModelSearch>> searchcodeStudent(String filter2) async {
+    try {
+      print('cooooooooooooode');
+      print(filter2);
+      var url = Uri.https('development.mrsaidmostafa.com', '/api/students', {
+        "code": filter2,
+      });
+
+      print(url);
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+
+      final responseData = json.decode(response.body);
+      print('coddddddddde');
+      print(responseData);
+      // print(responseData);
+      List<dynamic> studentsList = responseData['data'];
+      // print(studentsList[0]);
+      // print(studentsList);
+      print(StudentModelSearch.fromJson(studentsList[0]));
+
+      List<StudentModelSearch> list = studentsList
+          .map((data) => StudentModelSearch.fromJson(data))
+          .toList();
+
+      return list;
+    } catch (e) {
+      print('errrrrrrrrrr');
+      print(e);
       throw e;
     }
   }

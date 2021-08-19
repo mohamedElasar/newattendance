@@ -1155,7 +1155,7 @@ class _Register_FormState extends State<Register_Form> {
                               item: 'code',
                               hint: 'الكود الخاص',
                               small: true,
-                              inputType: TextInputType.number,
+                              inputType: TextInputType.text,
                               controller: barCodeController,
                               validate: (value) {
                                 if (value.isEmpty) {
