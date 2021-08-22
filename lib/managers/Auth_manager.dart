@@ -10,7 +10,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum user { center, student, assistant, teacher, parent }
+enum user { center, student, assistant, teacher, parent, assistant0 }
 
 class Auth_manager extends ChangeNotifier {
   String? token;
@@ -18,6 +18,7 @@ class Auth_manager extends ChangeNotifier {
   String? _userEmail;
   String? _userPhone;
   String? _type;
+  int? _premier;
   StudentModelSearch? _studentUser;
   TeacherModel? _teacherUser;
   late String _name;
@@ -30,7 +31,8 @@ class Auth_manager extends ChangeNotifier {
   user? get type {
     if (_type == 'center') return user.center;
     if (_type == 'student') return user.student;
-    if (_type == 'assistant') return user.assistant;
+    if (_type == 'assistant' && _premier == 1) return user.assistant;
+    if (_type == 'assistant' && _premier == 0) return user.assistant0;
     if (_type == 'teacher') return user.teacher;
     if (_type == 'parent') return user.parent;
   }
@@ -58,16 +60,15 @@ class Auth_manager extends ChangeNotifier {
       _name = responseData['data']['name'];
       group__name = _name;
       _type = responseData['data']['type'];
-      print(_type);
-      print("_name");
-      print(group__name);
-      print(_type);
 
       if (_type == 'student') {
         _studentUser = StudentModelSearch.fromJson(responseData['data']);
       }
       if (_type == 'teacher') {
         _teacherUser = TeacherModel.fromJson(responseData['data']);
+      }
+      if (_type == 'assistant') {
+        _premier = responseData['data']['premier'];
       }
       if (_type == 'parent') {
         String idstudent = responseData['data']['student']['id'].toString();
@@ -127,6 +128,21 @@ class Auth_manager extends ChangeNotifier {
       );
       prefs.setString('userData', userData);
     }
+    if (_type == 'assistant') {
+      final userData = json.encode(
+        {
+          'token': token,
+          'userId': _userId,
+          'userEmail': _userEmail,
+          'userPhone': _userPhone,
+          'name': _name,
+          'type': _type,
+          'premier': _premier,
+          // 'student': _studentUser!.toJson()
+        },
+      );
+      prefs.setString('userData', userData);
+    }
   }
 
   void logout() async {
@@ -135,6 +151,7 @@ class Auth_manager extends ChangeNotifier {
     _userEmail = null;
     _userPhone = null;
     _type = null;
+    _premier = null;
     _studentUser = null;
     _teacherUser = null;
     notifyListeners();
@@ -175,6 +192,16 @@ class Auth_manager extends ChangeNotifier {
       _userEmail = data['userEmail'];
       _name = data['name'];
       _type = data['type'];
+      // _studentUser = StudentModelSearch.fromJson(data['student']);
+    }
+    if (data['type'] == 'assistant') {
+      token = data['token'];
+      _userId = data['userId'];
+      _userPhone = data['userPhone'];
+      _userEmail = data['userEmail'];
+      _name = data['name'];
+      _type = data['type'];
+      _premier = data['premier'];
       // _studentUser = StudentModelSearch.fromJson(data['student']);
     }
 

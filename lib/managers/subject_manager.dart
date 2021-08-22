@@ -42,12 +42,13 @@ class SubjectManager extends ChangeNotifier {
         },
       );
       final responseData = json.decode(response.body);
-
-      if (response.statusCode == 200) {}
+      if (responseData['message'] == 'This action is unauthorized.') {
+        throw HttpException('غير مسموح لك باضافه ماده دراسيه');
+      }
       // add exception
 
     } catch (error) {
-      print(error);
+      throw (error);
     }
 
     notifyListeners();

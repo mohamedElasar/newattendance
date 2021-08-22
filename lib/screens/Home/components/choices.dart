@@ -1303,16 +1303,19 @@ class _ChoicesState extends State<Choices> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Button_Container(
-                  color: kbuttonColor2,
-                  size: widget.size,
-                  text: 'ادخال طالب',
-                  fnc: () async {
-                    Provider.of<AppStateManager>(context, listen: false)
-                        .registerStudent(true);
-                  },
-                ),
-                (widget.usser == user.assistant || widget.usser == user.teacher)
+                if (widget.usser != user.assistant0)
+                  Button_Container(
+                    color: kbuttonColor2,
+                    size: widget.size,
+                    text: 'ادخال طالب',
+                    fnc: () async {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .registerStudent(true);
+                    },
+                  ),
+                (widget.usser == user.assistant ||
+                        widget.usser == user.teacher ||
+                        widget.usser == user.assistant0)
                     ? Button_Container(
                         color: kbuttonColor2,
                         size: widget.size,
@@ -1331,35 +1334,48 @@ class _ChoicesState extends State<Choices> {
                               .registerTeacher(true);
                         },
                       ),
+                if (widget.usser == user.assistant0)
+                  Button_Container(
+                    color: kbackgroundColor1,
+                    size: widget.size,
+                    text: 'السنوات الدراسيه',
+                    fnc: () async {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .addYears(true);
+                    },
+                  ),
               ],
             ),
           ),
-          Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Button_Container(
-                  color: kbackgroundColor1,
-                  size: widget.size,
-                  text: 'السنوات الدراسيه',
-                  fnc: () async {
-                    Provider.of<AppStateManager>(context, listen: false)
-                        .addYears(true);
-                  },
-                ),
-                Button_Container(
-                  color: kbackgroundColor3,
-                  size: widget.size,
-                  text: 'ادخال مجموعه',
-                  fnc: () async {
-                    Provider.of<AppStateManager>(context, listen: false)
-                        .registerGroup(true);
-                  },
-                ),
-              ],
+          if (widget.usser != user.assistant0)
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Button_Container(
+                    color: kbackgroundColor1,
+                    size: widget.size,
+                    text: 'السنوات الدراسيه',
+                    fnc: () async {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .addYears(true);
+                    },
+                  ),
+                  Button_Container(
+                    color: kbackgroundColor3,
+                    size: widget.size,
+                    text: 'ادخال مجموعه',
+                    fnc: () async {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .registerGroup(true);
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          (widget.usser == user.assistant || widget.usser == user.teacher)
+          (widget.usser == user.assistant ||
+                  widget.usser == user.teacher ||
+                  widget.usser == user.assistant0)
               ? Container()
               : Container(
                   child: Row(
@@ -1402,7 +1418,6 @@ class _ChoicesState extends State<Choices> {
                       ),
                       onPressed: group_level
                           ? () async {
-
                               _add_lesson('message', 'title');
                             }
 
@@ -1544,7 +1559,6 @@ class _ChoicesState extends State<Choices> {
                                   context,
                                   listen: false)
                               .attendlesson(res, app_id_selected!);
-
 
                           if (resp['last_appointment_attend'] == false) {
                             ScaffoldMessenger.of(context).showSnackBar(

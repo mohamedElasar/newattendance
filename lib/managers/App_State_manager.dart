@@ -10,6 +10,7 @@ class AppStateManager extends ChangeNotifier {
   bool _home_options = false;
   bool _student_register = false;
   bool _teacher_register = false;
+  bool _assistant_register = false;
   bool _group_register = false;
   bool _communicate_students = false;
   bool _data_students = false;
@@ -34,6 +35,7 @@ class AppStateManager extends ChangeNotifier {
   bool get homeOptions => _home_options;
   bool get studentRegister => _student_register;
   bool get teacherRegister => _teacher_register;
+  bool get assistantRegister => _assistant_register;
   bool get groupRegister => _group_register;
   bool get communicateStudents => _communicate_students;
   bool get dataStudents => _data_students;
@@ -116,6 +118,11 @@ class AppStateManager extends ChangeNotifier {
 
   void registerTeacher(bool value) {
     _teacher_register = value;
+    notifyListeners();
+  }
+
+  void registerAssistant(bool value) {
+    _assistant_register = value;
     notifyListeners();
   }
 

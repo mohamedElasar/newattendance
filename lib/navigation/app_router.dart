@@ -9,8 +9,8 @@ import 'package:attendance/managers/year_manager.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/appointment.dart';
 import 'package:attendance/models/groupmodelsimple.dart';
-import 'package:attendance/models/student.dart';
 import 'package:attendance/screens/Add_academic_year/Academic_year.dart';
+import 'package:attendance/screens/Add_assistant/Add_Teacher_Screen.dart';
 import 'package:attendance/screens/Add_group/Add_group_Screen.dart';
 import 'package:attendance/screens/Add_subject/Academic_subject.dart';
 import 'package:attendance/screens/Add_teacher/Add_Teacher_Screen.dart';
@@ -75,7 +75,9 @@ class AppRouter extends RouterDelegate
         if (!authmanager.isLoggedIn) Admin_logIn.page(),
         if (authmanager.isLoggedIn && authmanager.type == user.center)
           Home_Screen.page(user: authmanager.type!),
-        if (authmanager.isLoggedIn && authmanager.type == user.assistant)
+        if (authmanager.isLoggedIn &&
+            (authmanager.type == user.assistant ||
+                authmanager.type == user.assistant0))
           Home_Screen.page(user: authmanager.type!),
         if (authmanager.isLoggedIn && authmanager.type == user.teacher)
           Home_Screen.page(
@@ -90,6 +92,8 @@ class AppRouter extends RouterDelegate
               editStudent: StudentModelSearch(), edit: false),
         if (authmanager.isLoggedIn && appStateManager.teacherRegister)
           Add_Teacher_Screeen.page(),
+        if (authmanager.isLoggedIn && appStateManager.assistantRegister)
+          Add_Assistant_Screen.page(),
         if (authmanager.isLoggedIn && appStateManager.groupscheck)
           Show_Group.page(),
         if (authmanager.isLoggedIn &&
@@ -224,6 +228,11 @@ class AppRouter extends RouterDelegate
       yearManager.getMoreData();
       subjectManager.getMoreData();
       appStateManager.registerTeacher(false);
+    }
+    if (route.settings.name == Attendance_Screens.assistant_registerpath) {
+      teachermanager.resetlist();
+      teachermanager.getMoreData();
+      appStateManager.registerAssistant(false);
     }
     if (route.settings.name == Attendance_Screens.student_registerpath) {
       groupManager.resetlist();

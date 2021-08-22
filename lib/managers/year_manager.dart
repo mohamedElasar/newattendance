@@ -41,11 +41,11 @@ class YearManager extends ChangeNotifier {
       );
       final responseData = json.decode(response.body);
 
-      if (response.statusCode == 200) {}
-      // add exception
-
+      if (responseData['message'] == 'This action is unauthorized.') {
+        throw HttpException('غير مسموح لك باضافه سنه دراسيه');
+      }
     } catch (error) {
-      print(error);
+      throw (error);
     }
 
     notifyListeners();

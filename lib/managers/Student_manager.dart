@@ -170,7 +170,7 @@ class StudentManager extends ChangeNotifier {
       var response = await dio.put(urld, data: jsonEncode(params));
 
       final responseData = response.data;
-      print(responseData);
+      print(response.statusCode);
       // if (responseData['errors'] != null) {
       //   print('here');
       //   List<String> errors = [];
@@ -184,8 +184,9 @@ class StudentManager extends ChangeNotifier {
         for (var value in e.response!.data['errors'].values)
           errors.add(value[0]);
         throw HttpException(errors.join('  '));
-      } else {
-        print(e);
+      } else if (e.response!.data['message'] ==
+          'This action is unauthorized.') {
+        throw HttpException('غير مسموح لك بتعديل بيانات طالب');
       }
     }
 

@@ -1,6 +1,7 @@
 import 'package:attendance/managers/Appointment_manager.dart';
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/Student_manager.dart';
+import 'package:attendance/managers/assistant_manager.dart';
 import 'package:attendance/managers/cities_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/stage_manager.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
   final _studentsmanager = StudentManager();
   final _subjectmanager = SubjectManager();
   final _appointmentmanager = AppointmentManager();
+  final _assistantmanager = AssistantManager();
   // final _studentmanager = StudentManager();
 
   // ignore: non_constant_identifier_names
@@ -110,6 +112,14 @@ class MyApp extends StatelessWidget {
                 // ignore: unnecessary_null_comparison
                 auth,
                 prevstage == null ? [] : prevstage.appointments!),
+        ),
+        ChangeNotifierProxyProvider<Auth_manager, AssistantManager>(
+          create: (ctx) => _assistantmanager,
+          update: (ctx, auth, prevstage) => prevstage!
+            ..receiveToken(
+                // ignore: unnecessary_null_comparison
+                auth,
+                prevstage == null ? [] : prevstage.assistants),
         ),
       ],
       child: MaterialApp(
