@@ -1,10 +1,12 @@
 import 'package:attendance/constants.dart';
 import 'package:attendance/helper/httpexception.dart';
+import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Auth_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
+import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:attendance/models/teacher.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -16,11 +18,15 @@ class group_form extends StatefulWidget {
     required this.size,
     this.tuser,
     this.teacher,
+    this.edit,
+    this.group,
   }) : super(key: key);
 
   final Size size;
   final user? tuser;
   final TeacherModel? teacher;
+  final bool? edit;
+  final GroupModelSimple? group;
 
   @override
   _group_formState createState() => _group_formState();
@@ -122,45 +128,96 @@ class _group_formState extends State<group_form> {
     setState(() {
       _isLoading = true;
     });
-    try {
-      await Provider.of<GroupManager>(context, listen: false)
-          .addgroup(
-            nameController.text,
-            year_id_selected,
-            subjectId_selected,
-            teacher_id_selected,
-            _newlist,
-            _finaltimes,
-          )
-          .then((_) {
-            nameController.text = '';
-            subjectname = 'الماده الدراسيه';
-            teachername = 'المدرس';
-            yearname = 'السنه الدراسيه';
-          })
-          .then((value) => setState(() {
-                _isLoading = false;
-              }))
-          .then(
-            (_) => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: Colors.green[300],
-                content: Text(
-                  'تم اضافه المجموعه بنجاح',
-                  style: TextStyle(fontFamily: 'GE-medium'),
+
+    if (widget.edit != true) {
+      try {
+        await Provider.of<GroupManager>(context, listen: false)
+            .addgroup(
+              nameController.text,
+              year_id_selected,
+              subjectId_selected,
+              teacher_id_selected,
+              _newlist,
+              _finaltimes,
+            )
+            .then((_) {
+              nameController.text = '';
+              subjectname = 'الماده الدراسيه';
+              teachername = 'المدرس';
+              yearname = 'السنه الدراسيه';
+            })
+            .then((value) => setState(() {
+                  _isLoading = false;
+                }))
+            .then(
+              (_) => ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.green[300],
+                  content: Text(
+                    'تم اضافه المجموعه بنجاح',
+                    style: TextStyle(fontFamily: 'GE-medium'),
+                  ),
+                  duration: Duration(seconds: 3),
                 ),
-                duration: Duration(seconds: 3),
               ),
-            ),
-          );
-    } on HttpException catch (error) {
-      _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
-    } catch (error) {
-      _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
+            );
+      } on HttpException catch (error) {
+        _showErrorDialog(error.toString(), 'حدث خطأ');
+      } catch (error) {
+        _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } else {
+      try {
+        await Provider.of<GroupManager>(context, listen: false)
+            .modifygroup(
+              widget.group!.id.toString(),
+              nameController.text,
+              year_id_selected,
+              subjectId_selected,
+              teacher_id_selected,
+              _newlist,
+              _finaltimes,
+            )
+            .then((value) =>
+                Provider.of<GroupManager>(context, listen: false).resetlist())
+            .then((value) =>
+                Provider.of<GroupManager>(context, listen: false).getMoreData())
+            .then((_) {
+              // nameController.text = '';
+              // subjectname = 'الماده الدراسيه';
+              // teachername = 'المدرس';
+              // yearname = 'السنه الدراسيه';
+
+              Provider.of<AppStateManager>(context, listen: false)
+                  .groupTapped('', false, GroupModelSimple());
+            })
+            .then((value) => setState(() {
+                  _isLoading = false;
+                }))
+            .then(
+              (_) => ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.green[300],
+                  content: Text(
+                    'تم تعديل المجموعه بنجاح',
+                    style: TextStyle(fontFamily: 'GE-medium'),
+                  ),
+                  duration: Duration(seconds: 3),
+                ),
+              ),
+            );
+      } on HttpException catch (error) {
+        _showErrorDialog(error.toString(), 'حدث خطأ');
+      } catch (error) {
+        _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
+      }
+      setState(() {
+        _isLoading = false;
+      });
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   var _isLoading = false;
@@ -182,6 +239,15 @@ class _group_formState extends State<group_form> {
     'أربعاء',
     'خميس',
     'جمعه',
+  ];
+  List<String> weekdays2 = [
+    'Saturday',
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
   ];
   List<TimeOfDay> _times = [
     TimeOfDay.now(),
@@ -269,6 +335,32 @@ class _group_formState extends State<group_form> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.edit == true) nameController.text = widget.group!.name!;
+    if (widget.edit == true)
+      subjectId_selected = widget.group!.subject!.id.toString();
+    if (widget.edit == true)
+      subjectname = widget.group!.subject!.name.toString();
+    if (widget.edit == true)
+      teacher_id_selected = widget.group!.teacher!.id.toString();
+    if (widget.edit == true)
+      teachername = widget.group!.teacher!.name.toString();
+    if (widget.edit == true)
+      year_id_selected = widget.group!.year!.id.toString();
+    if (widget.edit == true) yearname = widget.group!.year!.name.toString();
+    if (widget.edit == true) {
+      widget.group!.day!.asMap().forEach((index, value) {
+        days.add(index + 1);
+      });
+      for (int i = 0; i < widget.group!.day!.length; i++) {
+        setState(() {
+          _data[i] = widget.group!.day![i];
+        });
+      }
+      // widget.group!.day!.forEach((d) {
+      //   _data[1] = d;
+      // });
+    }
 
     Future.delayed(Duration.zero, () async {
       Provider.of<SubjectManager>(context, listen: false).resetlist();
@@ -944,7 +1036,7 @@ class _group_formState extends State<group_form> {
                                                           },
                                                           icon: Icon(Icons
                                                               .keyboard_arrow_down),
-                                                          items: weekdays
+                                                          items: weekdays2
                                                               .map((item) =>
                                                                   DropdownMenuItem(
                                                                     child: Text(
@@ -1010,11 +1102,13 @@ class _group_formState extends State<group_form> {
                           child: TextButton(
                             style: ButtonStyle(
                                 elevation: MaterialStateProperty.all(2),
-                                backgroundColor:
-                                    MaterialStateProperty.all(kbuttonColor2)),
+                                backgroundColor: MaterialStateProperty.all(
+                                    widget.edit == true
+                                        ? Colors.red[200]
+                                        : kbuttonColor2)),
                             onPressed: _submit,
                             child: Text(
-                              'تسجيل',
+                              widget.edit == true ? 'تعديل' : 'تسجيل',
                               style: TextStyle(
                                   fontFamily: 'GE-light', color: Colors.black),
                             ),

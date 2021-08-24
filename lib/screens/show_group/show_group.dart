@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
+import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/show_group/components/group_top_page.dart';
 import 'package:flutter/material.dart';
@@ -66,6 +67,79 @@ class _Show_GroupState extends State<Show_Group> {
     });
   }
 
+  void _showErrorDialog(String message, String title, int id) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          title,
+          style: TextStyle(fontFamily: 'GE-Bold'),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(fontFamily: 'AraHamah1964R-Bold'),
+        ),
+        actions: <Widget>[
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Center(
+                  child: TextButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            Colors.red.withOpacity(.6))),
+                    // color: kbackgroundColor1,
+                    child: Text(
+                      'نعم',
+                      style: TextStyle(
+                          fontFamily: 'GE-medium', color: Colors.black),
+                    ),
+                    onPressed: () async {
+                      setState(() {
+                        _isloading = true;
+                      });
+                      Navigator.of(ctx).pop();
+
+                      await Provider.of<GroupManager>(context, listen: false)
+                          .delete_group(id)
+                          .then((value) =>
+                              Provider.of<GroupManager>(context, listen: false)
+                                  .getMoreData())
+                          .then((_) {
+                        setState(() {
+                          _isloading = false;
+                        });
+                      });
+                    },
+                  ),
+                ),
+                Center(
+                  child: TextButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            Colors.green.withOpacity(.6))),
+                    // color: kbackgroundColor1,
+                    child: Text(
+                      'لا',
+                      style: TextStyle(
+                          fontFamily: 'GE-medium', color: Colors.black),
+                    ),
+                    onPressed: () {
+                      setState(() {});
+                      Navigator.of(ctx).pop();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -113,80 +187,82 @@ class _Show_GroupState extends State<Show_Group> {
                                         margin:
                                             EdgeInsets.symmetric(vertical: 5),
                                         color: colors[Index % colors.length],
-                                        child: ListTile(
-                                          trailing: Text(
-                                            groupManager.groups[Index]
-                                                        .teacher ==
-                                                    null
-                                                ? ''
-                                                : groupManager.groups[Index]
-                                                    .teacher!.name!,
-                                            style: TextStyle(
-                                                color: text_colors[
-                                                    Index % colors.length],
-                                                fontFamily: 'GE-light'),
-                                          ),
-                                          subtitle: Text(
-                                            groupManager.groups[Index].subject!
-                                                    .name ??
-                                                '',
-                                            style: TextStyle(
-                                                color: text_colors[
-                                                    Index % colors.length],
-                                                fontFamily: 'GE-light'),
-                                          ),
-                                          onTap: () {
-                                            // Navigator.push(
-                                            //     context,
-                                            //     MaterialPageRoute(
-                                            //         builder: (context) => Show_Group_Class()));
-                                            Provider.of<AppStateManager>(
-                                                    context,
-                                                    listen: false)
-                                                .goToSinglegroup(
-                                                    true,
-                                                    groupManager
-                                                        .groups[Index].id
-                                                        .toString(),
-                                                    groupManager.groups[Index]);
-                                          },
-                                          title: Text(
-                                            groupManager.groups[Index].name!,
-                                            style: TextStyle(
-                                                color: text_colors[
-                                                    Index % colors.length],
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: 'GE-medium'),
-                                          ),
+                                        child: Dismissible(
+                                          direction:
+                                              DismissDirection.startToEnd,
+                                          background:
+                                              Container(color: Colors.red),
+                                          // key: Key(Index.toString()),
+                                          key: UniqueKey(),
 
-                                          // Padding(
-                                          //   padding: const EdgeInsets.all(8.0),
-                                          //   child: Container(
-                                          //     decoration: BoxDecoration(
-                                          //       borderRadius:
-                                          //           BorderRadius.all(Radius.circular(5)),
-                                          //       border: Border.all(
-                                          //         color: Colors.grey,
-                                          //         width: 0.7,
-                                          //       ),
-                                          //     ),
-                                          //     height: 50,
-                                          //     child: Material(
-                                          //       elevation: 5.0,
-                                          //       borderRadius: BorderRadius.circular(5.0),
-                                          //       color: colors[Index % colors.length],
-                                          //       child: Center(
-                                          //         child: Text(
-                                          //           groupManager.groups[Index].name!,
-                                          //           style: TextStyle(
-                                          //               color: text_colors[
-                                          //                   Index % colors.length],
-                                          //               fontWeight: FontWeight.bold),
-                                          //         ),
-                                          //       ),
-                                          //     ),
-                                          //   ),
-                                          // ),
+                                          onDismissed: (dirction) {
+                                            if (dirction ==
+                                                DismissDirection.startToEnd) {
+                                              _showErrorDialog(
+                                                  'تاكيد مسح المجموعه',
+                                                  'تاكيد',
+                                                  groupManager
+                                                      .groups[Index].id!);
+                                            }
+                                          },
+                                          child: InkWell(
+                                            onDoubleTap: () {
+                                              Provider.of<AppStateManager>(
+                                                      context,
+                                                      listen: false)
+                                                  .groupTapped(
+                                                      groupManager
+                                                          .groups[Index].id
+                                                          .toString(),
+                                                      true,
+                                                      groupManager
+                                                          .groups[Index]);
+                                            },
+                                            child: ListTile(
+                                              trailing: Text(
+                                                groupManager.groups[Index]
+                                                            .teacher ==
+                                                        null
+                                                    ? ''
+                                                    : groupManager.groups[Index]
+                                                        .teacher!.name!,
+                                                style: TextStyle(
+                                                    color: text_colors[
+                                                        Index % colors.length],
+                                                    fontFamily: 'GE-light'),
+                                              ),
+                                              subtitle: Text(
+                                                groupManager.groups[Index]
+                                                        .subject!.name ??
+                                                    '',
+                                                style: TextStyle(
+                                                    color: text_colors[
+                                                        Index % colors.length],
+                                                    fontFamily: 'GE-light'),
+                                              ),
+                                              onTap: () {
+                                                Provider.of<AppStateManager>(
+                                                        context,
+                                                        listen: false)
+                                                    .goToSinglegroup(
+                                                        true,
+                                                        groupManager
+                                                            .groups[Index].id
+                                                            .toString(),
+                                                        groupManager
+                                                            .groups[Index]);
+                                              },
+                                              title: Text(
+                                                groupManager
+                                                    .groups[Index].name!,
+                                                style: TextStyle(
+                                                    color: text_colors[
+                                                        Index % colors.length],
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'GE-medium'),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),

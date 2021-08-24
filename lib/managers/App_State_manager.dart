@@ -86,6 +86,15 @@ class AppStateManager extends ChangeNotifier {
   AppointmentModel _singlelesson = AppointmentModel();
   AppointmentModel get getsinglelesson => _singlelesson;
 
+//group edit
+  String _editgroupid = '';
+  String get geteditgroupID => _editgroupid;
+  bool _editgroup = false;
+  bool get geteditgrooup => _editgroup;
+  GroupModelSimple _groupEdit = GroupModelSimple();
+  GroupModelSimple get getGroupEdit => _groupEdit;
+  //
+
   void setstudent(StudentModelSearch st) {
     _student = st;
   }
@@ -209,6 +218,13 @@ class AppStateManager extends ChangeNotifier {
     _editStudentid = id;
     _editStudent = value;
     _student = stu;
+    notifyListeners();
+  }
+
+  void groupTapped(String id, bool value, GroupModelSimple gr) {
+    _editgroupid = id;
+    _editgroup = value;
+    _groupEdit = gr;
     notifyListeners();
   }
 }

@@ -34,19 +34,8 @@ class GroupManager extends ChangeNotifier {
   bool _error = false;
   bool _loading = true;
   final int _defaultGroupsPerPageCount = 15;
-  // var lesson__id = [];
-  // var i = 0;
-  Future<void> add_compare(
-      lesson__id,
-      student_absence,
-      // String? degree,
-      // // String? year,
-      // String? student_id,
-      int? url
-      // String? teacher,
-      // List<String>? day,
-      // List<String>? time,
-      ) async {
+
+  Future<void> add_compare(lesson__id, student_absence, int? url) async {
     try {
       Dio dio = Dio();
       String urld =
@@ -60,27 +49,14 @@ class GroupManager extends ChangeNotifier {
             {"appointment_id": lesson__id[i], "case": student_absence[i]},
         ]
       };
-      print('e lesson__idddddddddddddddd');
-      print(lesson__id);
-      print('e student_absenceeeeeeee');
-      print(student_absence);
 
       dio.options.headers["Authorization"] = 'Bearer $_authToken';
       dio.options.headers["Accept"] = 'application/json';
 
       var response = await dio.post(urld, data: jsonEncode(params));
-      print(response);
 
       final responseData = response.data;
-      print('responseDataaaaaaaaaaaaaaaaaaaaa');
-      print(responseData);
 
-      // if (responseData['errors'] != null) {
-      //   print(responseData['errors']);
-      //   List<String> errors = [];
-      //   for (var value in responseData['errors'].values) errors.add(value[0]);
-      //   throw HttpException(errors.join('  '));
-      //}
       List students = responseData['data']['students'];
       print('students');
       print(students);
@@ -142,50 +118,6 @@ class GroupManager extends ChangeNotifier {
     notifyListeners();
   }
 
-
-  // Future<void> add_degree_off(
-  //     var? degree,
-  //     // String? year,
-  //     var ? student_id,
-  //     String? url
-  //     // String? teacher,
-  //     // List<String>? day,
-  //     // List<String>? time,
-  //     ) async {
-  //   try {
-  //     Dio dio = Dio();
-  //     String urld =
-  //         'https://development.mrsaidmostafa.com/api/degree/appointments/$url';
-  //     print(urld);
-  //     var params = {
-  //       'degree': degree,
-  //       'student_id': student_id,
-  //     };
-
-  //     dio.options.headers["Authorization"] = 'Bearer $_authToken';
-  //     dio.options.headers["Accept"] = 'application/json';
-
-  //     var response = await dio.post(urld, data: jsonEncode(params));
-  //     print(response);
-
-  //     final responseData = response.data;
-  //     print(responseData);
-
-  //     if (responseData['errors'] != null) {
-  //       print(responseData['errors']);
-  //       List<String> errors = [];
-  //       for (var value in responseData['errors'].values) errors.add(value[0]);
-  //       throw HttpException(errors.join('  '));
-  //     }
-  //   } catch (error) {
-  //     print(error);
-  //     throw (error);
-  //   }
-
-  //   notifyListeners();
-  // }
-
-
   Future<void> addgroup(
     String? name,
     String? year,
@@ -216,15 +148,83 @@ class GroupManager extends ChangeNotifier {
       final responseData = response.data;
       print(responseData);
 
-      if (responseData['errors'] != null) {
-        print(responseData['errors']);
+      // if (responseData['errors'] != null) {
+      //   print(responseData['errors']);
+      //   List<String> errors = [];
+      //   for (var value in responseData['errors'].values) errors.add(value[0]);
+      //   throw HttpException(errors.join('  '));
+      // } else if (responseData['message'] == 'This action is unauthorized.') {
+      //   throw HttpException('غير مسموح لك باضافه مجموعه');
+      // }
+    } on DioError catch (e) {
+      if (e.response!.data['errors'] != null) {
+        print(e.response!.data);
         List<String> errors = [];
-        for (var value in responseData['errors'].values) errors.add(value[0]);
+        for (var value in e.response!.data['errors'].values)
+          errors.add(value[0]);
         throw HttpException(errors.join('  '));
+      } else if (e.response!.data['message'] ==
+          'This action is unauthorized.') {
+        throw HttpException('غير مسموح لك باضافه مجموعه');
       }
     } catch (error) {
       print(error);
       throw (error);
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> modifygroup(
+    String? id,
+    String? name,
+    String? year,
+    String? subject,
+    String? teacher,
+    List<String>? day,
+    List<String>? time,
+  ) async {
+    try {
+      Dio dio = Dio();
+      String urld = 'https://development.mrsaidmostafa.com/api/groups/$id';
+      print(urld);
+      var params = {
+        'name': name,
+        'year_id': year,
+        'subject_id': subject,
+        'teacher_id': teacher,
+        'day': day,
+        'time': time
+      };
+
+      dio.options.headers["Authorization"] = 'Bearer $_authToken';
+      dio.options.headers["Accept"] = 'application/json';
+
+      var response = await dio.put(urld, data: jsonEncode(params));
+      print(response);
+
+      final responseData = response.data;
+      print(responseData);
+
+      // if (responseData['errors'] != null) {
+      //   print(responseData['errors']);
+      //   List<String> errors = [];
+      //   for (var value in responseData['errors'].values) errors.add(value[0]);
+      //   throw HttpException(errors.join('  '));
+      // } else if (responseData['message'] == 'This action is unauthorized.') {
+      //   throw HttpException('غير مسموح لك بتعديل مجموعه');
+      // }
+    } on DioError catch (e) {
+      if (e.response!.data['errors'] != null) {
+        print(e.response!.data);
+        List<String> errors = [];
+        for (var value in e.response!.data['errors'].values)
+          errors.add(value[0]);
+        throw HttpException(errors.join('  '));
+      } else if (e.response!.data['message'] ==
+          'This action is unauthorized.') {
+        throw HttpException('غير مسموح لك بتعديل بيانات مجموعه');
+      }
     }
 
     notifyListeners();
@@ -383,5 +383,57 @@ class GroupManager extends ChangeNotifier {
   void seterror(bool value) {
     _error = value;
     notifyListeners();
+  }
+
+  Future<void> delete_group(int id) async {
+    var url = Uri.https('development.mrsaidmostafa.com', '/api/groups/$id');
+    try {
+      var response = await http.delete(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+      final responseData = json.decode(response.body);
+      print(responseData);
+      if (responseData['massage'] ==
+          'The group has been deleted successfully.') {
+        _groups.removeWhere((e) => e.id == id);
+      }
+    } catch (error) {
+      print(error);
+    }
+
+    notifyListeners();
+  }
+
+  Future<List<GroupModelSimple>> searchgroups(String filter1) async {
+    try {
+      var url = Uri.https('development.mrsaidmostafa.com', '/api/groups', {
+        "name": filter1,
+      });
+
+      print(url);
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+
+      final responseData = json.decode(response.body);
+      List<dynamic> groupsList = responseData['data'];
+      // print(StudentModelSearch.fromJson(studentsList[0]));
+
+      List<GroupModelSimple> list =
+          groupsList.map((data) => GroupModelSimple.fromJson(data)).toList();
+
+      return list;
+    } catch (e) {
+      print(e);
+      throw e;
+    }
   }
 }

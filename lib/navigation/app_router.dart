@@ -160,6 +160,11 @@ class AppRouter extends RouterDelegate
             editStudent: appStateManager.getstudent,
             edit: true,
           ),
+        if (authmanager.isLoggedIn &&
+            appStateManager.groupscheck &&
+            appStateManager.geteditgrooup)
+          Add_group_screen.page(
+              medit: true, editGroup: appStateManager.getGroupEdit),
       ],
     );
   }
@@ -221,6 +226,8 @@ class AppRouter extends RouterDelegate
       subjectManager.getMoreData();
       teachermanager.getMoreData();
       appStateManager.registerGroup(false);
+      appStateManager.groupTapped('id', false, GroupModelSimple());
+      ;
     }
     if (route.settings.name == Attendance_Screens.teacher_registerpath) {
       subjectManager.resetlist();

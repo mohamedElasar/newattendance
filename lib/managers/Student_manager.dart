@@ -45,6 +45,9 @@ class StudentManager extends ChangeNotifier {
 
   Future<void> add_student(
     String? name,
+    String? name2,
+    String? name3,
+    String? name4,
     String? email,
     String? phone,
     String? school,
@@ -71,6 +74,9 @@ class StudentManager extends ChangeNotifier {
 
       var params = {
         'name': name,
+        'name_2': name2,
+        'name_3': name3,
+        'name_4': name4,
         'phone': phone,
         'email': email,
         'password': password,

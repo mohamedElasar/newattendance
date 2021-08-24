@@ -1,5 +1,6 @@
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Auth_manager.dart';
+import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:attendance/models/teacher.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/Add_group/components/group_form.dart';
@@ -9,19 +10,28 @@ import 'package:provider/provider.dart';
 class Add_group_screen extends StatelessWidget {
   final user? myuser;
   final TeacherModel? teacher;
+  final bool? edit;
+  final GroupModelSimple? mygroup;
 
-  static MaterialPage page({TeacherModel? userteahcer, user? user}) {
+  static MaterialPage page(
+      {TeacherModel? userteahcer,
+      user? user,
+      bool? medit,
+      GroupModelSimple? editGroup}) {
     return MaterialPage(
       name: Attendance_Screens.group_registerpath,
       key: ValueKey(Attendance_Screens.group_registerpath),
       child: Add_group_screen(
         myuser: user,
         teacher: userteahcer,
+        edit: medit,
+        mygroup: editGroup,
       ),
     );
   }
 
-  const Add_group_screen({Key? key, this.myuser, this.teacher})
+  const Add_group_screen(
+      {Key? key, this.myuser, this.teacher, this.edit, this.mygroup})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -32,7 +42,7 @@ class Add_group_screen extends StatelessWidget {
         appBar: AppBar(
           title: Center(
             child: Text(
-              'تسجيل مجموعه',
+              edit == true ? 'تعديل مجموعه' : 'تسجيل مجموعه',
               style: TextStyle(
                   color: Colors.black,
                   fontSize: 25,
@@ -54,6 +64,8 @@ class Add_group_screen extends StatelessWidget {
                 onTap: () {
                   Provider.of<AppStateManager>(context, listen: false)
                       .registerGroup(false);
+                  Provider.of<AppStateManager>(context, listen: false)
+                      .groupTapped('id', false, GroupModelSimple());
                 },
                 child: RotatedBox(
                   quarterTurns: 2,
@@ -76,7 +88,12 @@ class Add_group_screen extends StatelessWidget {
         ),
         backgroundColor: Colors.grey[300],
         body: SingleChildScrollView(
-          child: group_form(size: size, tuser: myuser, teacher: teacher),
+          child: group_form(
+              size: size,
+              tuser: myuser,
+              teacher: teacher,
+              edit: edit,
+              group: mygroup),
         ),
       ),
     );

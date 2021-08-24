@@ -1396,6 +1396,26 @@ class _ChoicesState extends State<Choices> {
                     ],
                   ),
                 ),
+          if (widget.usser == user.teacher)
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Button_Container(
+                    color: kbuttonColor2,
+                    size: widget.size,
+                    text: 'ادخال مساعد',
+                    fnc: () async {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .registerAssistant(true);
+                    },
+                  ),
+                  Container(
+                    width: widget.size.width * .45,
+                  )
+                ],
+              ),
+            ),
           Container(
             width: double.infinity,
             child: Row(
@@ -1403,11 +1423,7 @@ class _ChoicesState extends State<Choices> {
               children: [
                 Container(
                   height: 20,
-                  // width: double.infinity,
                   color: Colors.white,
-                  // decoration: BoxDecoration(
-                  //   color: kbackgroundColor2,
-                  // ),
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: ElevatedButton.icon(
@@ -1420,79 +1436,13 @@ class _ChoicesState extends State<Choices> {
                           ? () async {
                               _add_lesson('message', 'title');
                             }
-
-                          // () async {
-                          //     final TimeOfDay? newTime = await showTimePicker(
-                          //       context: context,
-                          //       initialTime: TimeOfDay.now(),
-                          //     );
-                          //     if (newTime != null) {
-                          //       setState(() {
-                          //         _isloadingappointment = true;
-                          //         group_level = false;
-                          //       });
-                          //       try {
-                          //         await Provider.of<AppointmentManager>(context,
-                          //                 listen: false)
-                          //             .add_appointment(
-                          //               group_id_selected,
-                          //               formatTimeOfDay(newTime)[0],
-                          //               formatTimeOfDay(TimeOfDay.now())[1],
-                          //             )
-                          //             .then((value) => Provider.of<
-                          //                         AppointmentManager>(context,
-                          //                     listen: false)
-                          //                 .get_appointments(group_id_selected))
-                          //             .then((value) => setState(() {
-                          //                   _isloadingappointment = false;
-                          //                   group_level = true;
-                          //                 }))
-                          //             .then((value) => setState(() {
-                          //                   app_id_selected =
-                          //                       Provider.of<AppointmentManager>(
-                          //                               context,
-                          //                               listen: false)
-                          //                           .currentapp!
-                          //                           .id
-                          //                           .toString();
-                          //                   app_name =
-                          //                       Provider.of<AppointmentManager>(
-                          //                               context,
-                          //                               listen: false)
-                          //                           .currentapp!
-                          //                           .name!;
-                          //                 }))
-                          //             .then(
-                          //               (_) => ScaffoldMessenger.of(context)
-                          //                   .showSnackBar(
-                          //                 SnackBar(
-                          //                   backgroundColor: Colors.black38,
-                          //                   content: Text(
-                          //                     'تم اضافه الحصه بنجاح',
-                          //                     style: TextStyle(
-                          //                         fontFamily: 'GE-medium'),
-                          //                   ),
-                          //                   duration: Duration(seconds: 3),
-                          //                 ),
-                          //               ),
-                          //             );
-                          //       } catch (e) {
-                          //         _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
-                          //       }
-                          //     }
-                          //   }
                           : () {},
                       icon: Icon(Icons.add),
-                      label: Container(
-                          // '',
-                          // style: TextStyle(
-                          //     fontFamily: 'GE-medium', color: Colors.black),
-                          ),
+                      label: Container(),
                     ),
                   ),
                 ),
                 Container(
-                  // padding: EdgeInsets.only(right: 6),
                   margin: EdgeInsets.all(10),
                   alignment: Alignment.center,
                   height: 30,

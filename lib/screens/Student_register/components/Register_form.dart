@@ -54,6 +54,9 @@ class _Register_FormState extends State<Register_Form> {
       await Provider.of<StudentManager>(context, listen: false)
           .add_student(
         nameController.text,
+        name2Controller.text,
+        name3Controller.text,
+        name4Controller.text,
         emailController.text,
         phonecontroller.text,
         schoolController.text,
@@ -620,6 +623,9 @@ class _Register_FormState extends State<Register_Form> {
   }
 
   var nameController = TextEditingController();
+  var name2Controller = TextEditingController();
+  var name3Controller = TextEditingController();
+  var name4Controller = TextEditingController();
   var parentNameController = TextEditingController();
   var relationController = TextEditingController();
   var parentPhoneController = TextEditingController();
@@ -657,6 +663,9 @@ class _Register_FormState extends State<Register_Form> {
   final focus14 = FocusNode();
   final focus15 = FocusNode();
   final focus16 = FocusNode();
+  final focus17 = FocusNode();
+  final focus18 = FocusNode();
+  final focus19 = FocusNode();
   ScrollController _sc = new ScrollController();
   ScrollController _sc2 = new ScrollController();
   ScrollController _sc3 = new ScrollController();
@@ -664,6 +673,9 @@ class _Register_FormState extends State<Register_Form> {
   void dispose() {
     _isLoading = false;
     nameController.dispose();
+    name2Controller.dispose();
+    name3Controller.dispose();
+    name4Controller.dispose();
     parentNameController.dispose();
     relationController.dispose();
     parentPhoneController.dispose();
@@ -696,6 +708,12 @@ class _Register_FormState extends State<Register_Form> {
     focus12.dispose();
     focus13.dispose();
     focus14.dispose();
+    focus15.dispose();
+    focus16.dispose();
+    focus17.dispose();
+    focus18.dispose();
+    focus19.dispose();
+    // focus17.dispose();
     _sc.dispose();
     _sc2.dispose();
 
@@ -837,10 +855,49 @@ class _Register_FormState extends State<Register_Form> {
                     height: 5,
                   ),
                   build_edit_field(
-                    item: 'name',
-                    hint: 'الاسم',
+                    item: 'name1',
+                    hint: 'الاسم الاول',
                     inputType: TextInputType.name,
                     controller: nameController,
+                    validate: (value) {
+                      if (value.isEmpty) {
+                        return '*';
+                      }
+                      return null;
+                    },
+                    focus: focus17,
+                  ),
+                  build_edit_field(
+                    item: 'name2',
+                    hint: 'الاسم الثانى',
+                    inputType: TextInputType.name,
+                    controller: name2Controller,
+                    validate: (value) {
+                      if (value.isEmpty) {
+                        return '*';
+                      }
+                      return null;
+                    },
+                    focus: focus18,
+                  ),
+                  build_edit_field(
+                    item: 'name3',
+                    hint: 'الاسم الثالث',
+                    inputType: TextInputType.name,
+                    controller: name3Controller,
+                    validate: (value) {
+                      if (value.isEmpty) {
+                        return '*';
+                      }
+                      return null;
+                    },
+                    focus: focus19,
+                  ),
+                  build_edit_field(
+                    item: 'name4',
+                    hint: 'الاسم الرابع',
+                    inputType: TextInputType.name,
+                    controller: name4Controller,
                     validate: (value) {
                       if (value.isEmpty) {
                         return '*';
