@@ -6,6 +6,7 @@ import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
+import 'package:attendance/models/Student4SearchModel.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/appointment.dart';
 import 'package:attendance/models/groupmodelsimple.dart';
@@ -89,7 +90,7 @@ class AppRouter extends RouterDelegate
               userstudent: authmanager.studentUser, user: user.student),
         if (authmanager.isLoggedIn && appStateManager.studentRegister)
           Student_Register_Screen.page(
-              editStudent: StudentModelSearch(), edit: false),
+              editStudent: Student4ModelSearch(), edit: false),
         if (authmanager.isLoggedIn && appStateManager.teacherRegister)
           Add_Teacher_Screeen.page(),
         if (authmanager.isLoggedIn && appStateManager.assistantRegister)
@@ -157,7 +158,7 @@ class AppRouter extends RouterDelegate
               groupid: appStateManager.mysinglegroup),
         if (authmanager.isLoggedIn && appStateManager.geteditstudent)
           Student_Register_Screen.page(
-            editStudent: appStateManager.getstudent,
+            editStudent: appStateManager.getstudent4,
             edit: true,
           ),
         if (authmanager.isLoggedIn &&
@@ -187,12 +188,12 @@ class AppRouter extends RouterDelegate
     if (route.settings.name == Attendance_Screens.student_registerpath &&
         appStateManager.geteditstudent == true &&
         appStateManager.communicateStudents == true) {
-      appStateManager.studentTapped('', false, StudentModelSearch());
+      appStateManager.studentTapped('', false, Student4ModelSearch());
       // appStateManager.goToSingleStudent(false, StudentModel(), '');
     }
     if (route.settings.name == Attendance_Screens.student_registerpath &&
         appStateManager.geteditstudent == true) {
-      appStateManager.studentTapped('', false, StudentModelSearch());
+      appStateManager.studentTapped('', false, Student4ModelSearch());
     }
     if (route.settings.name == Attendance_Screens.single_student) {
       appStateManager.goToSingleStudentfromHome(false, '');

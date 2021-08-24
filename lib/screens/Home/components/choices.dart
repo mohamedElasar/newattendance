@@ -1033,6 +1033,8 @@ class _ChoicesState extends State<Choices> {
     );
   }
 
+  bool? lessonadd = false;
+
   void _showErrorDialog(String message, String title) {
     showDialog(
       context: context,
@@ -1070,6 +1072,7 @@ class _ChoicesState extends State<Choices> {
     final dateformate = DateFormat('y-M-d');
 
     showDialog(
+        barrierDismissible: false,
         context: context,
         builder: (ctx) => StatefulBuilder(
             builder: (context, setState) => (AlertDialog(
@@ -1077,158 +1080,216 @@ class _ChoicesState extends State<Choices> {
                     'اضافه حصه',
                     style: TextStyle(fontFamily: 'GE-Bold'),
                   ),
-                  content: Container(
-                    height: 80,
-                    child: Column(
-                      children: [
-                        InkWell(
-                          onTap: () async {
-                            final TimeOfDay? newTime = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.now(),
-                            );
-                            if (newTime != null) {
-                              setState(() {
-                                // _isloadingappointment = true;
-                                // group_level = false;
-                                newLessonTime =
-                                    formatTimeOfDay(newTime)[0].toString();
-                              });
-                            }
-                          },
-                          child: Row(
+                  content: !lessonadd!
+                      ? Container(
+                          height: 80,
+                          child: Column(
                             children: [
-                              Container(
-                                color: kbuttonColor3.withOpacity(.8),
+                              InkWell(
+                                onTap: () async {
+                                  final TimeOfDay? newTime =
+                                      await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                  );
+                                  if (newTime != null) {
+                                    setState(() {
+                                      // _isloadingappointment = true;
+                                      // group_level = false;
+                                      newLessonTime =
+                                          formatTimeOfDay(newTime)[0]
+                                              .toString();
+                                    });
+                                  }
+                                },
                                 child: Row(
                                   children: [
-                                    Icon(Icons.add),
-                                    Text('Time'),
-                                  ],
-                                ),
-                              ),
-                              Spacer(),
-                              Text(newLessonTime)
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        InkWell(
-                          onTap: () async {
-                            final newDate = await showDatePicker(
-                              firstDate: DateTime(2021),
-                              lastDate: DateTime(2030),
-                              context: context,
-                              initialDate: DateTime.now(),
-                            );
-                            if (newDate != null) {
-                              setState(() {
-                                // _isloadingappointment = true;
-                                // group_level = false;
-                                newLessonDate =
-                                    dateformate.format(newDate).toString();
-                              });
-                            }
-                          },
-                          child: Row(
-                            children: [
-                              Container(
-                                color: kbuttonColor3.withOpacity(.8),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.add),
-                                    Text('Date'),
-                                  ],
-                                ),
-                              ),
-                              Spacer(),
-                              Text(newLessonDate)
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  actions: <Widget>[
-                    Center(
-                      child: TextButton(
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(kbackgroundColor1)),
-                          // color: kbackgroundColor1,
-                          child: Text(
-                            'اضافه',
-                            style: TextStyle(
-                                fontFamily: 'GE-medium', color: Colors.black),
-                          ),
-                          onPressed: () async {
-                            if (newLessonDate != '' && newLessonTime != '') {
-                              setState(() {
-                                _isloadingappointment = true;
-                                group_level = false;
-                              });
-
-                              try {
-                                await Provider.of<AppointmentManager>(context,
-                                        listen: false)
-                                    .add_appointment(
-                                      group_id_selected,
-                                      newLessonTime,
-                                      newLessonDate,
-                                    )
-                                    .then((value) =>
-                                        Provider.of<AppointmentManager>(context,
-                                                listen: false)
-                                            .get_appointments(
-                                                group_id_selected))
-                                    .then((value) => setState(() {
-                                          _isloadingappointment = false;
-                                          group_level = true;
-                                        }))
-                                    .then((value) => setState(() {
-                                          app_id_selected =
-                                              Provider.of<AppointmentManager>(
-                                                      context,
-                                                      listen: false)
-                                                  .currentapp!
-                                                  .id
-                                                  .toString();
-                                          app_name =
-                                              Provider.of<AppointmentManager>(
-                                                      context,
-                                                      listen: false)
-                                                  .currentapp!
-                                                  .name!;
-                                        }))
-                                    .then(
-                                      (_) => ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          backgroundColor: Colors.black38,
-                                          content: Text(
-                                            'تم اضافه الحصه بنجاح',
-                                            style: TextStyle(
-                                                fontFamily: 'GE-medium'),
-                                          ),
-                                          duration: Duration(seconds: 3),
-                                        ),
+                                    Container(
+                                      color: kbuttonColor3.withOpacity(.8),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.add),
+                                          Text('Time'),
+                                        ],
                                       ),
-                                    );
-                              } catch (e) {
-                                _showErrorDialog('حاول مره اخري ', 'حدث خطأ');
-                              }
-                              Navigator.of(ctx).pop();
-                              setState(() {
-                                newLessonDate = '';
-                                newLessonTime = '';
-                              });
-                            }
+                                    ),
+                                    Spacer(),
+                                    Text(newLessonTime)
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              InkWell(
+                                onTap: () async {
+                                  final newDate = await showDatePicker(
+                                    firstDate: DateTime(2021),
+                                    lastDate: DateTime(2030),
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                  );
+                                  if (newDate != null) {
+                                    setState(() {
+                                      // _isloadingappointment = true;
+                                      // group_level = false;
+                                      newLessonDate = dateformate
+                                          .format(newDate)
+                                          .toString();
+                                    });
+                                  }
+                                },
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      color: kbuttonColor3.withOpacity(.8),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.add),
+                                          Text('Date'),
+                                        ],
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Text(newLessonDate)
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Container(
+                          height: 80,
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                  actions: <Widget>[
+                    !lessonadd!
+                        ? Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                kbackgroundColor1)),
+                                    onPressed: !lessonadd!
+                                        ? () {
+                                            Navigator.of(context).pop();
+                                          }
+                                        : () {},
+                                    child: Text(
+                                      'لا',
+                                      style: TextStyle(
+                                          fontFamily: 'GE-medium',
+                                          color: Colors.black),
+                                    )),
+                                TextButton(
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                kbackgroundColor1)),
+                                    // color: kbackgroundColor1,
+                                    child: Text(
+                                      'نعم',
+                                      style: TextStyle(
+                                          fontFamily: 'GE-medium',
+                                          color: Colors.black),
+                                    ),
+                                    onPressed: !lessonadd!
+                                        ? () async {
+                                            if (newLessonDate != '' &&
+                                                newLessonTime != '') {
+                                              setState(() {
+                                                _isloadingappointment = true;
+                                                group_level = false;
+                                              });
+                                              setState(() {
+                                                lessonadd = true;
+                                              });
 
-                            ;
-                          }),
-                    )
+                                              try {
+                                                await Provider.of<
+                                                            AppointmentManager>(
+                                                        context,
+                                                        listen: false)
+                                                    .add_appointment(
+                                                      group_id_selected,
+                                                      newLessonTime,
+                                                      newLessonDate,
+                                                    )
+                                                    .then((value) => Provider
+                                                            .of<AppointmentManager>(
+                                                                context,
+                                                                listen: false)
+                                                        .get_appointments(
+                                                            group_id_selected))
+                                                    .then(
+                                                        (value) => setState(() {
+                                                              _isloadingappointment =
+                                                                  false;
+                                                              group_level =
+                                                                  true;
+                                                            }))
+                                                    .then((value) =>
+                                                        setState(() {
+                                                          app_id_selected =
+                                                              Provider.of<AppointmentManager>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                                  .currentapp!
+                                                                  .id
+                                                                  .toString();
+                                                          app_name = Provider
+                                                                  .of<AppointmentManager>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                              .currentapp!
+                                                              .name!;
+                                                        }))
+                                                    .then(
+                                                      (_) =>
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                        SnackBar(
+                                                          backgroundColor:
+                                                              Colors.black38,
+                                                          content: Text(
+                                                            'تم اضافه الحصه بنجاح',
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'GE-medium'),
+                                                          ),
+                                                          duration: Duration(
+                                                              seconds: 3),
+                                                        ),
+                                                      ),
+                                                    );
+                                                setState(() {
+                                                  lessonadd = false;
+                                                });
+                                                Navigator.of(context).pop();
+                                              } catch (e) {
+                                                _showErrorDialog(
+                                                    'حاول مره اخري. ',
+                                                    'حدث خطأ');
+                                              }
+                                              setState(() {
+                                                newLessonDate = '';
+                                                newLessonTime = '';
+                                              });
+                                            }
+
+                                            ;
+                                          }
+                                        : () {}),
+                              ],
+                            ),
+                          )
+                        : Container()
                   ],
                 ))));
   }
@@ -1243,6 +1304,14 @@ class _ChoicesState extends State<Choices> {
   var group_level = false;
   @override
   Widget build(BuildContext context) {
+    // app_id_selected = Provider.of<AppointmentManager>(context, listen: false)
+    //     .currentapp!
+    //     .id
+    //     .toString();
+    // app_name = Provider.of<AppointmentManager>(context, listen: false)
+    //     .currentapp!
+    //     .name
+    //     .toString();
     return Container(
       height: widget.size.height * .7,
       child: Column(
@@ -1454,38 +1523,41 @@ class _ChoicesState extends State<Choices> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: InkWell(
-                    onTap: group_level
-                        ? () {
-                            _modalBottomSheetMenuappoint(context);
-                          }
-                        : null,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5),
-                      child: Row(
-                        children: [
-                          _isloadingappointment
-                              ? CircularProgressIndicator()
-                              : Container(
-                                  width: widget.size.width * .5,
-                                  child: Text(
-                                    app_name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    style: TextStyle(
-                                        fontFamily: 'AraHamah1964B-Bold',
-                                        fontSize: 20,
-                                        color: group_level
-                                            ? Colors.black
-                                            : Colors.black26),
-                                  ),
-                                ),
-                          Spacer(),
-                          Icon(Icons.keyboard_arrow_down)
-                        ],
-                      ),
-                    ),
-                  ),
+                      onTap: group_level
+                          ? () {
+                              _modalBottomSheetMenuappoint(context);
+                            }
+                          : null,
+                      child: Consumer<AppointmentManager>(
+                        builder: (context, appmanager, child) {
+                          return Container(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Row(
+                              children: [
+                                _isloadingappointment
+                                    ? CircularProgressIndicator()
+                                    : Container(
+                                        width: widget.size.width * .5,
+                                        child: Text(
+                                          app_name,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: false,
+                                          style: TextStyle(
+                                              fontFamily: 'AraHamah1964B-Bold',
+                                              fontSize: 20,
+                                              color: group_level
+                                                  ? Colors.black
+                                                  : Colors.black26),
+                                        ),
+                                      ),
+                                Spacer(),
+                                Icon(Icons.keyboard_arrow_down)
+                              ],
+                            ),
+                          );
+                        },
+                      )),
                 ),
               ],
             ),
@@ -1584,107 +1656,6 @@ class _ChoicesState extends State<Choices> {
                       print(code_from_windows);
                     }
                     setState(() {});
-
-                    // if (a != null) {
-                    //   setState(() {
-                    //     inputK += a;
-                    //   });
-                    // }
-                    // print(inputK);
-
-                    // if (
-                    //     // event.runtimeType.toString() == 'RawKeyDownEvent' &&
-                    //     (app_name != 'الحصه' && _loadingscann == false)) {
-                    //   // print(event.logicalKey.keyLabel);
-                    //   // List<String> test = [];
-                    //   // var a = event.physicalKey.debugName;
-                    //   // test.add(a!);
-                    //   // print(test);
-                    //   //   if (event.isKeyPressed(LogicalKeyboardKey.space)) {
-                    //   String key = event.logicalKey.keyLabel;
-                    //   // String key2 = keyEvent.data.logicalKey;
-
-                    //   if (key != null) {
-                    //     setState(() {
-                    //       inputK += key;
-                    //     });
-                    //   }
-                    //   _showErrorDialog('message', inputK);
-
-                    //   setState(() {
-                    //     _loadingscann = true;
-                    //   });
-                    //   if (app_id_selected == null) {
-                    //     _showErrorDialog('اختر حصه', 'حدث خطأ');
-                    //     return;
-                    //   }
-
-                    //   try {
-                    //     String res = inputK;
-                    //     dynamic resp = await Provider.of<AppointmentManager>(
-                    //             context,
-                    //             listen: false)
-                    //         .attendlesson(res, app_id_selected!);
-
-                    //     if (resp['last_appointment_attend'] == false) {
-                    //       ScaffoldMessenger.of(context).showSnackBar(
-                    //         SnackBar(
-                    //           backgroundColor: Colors.orange[200],
-                    //           content: Text(
-                    //             ' تم التسجيل بنجاح والحصه السابقه لم يحضرها',
-                    //             style: TextStyle(fontFamily: 'GE-medium'),
-                    //           ),
-                    //           duration: Duration(seconds: 3),
-                    //         ),
-                    //       );
-                    //     }
-                    //     if (resp['last_appointment_attend'] == true) {
-                    //       ScaffoldMessenger.of(context).showSnackBar(
-                    //         SnackBar(
-                    //           backgroundColor: Colors.green[300],
-                    //           content: Text(
-                    //             ' تم التسجيل بنجاح',
-                    //             style: TextStyle(fontFamily: 'GE-medium'),
-                    //           ),
-                    //           duration: Duration(seconds: 3),
-                    //         ),
-                    //       );
-                    //     }
-                    //   } on HttpException catch (e) {
-                    //     setState(() {
-                    //       _loadingscann = false;
-                    //     });
-                    //     // _showErrorDialog(e.toString(), 'حدث خطأ');
-                    //     ScaffoldMessenger.of(context).showSnackBar(
-                    //       SnackBar(
-                    //         backgroundColor: Colors.red[300],
-                    //         content: Text(
-                    //           e.toString(),
-                    //           style: TextStyle(fontFamily: 'GE-medium'),
-                    //         ),
-                    //         duration: Duration(seconds: 3),
-                    //       ),
-                    //     );
-                    //   } catch (e) {
-                    //     setState(() {
-                    //       _loadingscann = false;
-                    //     });
-                    //     ScaffoldMessenger.of(context).showSnackBar(
-                    //       SnackBar(
-                    //         backgroundColor: Colors.red[300],
-                    //         content: Text(
-                    //           'حدث خطأ',
-                    //           style: TextStyle(fontFamily: 'GE-medium'),
-                    //         ),
-                    //         duration: Duration(seconds: 3),
-                    //       ),
-                    //     );
-                    //   }
-                    //   setState(() {
-                    //     _loadingscann = false;
-                    //   });
-                    // }
-                    // ;
                   },
                   child: Column(
                     children: [

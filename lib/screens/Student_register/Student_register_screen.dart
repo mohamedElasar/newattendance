@@ -1,3 +1,4 @@
+import 'package:attendance/models/Student4SearchModel.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/student.dart';
 import 'package:attendance/navigation/screens.dart';
@@ -5,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'components/Register_form.dart';
 
 class Student_Register_Screen extends StatelessWidget {
-  final StudentModelSearch? myStudent;
+  final Student4ModelSearch? myStudent;
   final bool? myedit;
   static MaterialPage page(
-      {required StudentModelSearch editStudent, required edit}) {
+      {required Student4ModelSearch editStudent, required edit}) {
     return MaterialPage(
       name: Attendance_Screens.student_registerpath,
       key: ValueKey(Attendance_Screens.student_registerpath),

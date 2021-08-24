@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:attendance/helper/httpexception.dart';
+import 'package:attendance/models/Student4SearchModel.dart';
 import 'package:attendance/models/StudentModelSimple.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/attendgroupstudent.dart';
@@ -23,10 +24,10 @@ class StudentManager extends ChangeNotifier {
   String? _authToken;
   List<StudentModelSearch> __students = [];
   List<StudentModelSimple> _studentsSimple = [];
-  StudentModelSearch _singleStudent = StudentModelSearch();
+  Student4ModelSearch _singleStudent = Student4ModelSearch();
   List<StudentModelSearch> get students => __students;
   List<StudentModelSimple> get studentsSimple => _studentsSimple;
-  StudentModelSearch? get singleStudent => _singleStudent;
+  Student4ModelSearch? get singleStudent => _singleStudent;
 
   get hasmore => _hasMore;
   get pageNumber => _pageNumber;
@@ -48,7 +49,7 @@ class StudentManager extends ChangeNotifier {
     String? name2,
     String? name3,
     String? name4,
-    String? email,
+    // String? email,
     String? phone,
     String? school,
     String? note,
@@ -63,24 +64,24 @@ class StudentManager extends ChangeNotifier {
     dynamic secondLanguage,
     String? discount,
     String? code,
-    String? password,
-    String? passwordconfirmation,
-    String? parentemail,
-    String? parentpassword,
+    // String? password,
+    // String? passwordconfirmation,
+    // String? parentemail,
+    // String? parentpassword,
   ) async {
     try {
       Dio dio = Dio();
       String urld = 'https://development.mrsaidmostafa.com/api/students';
 
       var params = {
-        'name': name,
+        'name_1': name,
         'name_2': name2,
         'name_3': name3,
         'name_4': name4,
         'phone': phone,
-        'email': email,
-        'password': password,
-        'password_confirmation': passwordconfirmation,
+        // 'email': email,
+        // 'password': password,
+        // 'password_confirmation': passwordconfirmation,
         'school': school,
         // 'subject_id': subject,
         'groups': groups,
@@ -94,8 +95,8 @@ class StudentManager extends ChangeNotifier {
         'discount': discount,
         'code': code,
         'second_language': secondLanguage,
-        'parent_email': parentemail,
-        'parent_password': parentpassword,
+        // 'parent_email': parentemail,
+        // 'parent_password': parentpassword,
       };
       dio.options.headers["Authorization"] = 'Bearer $_authToken';
       dio.options.headers["Accept"] = 'application/json';
@@ -127,6 +128,9 @@ class StudentManager extends ChangeNotifier {
   Future<void> modify_student(
     String id,
     String? name,
+    String? name2,
+    String? name3,
+    String? name4,
     String? email,
     String? phone,
     String? school,
@@ -151,7 +155,10 @@ class StudentManager extends ChangeNotifier {
       print(urld);
 
       var params = {
-        'name': name,
+        'name_1': name,
+        'name_2': name2,
+        'name_3': name3,
+        'name_4': name4,
         'phone': phone,
         'email': email,
         'password': password,
@@ -273,9 +280,8 @@ class StudentManager extends ChangeNotifier {
   Future<void> getMoreDatafilteredId(String filter1) async {
     // print(_pageNumber);
     try {
-      var url = Uri.https('development.mrsaidmostafa.com', '/api/students', {
-        "id": filter1,
-      });
+      var url =
+          Uri.https('development.mrsaidmostafa.com', '/api/students/$filter1');
       // print(url);
       // print(_pageNumber);
       //
@@ -290,21 +296,13 @@ class StudentManager extends ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      List<dynamic> studentsList = responseData['data'];
-      // var fetchedstudents =
-      //     studentsList.map((data) => StudentModel.fromJson(data)).toList();
-      var fetchedstudent = StudentModelSearch.fromJson(studentsList[0]);
+      var student = responseData['data'];
 
-      // _hasMore = fetchedstudents.length == _defaultPerPageCount;
-      // _loading = false;
-      // _pageNumber = _pageNumber + 1;
+      var fetchedstudent = Student4ModelSearch.fromJson(student);
 
       _singleStudent = fetchedstudent;
-      print(fetchedstudent.groups);
     } catch (e) {
-      _loading = false;
-      _error = true;
-      notifyListeners();
+      throw (e);
     }
 
     notifyListeners();
@@ -332,8 +330,6 @@ class StudentManager extends ChangeNotifier {
 
   Future<List<StudentModelSearch>> searchStudent(String filter1) async {
     try {
-      print('cooooooooooooode');
-      print(filter1);
       var url = Uri.https('development.mrsaidmostafa.com', '/api/students', {
         "name": filter1,
       });
@@ -348,13 +344,7 @@ class StudentManager extends ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print('coddddddddde');
-      print(responseData);
-      // print(responseData);
       List<dynamic> studentsList = responseData['data'];
-      // print(studentsList[0]);
-      // print(studentsList);
-      print(StudentModelSearch.fromJson(studentsList[0]));
 
       List<StudentModelSearch> list = studentsList
           .map((data) => StudentModelSearch.fromJson(data))
@@ -362,7 +352,6 @@ class StudentManager extends ChangeNotifier {
 
       return list;
     } catch (e) {
-      print('errrrrrrrrrr');
       print(e);
       throw e;
     }
@@ -370,8 +359,6 @@ class StudentManager extends ChangeNotifier {
 
   Future<List<StudentModelSearch>> searchcodeStudent(String filter2) async {
     try {
-      print('cooooooooooooode');
-      print(filter2);
       var url = Uri.https('development.mrsaidmostafa.com', '/api/students', {
         "code": filter2,
       });
@@ -386,7 +373,6 @@ class StudentManager extends ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print('coddddddddde');
       print(responseData);
       // print(responseData);
       List<dynamic> studentsList = responseData['data'];
@@ -400,13 +386,12 @@ class StudentManager extends ChangeNotifier {
 
       return list;
     } catch (e) {
-      print('errrrrrrrrrr');
       print(e);
       throw e;
     }
   }
 
-  void setSingleStudent(StudentModelSearch st) {
+  void setSingleStudent(Student4ModelSearch st) {
     _singleStudent = st;
     notifyListeners();
   }

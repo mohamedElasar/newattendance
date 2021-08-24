@@ -1,3 +1,4 @@
+import 'package:attendance/models/Student4SearchModel.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/appointment.dart';
 import 'package:attendance/models/groupmodelsimple.dart';
@@ -67,6 +68,8 @@ class AppStateManager extends ChangeNotifier {
   bool get geteditstudent => _editStudent;
   StudentModelSearch _student = StudentModelSearch();
   StudentModelSearch get getstudent => _student;
+  Student4ModelSearch _student4 = Student4ModelSearch();
+  Student4ModelSearch get getstudent4 => _student4;
 
   bool _singlegroup = false;
   bool get singlegroup => _singlegroup;
@@ -214,10 +217,10 @@ class AppStateManager extends ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void studentTapped(String id, bool value, StudentModelSearch stu) {
+  void studentTapped(String id, bool value, Student4ModelSearch stu) {
     _editStudentid = id;
     _editStudent = value;
-    _student = stu;
+    _student4 = stu;
     notifyListeners();
   }
 

@@ -3,6 +3,7 @@ import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/managers/cities_manager.dart';
 import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
+import 'package:attendance/models/Student4SearchModel.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/city.dart';
 import 'package:attendance/models/student.dart';
@@ -25,7 +26,7 @@ class Register_Form extends StatefulWidget {
 
   final Size size;
   final bool? edit;
-  final StudentModelSearch? student;
+  final Student4ModelSearch? student;
 
   @override
   _Register_FormState createState() => _Register_FormState();
@@ -57,7 +58,7 @@ class _Register_FormState extends State<Register_Form> {
         name2Controller.text,
         name3Controller.text,
         name4Controller.text,
-        emailController.text,
+        // emailController.text,
         phonecontroller.text,
         schoolController.text,
         notesController.text,
@@ -72,13 +73,16 @@ class _Register_FormState extends State<Register_Form> {
         langId_selected,
         discountController.text,
         barCodeController.text,
-        passwordcontroller.text,
-        confirmpasswordController.text,
-        parentemailController.text,
-        parentpasswordController.text,
+        // passwordcontroller.text,
+        // confirmpasswordController.text,
+        // parentemailController.text,
+        // parentpasswordController.text,
       )
           .then((_) {
         nameController.text = '';
+        name2Controller.text = '';
+        name3Controller.text = '';
+        name4Controller.text = '';
         parentNameController.text = '';
         relationController.text = '';
         parentPhoneController.text = '';
@@ -89,14 +93,14 @@ class _Register_FormState extends State<Register_Form> {
         discountController.text = '';
         languageController.text = '';
         notesController.text = '';
-        emailController.text = '';
+        // emailController.text = '';
         studyTypeController.text = '';
         phonecontroller.text = '';
-        passwordcontroller.text = '';
-        confirmpasswordController.text = '';
+        // passwordcontroller.text = '';
+        // confirmpasswordController.text = '';
         parentphoneController.text = '';
-        parentemailController.text = '';
-        parentpasswordController.text = '';
+        // parentemailController.text = '';
+        // parentpasswordController.text = '';
         _register_data['gender'] = null;
         _register_data['language'] = null;
         cityname = 'المحافظه';
@@ -124,8 +128,10 @@ class _Register_FormState extends State<Register_Form> {
   }
 
   void _modify() async {
+    print('object');
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
+      print('aaa');
       return;
     }
     if (_register_data['gender'] == null ||
@@ -144,6 +150,9 @@ class _Register_FormState extends State<Register_Form> {
           .modify_student(
               widget.student!.id.toString(),
               nameController.text,
+              name2Controller.text,
+              name3Controller.text,
+              name4Controller.text,
               emailController.text,
               phonecontroller.text,
               schoolController.text,
@@ -163,9 +172,9 @@ class _Register_FormState extends State<Register_Form> {
               confirmpasswordController.text)
           .then(
             (value) => Provider.of<StudentManager>(context, listen: false)
-              ..getMoreDatafilteredId(
-                widget.student!.id.toString(),
-              ),
+                .getMoreDatafilteredId(
+              widget.student!.id.toString(),
+            ),
           )
           .then((_) {
         Navigator.pop(context);
@@ -642,8 +651,8 @@ class _Register_FormState extends State<Register_Form> {
   var passwordcontroller = TextEditingController();
   var confirmpasswordController = TextEditingController();
   var parentphoneController = TextEditingController();
-  var parentemailController = TextEditingController();
-  var parentpasswordController = TextEditingController();
+  // var parentemailController = TextEditingController();
+  // var parentpasswordController = TextEditingController();
   late int _selectedCity;
 
   List<String> _groups = [];
@@ -690,10 +699,10 @@ class _Register_FormState extends State<Register_Form> {
     studyTypeController.dispose();
     phonecontroller.dispose();
     passwordcontroller.dispose();
-    confirmpasswordController.dispose();
+    // confirmpasswordController.dispose();
     parentphoneController.dispose();
-    parentemailController.dispose();
-    parentpasswordController.dispose();
+    // parentemailController.dispose();
+    // parentpasswordController.dispose();r
     focus1.dispose();
     focus2.dispose();
     focus3.dispose();
@@ -725,9 +734,19 @@ class _Register_FormState extends State<Register_Form> {
     super.initState();
     // print(widget.student!.id);
     // print(widget.edit);
+    print(widget.student!.name1);
     widget.edit!
-        ? nameController.text = widget.student!.name ?? ''
+        ? nameController.text = widget.student!.name1 ?? ''
         : nameController.text = '';
+    widget.edit!
+        ? name2Controller.text = widget.student!.name2 ?? ''
+        : name2Controller.text = '';
+    widget.edit!
+        ? name3Controller.text = widget.student!.name3 ?? ''
+        : name3Controller.text = '';
+    widget.edit!
+        ? name4Controller.text = widget.student!.name4 ?? ''
+        : name4Controller.text = '';
     widget.edit!
         ? parentNameController.text = widget.student!.parent ?? ''
         : parentNameController.text = '';
@@ -752,9 +771,9 @@ class _Register_FormState extends State<Register_Form> {
     widget.edit!
         ? notesController.text = widget.student!.note ?? ''
         : notesController.text = '';
-    widget.edit!
-        ? emailController.text = widget.student!.email ?? ''
-        : emailController.text = '';
+    // widget.edit!
+    //     ? emailController.text = widget.student!.email ?? ''
+    //     : emailController.text = '';
     widget.edit!
         ? studyTypeController.text = widget.student!.studyType ?? ''
         : studyTypeController.text = '';
@@ -906,43 +925,43 @@ class _Register_FormState extends State<Register_Form> {
                     },
                     focus: focus1,
                   ),
-                  build_edit_field(
-                    item: 'email',
-                    hint: 'الايميل',
-                    inputType: TextInputType.name,
-                    controller: emailController,
-                    validate: (value) {
-                      if (value.isEmpty) {
-                        return '*';
-                      }
-                    },
-                    focus: focus3,
-                  ),
-                  build_edit_field(
-                    item: 'password',
-                    hint: 'password',
-                    // small: true,
-                    inputType: TextInputType.name,
-                    controller: passwordcontroller,
-                    validate: (value) {
-                      if (value.isEmpty) {
-                        return '*';
-                      }
-                    },
-                    focus: focus4,
-                  ),
-                  build_edit_field(
-                      item: 'confirm_password',
-                      hint: 'confirm_password',
-                      // small: true,
-                      inputType: TextInputType.name,
-                      controller: confirmpasswordController,
-                      validate: (value) {
-                        if (value.isEmpty) {
-                          return '*';
-                        }
-                      },
-                      focus: focus5),
+                  // build_edit_field(
+                  //   item: 'email',
+                  //   hint: 'الايميل',
+                  //   inputType: TextInputType.name,
+                  //   controller: emailController,
+                  //   validate: (value) {
+                  //     if (value.isEmpty) {
+                  //       return '*';
+                  //     }
+                  //   },
+                  //   focus: focus3,
+                  // ),
+                  // build_edit_field(
+                  //   item: 'password',
+                  //   hint: 'password',
+                  //   // small: true,
+                  //   inputType: TextInputType.name,
+                  //   controller: passwordcontroller,
+                  //   validate: (value) {
+                  //     if (value.isEmpty) {
+                  //       return '*';
+                  //     }
+                  //   },
+                  //   focus: focus4,
+                  // ),
+                  // build_edit_field(
+                  //     item: 'confirm_password',
+                  //     hint: 'confirm_password',
+                  //     // small: true,
+                  //     inputType: TextInputType.name,
+                  //     controller: confirmpasswordController,
+                  //     validate: (value) {
+                  //       if (value.isEmpty) {
+                  //         return '*';
+                  //       }
+                  //     },
+                  //     focus: focus5),
                   build_edit_field(
                     item: 'phonenumber',
                     hint: 'رقم التليفون',
@@ -991,33 +1010,33 @@ class _Register_FormState extends State<Register_Form> {
                       ),
                     ),
                   ),
-                  if (!widget.edit!)
-                    build_edit_field(
-                      item: 'parentemail',
-                      hint: 'ايميل ولى الامر',
-                      inputType: TextInputType.emailAddress,
-                      controller: parentemailController,
-                      validate: (value) {
-                        if (value.isEmpty) {
-                          return '*';
-                        }
-                      },
-                      focus: focus15,
-                    ),
-                  if (!widget.edit!)
-                    build_edit_field(
-                      item: 'passwordparent',
-                      hint: 'parent password',
-                      // small: true,
-                      inputType: TextInputType.name,
-                      controller: parentpasswordController,
-                      validate: (value) {
-                        if (value.isEmpty) {
-                          return '*';
-                        }
-                      },
-                      focus: focus16,
-                    ),
+                  // if (!widget.edit!)
+                  //   build_edit_field(
+                  //     item: 'parentemail',
+                  //     hint: 'ايميل ولى الامر',
+                  //     inputType: TextInputType.emailAddress,
+                  //     controller: parentemailController,
+                  //     validate: (value) {
+                  //       if (value.isEmpty) {
+                  //         return '*';
+                  //       }
+                  //     },
+                  //     focus: focus15,
+                  //   ),
+                  // if (!widget.edit!)
+                  //   build_edit_field(
+                  //     item: 'passwordparent',
+                  //     hint: 'parent password',
+                  //     // small: true,
+                  //     inputType: TextInputType.name,
+                  //     controller: parentpasswordController,
+                  //     validate: (value) {
+                  //       if (value.isEmpty) {
+                  //         return '*';
+                  //       }
+                  //     },
+                  //     focus: focus16,
+                  //   ),
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

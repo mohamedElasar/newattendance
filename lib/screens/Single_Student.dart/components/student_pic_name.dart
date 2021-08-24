@@ -18,9 +18,6 @@ class Student_pic_name extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(myuser);
-    print(myuser);
-    print(myuser);
     return Column(
       children: [
         Consumer<StudentManager>(
@@ -35,6 +32,7 @@ class Student_pic_name extends StatelessWidget {
                       if (myuser == user.center)
                         InkWell(
                           onTap: () {
+                            print(studetmanager.singleStudent);
                             // print(stu_id);
                             Provider.of<AppStateManager>(context, listen: false)
                                 .studentTapped(stu_id!, true,
