@@ -118,7 +118,7 @@ class StudentManager extends ChangeNotifier {
           errors.add(value[0]);
         throw HttpException(errors.join('  '));
       } else {
-        print(error);
+        throw (e);
       }
     }
 
@@ -200,6 +200,10 @@ class StudentManager extends ChangeNotifier {
       } else if (e.response!.data['message'] ==
           'This action is unauthorized.') {
         throw HttpException('غير مسموح لك بتعديل بيانات طالب');
+      } else {
+        // print(e.response);
+
+        throw (e);
       }
     }
 

@@ -734,7 +734,6 @@ class _Register_FormState extends State<Register_Form> {
     super.initState();
     // print(widget.student!.id);
     // print(widget.edit);
-    print(widget.student!.name1);
     widget.edit!
         ? nameController.text = widget.student!.name1 ?? ''
         : nameController.text = '';

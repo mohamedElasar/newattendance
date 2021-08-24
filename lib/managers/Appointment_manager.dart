@@ -239,6 +239,46 @@ class AppointmentManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> unattendlesson(String code, String lessonid) async {
+    var url = Uri.https('development.mrsaidmostafa.com',
+        '/api/remove-student/appointments/$lessonid');
+    // print(url);
+    // print(code);
+    // print(lessonid);
+    // print(groupid);
+    try {
+      var response = await http.post(url, headers: {
+        'Accept': 'application/json',
+        'x-accept-language': 'ar',
+        HttpHeaders.authorizationHeader: 'Bearer $authToken'
+      }, body: {
+        'code': code,
+      });
+      final responseData = json.decode(response.body);
+
+      // if (response.statusCode == 422) {
+      //   if (responseData['errors']['code'] != null) {
+      //     List<String> errors = [];
+      //     for (var value in responseData['errors'].values) errors.add(value[0]);
+      //     throw HttpException(errors.join('  '));
+      //   }
+      //   if (responseData['errors']['group'] != null) {
+      //     throw HttpException(responseData['errors']['group']);
+      //   }
+      // }
+
+      // return (responseData);
+
+      // add exception
+
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+
+    notifyListeners();
+  }
+
   // Future<void> getMoreData() async {
   //   try {
   //     var url = Uri.https('development.mrsaidmostafa.com', '/api/stages',

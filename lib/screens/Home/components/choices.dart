@@ -1067,6 +1067,66 @@ class _ChoicesState extends State<Choices> {
     );
   }
 
+  void _showAttendConfirmDialog(String code, String lessonid) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          'تاكيد',
+          style: TextStyle(fontFamily: 'GE-Bold'),
+        ),
+        content: Text(
+          'الطالب لم يحضر الحصه السابقه لتسجيل الحضور اضغط تاكيد',
+          style: TextStyle(fontFamily: 'AraHamah1964R-Bold'),
+        ),
+        actions: <Widget>[
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(kbuttonColor2)),
+                  // color: kbackgroundColor1,
+                  child: Text(
+                    'تاكيد',
+                    style:
+                        TextStyle(fontFamily: 'GE-medium', color: Colors.black),
+                  ),
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+                TextButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(Colors.red[200])),
+                  // color: kbackgroundColor1,
+                  child: Text(
+                    'الغاء',
+                    style:
+                        TextStyle(fontFamily: 'GE-medium', color: Colors.black),
+                  ),
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    try {
+                      Provider.of<AppointmentManager>(context, listen: false)
+                          .unattendlesson(code, lessonid);
+                    } catch (e) {
+                      _showErrorDialog('تم تسجيل الطالب حضور', 'حدث خطأ');
+                    }
+                  },
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   void _add_lesson(String message, String title) {
     // final format = TimeOfDayFormat('hh:mm'); //"6:00 AM"
     final dateformate = DateFormat('y-M-d');
@@ -1583,16 +1643,17 @@ class _ChoicesState extends State<Choices> {
                               .attendlesson(res, app_id_selected!);
 
                           if (resp['last_appointment_attend'] == false) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor: Colors.orange[200],
-                                content: Text(
-                                  ' تم التسجيل بنجاح والحصه السابقه لم يحضرها',
-                                  style: TextStyle(fontFamily: 'GE-medium'),
-                                ),
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
+                            _showAttendConfirmDialog(res, app_id_selected!);
+                            // ScaffoldMessenger.of(context).showSnackBar(
+                            //   SnackBar(
+                            //     backgroundColor: Colors.orange[200],
+                            //     content: Text(
+                            //       ' تم التسجيل بنجاح والحصه السابقه لم يحضرها',
+                            //       style: TextStyle(fontFamily: 'GE-medium'),
+                            //     ),
+                            //     duration: Duration(seconds: 3),
+                            //   ),
+                            // );
                           }
                           if (resp['last_appointment_attend'] == true) {
                             ScaffoldMessenger.of(context).showSnackBar(
