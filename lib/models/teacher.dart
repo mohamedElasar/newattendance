@@ -9,8 +9,8 @@ class TeacherModel {
   String? phone;
   String? email;
   String? phone2;
-  String? password;
-  String? passwordConfirmation;
+  // String? password;
+  // String? passwordConfirmation;
   String? assistantPhone;
   String? assistantPhone2;
   String? school;
@@ -26,8 +26,8 @@ class TeacherModel {
       this.phone,
       this.email,
       this.phone2,
-      this.password,
-      this.passwordConfirmation,
+      // this.password,
+      // this.passwordConfirmation,
       this.assistantPhone,
       this.assistantPhone2,
       this.school,
@@ -43,22 +43,31 @@ class TeacherModel {
     phone = json['phone'];
     email = json['email'];
     phone2 = json['phone2'];
-    password = json['password'];
-    passwordConfirmation = json['password_confirmation'];
+    // password = json['password'];
+    // passwordConfirmation = json['password_confirmation'];
     assistantPhone = json['assistant_phone'];
     assistantPhone2 = json['assistant_phone2'];
     school = json['school'];
     experience = json['experience'];
     note = json['note'];
-    subject = json['subject'] != null
-        ? new SubjectModel.fromJson(json['subject'])
+    subject = json['subject_id'] != null
+        ? new SubjectModel.fromJson(json['subject_id'])
         : null;
-    if (json['years'] != null) {
-      List<YearModel> years = [];
-      json['years'].forEach((v) {
-        years.add(new YearModel.fromJson(v));
-      });
-    }
+    // if (json['years'] != null) {
+    //   List<YearModel> years = [];
+    //   json['years'].forEach((v) {
+    //     years.add(new YearModel.fromJson(v));
+    //   });
+    // }
+
+    years = json['years'] != null
+        ? List<YearModel>.from(
+            json['years'].map(
+              (model) => YearModel.fromJson(model),
+            ),
+          )
+        : null;
+
     cityId =
         json['city_id'] != null ? new City.fromJson(json['city_id']) : null;
   }
@@ -70,15 +79,15 @@ class TeacherModel {
     data['phone'] = this.phone;
     data['email'] = this.email;
     data['phone2'] = this.phone2;
-    data['password'] = this.password;
-    data['password_confirmation'] = this.passwordConfirmation;
+    // data['password'] = this.password;
+    // data['password_confirmation'] = this.passwordConfirmation;
     data['assistant_phone'] = this.assistantPhone;
     data['assistant_phone2'] = this.assistantPhone2;
     data['school'] = this.school;
     data['experience'] = this.experience;
     data['note'] = this.note;
     if (this.subject != null) {
-      data['subject'] = this.subject!.toJson();
+      data['subject_id'] = this.subject!.toJson();
     }
     if (this.years != null) {
       data['years'] = this.years!.map((v) => v.toJson()).toList();

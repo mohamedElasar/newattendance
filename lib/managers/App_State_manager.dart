@@ -3,6 +3,7 @@ import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/appointment.dart';
 import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:attendance/models/student.dart';
+import 'package:attendance/models/teacher.dart';
 import 'package:flutter/material.dart';
 
 class AppStateManager extends ChangeNotifier {
@@ -30,6 +31,7 @@ class AppStateManager extends ChangeNotifier {
   bool _single_student_attend = false;
 
   bool _groupscheck = false;
+  bool _teacherscheck = false;
   // students page .. end
 
   // home screen state.. start
@@ -45,6 +47,7 @@ class AppStateManager extends ChangeNotifier {
   bool get yearsAdd => _years_add;
   bool get singleStudentFromHome => _singleStudentfromHome;
   bool get groupscheck => _groupscheck;
+  bool get teachersscheck => _teacherscheck;
   // home screen end
 
   // students page .. start
@@ -70,6 +73,13 @@ class AppStateManager extends ChangeNotifier {
   StudentModelSearch get getstudent => _student;
   Student4ModelSearch _student4 = Student4ModelSearch();
   Student4ModelSearch get getstudent4 => _student4;
+
+  String _editTeacherid = '';
+  String get geteditTeacherID => _editTeacherid;
+  bool _editteacher = false;
+  bool get geteditteacher => _editteacher;
+  TeacherModel _teacher = TeacherModel();
+  TeacherModel get getteacher => _teacher;
 
   bool _singlegroup = false;
   bool get singlegroup => _singlegroup;
@@ -168,6 +178,11 @@ class AppStateManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  void checkteachers(bool value) {
+    _teacherscheck = value;
+    notifyListeners();
+  }
+
   void goToSingleStudent(bool value, StudentModelSearch st, String id) {
     _single_student = value;
     _student = st;
@@ -221,6 +236,13 @@ class AppStateManager extends ChangeNotifier {
     _editStudentid = id;
     _editStudent = value;
     _student4 = stu;
+    notifyListeners();
+  }
+
+  void teacherTapped(String id, bool value, TeacherModel tea) {
+    _editTeacherid = id;
+    _editteacher = value;
+    _teacher = tea;
     notifyListeners();
   }
 

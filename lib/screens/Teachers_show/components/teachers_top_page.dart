@@ -1,14 +1,11 @@
 import 'package:attendance/managers/App_State_manager.dart';
-import 'package:attendance/models/groupmodelsimple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Show_Class_Top_Page extends StatelessWidget {
-  const Show_Class_Top_Page({Key? key, required this.size, this.group})
+class Show_Teachers_Top_Page extends StatelessWidget {
+  const Show_Teachers_Top_Page({Key? key, required this.size})
       : super(key: key);
   final Size size;
-  final GroupModelSimple? group;
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -23,12 +20,16 @@ class Show_Class_Top_Page extends StatelessWidget {
           InkWell(
             onTap: () {
               Provider.of<AppStateManager>(context, listen: false)
-                  .goToSinglegroup(false, '', GroupModelSimple());
+                  .checkteachers(false);
             },
-            child: Icon(
+            child:
+                //  RotatedBox(
+                // quarterTurns: 2,
+                Icon(
               Icons.arrow_back,
               color: Colors.black,
             ),
+            // ),
           ),
           // Icon(
           //   Icons.menu,
@@ -36,17 +37,17 @@ class Show_Class_Top_Page extends StatelessWidget {
           // ),
           Row(
             children: [
-              Icon(Icons.table_view_sharp),
+              Icon(
+                Icons.account_box,
+                size: 30,
+              ),
               Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Text(
-                    group!.name!,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    softWrap: false,
+                    'المدرسين',
                     style: TextStyle(
-                        fontSize: 25,
+                        fontSize: 35,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'AraHamah1964B-Bold'),
                   ),
@@ -54,8 +55,28 @@ class Show_Class_Top_Page extends StatelessWidget {
               ),
             ],
           ),
-
-          Container()
+          Container(),
+          // InkWell(
+          //   onTap: () async {
+          //     // await showSearch(context: context, delegate: GroupSearch());
+          //   },
+          //   child: Row(
+          //     children: [
+          //       Text(
+          //         'بحث',
+          //         style: TextStyle(
+          //             fontFamily: 'GE-light',
+          //             color: Colors.black87,
+          //             fontSize: 20),
+          //       ),
+          //       Icon(
+          //         Icons.search,
+          //         size: 20,
+          //         color: Colors.black87,
+          //       ),
+          //     ],
+          //   ),
+          // )
         ],
       ),
     );

@@ -19,50 +19,37 @@ class Show_Presence_Top_Page extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(),
-          // Icon(
-          //   Icons.menu,
-          //   size: 30,
-          // ),
-          Row(
-            children: [
-              Icon(Icons.table_view_sharp),
-              Container(
-                width: size.width / 1.5,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Container(
-                      // width: double.infinity / 3,
-                      child: Text(
-                        'حضور الحصه',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        softWrap: false,
-                        style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'AraHamah1964B-Bold'),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
           InkWell(
             onTap: () {
               Provider.of<AppStateManager>(context, listen: false)
                   .goToSinglelessonattend(false, '', AppointmentModel());
             },
-            child: RotatedBox(
-              quarterTurns: 2,
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              ),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.black,
             ),
-          )
+          ),
+          Row(
+            children: [
+              Icon(Icons.table_view_sharp),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Text(
+                    'حضور الحصه',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: false,
+                    style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'AraHamah1964B-Bold'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Container()
         ],
       ),
     );

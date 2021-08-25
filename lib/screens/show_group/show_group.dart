@@ -233,8 +233,11 @@ class _Show_GroupState extends State<Show_Group> {
                                               ),
                                               subtitle: Text(
                                                 groupManager.groups[Index]
-                                                        .subject!.name ??
-                                                    '',
+                                                            .subject ==
+                                                        null
+                                                    ? ''
+                                                    : groupManager.groups[Index]
+                                                        .subject!.name!,
                                                 style: TextStyle(
                                                     color: text_colors[
                                                         Index % colors.length],

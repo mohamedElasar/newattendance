@@ -10,6 +10,7 @@ import 'package:attendance/models/Student4SearchModel.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/appointment.dart';
 import 'package:attendance/models/groupmodelsimple.dart';
+import 'package:attendance/models/teacher.dart';
 import 'package:attendance/screens/Add_academic_year/Academic_year.dart';
 import 'package:attendance/screens/Add_assistant/Add_Teacher_Screen.dart';
 import 'package:attendance/screens/Add_group/Add_group_Screen.dart';
@@ -21,6 +22,7 @@ import 'package:attendance/screens/Home/Home_Screen.dart';
 import 'package:attendance/screens/Single_Student.dart/Single_Student_Screen.dart';
 import 'package:attendance/screens/Student_register/Student_register_screen.dart';
 import 'package:attendance/screens/Students/Students_screen.dart';
+import 'package:attendance/screens/Teachers_show/show_Teachers.dart';
 import 'package:attendance/screens/modify_lessons/modify_lessons_screen.dart';
 import 'package:attendance/screens/show_class/show_Class.dart';
 import 'package:attendance/screens/show_group/show_group.dart';
@@ -92,7 +94,9 @@ class AppRouter extends RouterDelegate
           Student_Register_Screen.page(
               editStudent: Student4ModelSearch(), edit: false),
         if (authmanager.isLoggedIn && appStateManager.teacherRegister)
-          Add_Teacher_Screeen.page(),
+          Add_Teacher_Screeen.page(medit: false, editTeacher: TeacherModel()),
+        if (authmanager.isLoggedIn && appStateManager.teachersscheck)
+          Show_Teachers.page(),
         if (authmanager.isLoggedIn && appStateManager.assistantRegister)
           Add_Assistant_Screen.page(),
         if (authmanager.isLoggedIn && appStateManager.groupscheck)
@@ -166,6 +170,11 @@ class AppRouter extends RouterDelegate
             appStateManager.geteditgrooup)
           Add_group_screen.page(
               medit: true, editGroup: appStateManager.getGroupEdit),
+        if (authmanager.isLoggedIn &&
+            appStateManager.teachersscheck &&
+            appStateManager.geteditteacher)
+          Add_Teacher_Screeen.page(
+              medit: true, editTeacher: appStateManager.getteacher),
       ],
     );
   }
@@ -201,6 +210,9 @@ class AppRouter extends RouterDelegate
     if (route.settings.name == Attendance_Screens.data_students) {
       appStateManager.studentsCommunicate(false);
     }
+    if (route.settings.name == Attendance_Screens.teachers_show) {
+      appStateManager.checkteachers(false);
+    }
     if (route.settings.name == Attendance_Screens.groupcheck) {
       // print('object');
       groupManager.resetlist();
@@ -227,7 +239,7 @@ class AppRouter extends RouterDelegate
       subjectManager.getMoreData();
       teachermanager.getMoreData();
       appStateManager.registerGroup(false);
-      appStateManager.groupTapped('id', false, GroupModelSimple());
+      appStateManager.groupTapped('', false, GroupModelSimple());
       ;
     }
     if (route.settings.name == Attendance_Screens.teacher_registerpath) {
@@ -236,6 +248,7 @@ class AppRouter extends RouterDelegate
       yearManager.getMoreData();
       subjectManager.getMoreData();
       appStateManager.registerTeacher(false);
+      appStateManager.teacherTapped('', false, TeacherModel());
     }
     if (route.settings.name == Attendance_Screens.assistant_registerpath) {
       teachermanager.resetlist();

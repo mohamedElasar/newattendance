@@ -291,7 +291,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                           borderRadius: BorderRadius.circular(5.0),
                           child: Center(
                             child: Text(
-                              "اظهار مجموعة",
+                              "اظهار المجموعات",
                               style: TextStyle(
                                   fontSize: 19, fontWeight: FontWeight.bold),
                             ),
@@ -304,6 +304,37 @@ class _Home_ScreenState extends State<Home_Screen> {
                           .gotocheckgroups(true);
                     },
                   ),
+                  if (widget.myuser == user.center)
+                    ListTile(
+                      title: Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            border: Border.all(
+                              color: Colors.grey,
+                              width: 0.7,
+                            ),
+                          ),
+                          height: 40,
+                          child: Material(
+                            // elevation: 5.0,
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: Center(
+                              child: Text(
+                                "اظهار المدرسين",
+                                style: TextStyle(
+                                    fontSize: 19, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        Provider.of<AppStateManager>(context, listen: false)
+                            .checkteachers(true);
+                      },
+                    ),
                   ListTile(
                     title: Padding(
                       padding: const EdgeInsets.all(1.0),

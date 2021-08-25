@@ -15,4 +15,5 @@ class Attendance_Screens {
   static String groupcheck = '/groupcheck';
   static String groupclasses = '/groupclasses';
   static String classattend = '/classattend';
+  static String teachers_show = '/teachersSHoww';
 }

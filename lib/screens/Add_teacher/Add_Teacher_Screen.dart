@@ -1,19 +1,27 @@
 import 'package:attendance/managers/App_State_manager.dart';
+import 'package:attendance/models/teacher.dart';
 import 'package:attendance/navigation/screens.dart';
 import 'package:attendance/screens/Add_teacher/components/Teacher_Form.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Add_Teacher_Screeen extends StatelessWidget {
-  static MaterialPage page() {
+  final bool? edit;
+  final TeacherModel? myTeacher;
+
+  static MaterialPage page({bool? medit, TeacherModel? editTeacher}) {
     return MaterialPage(
       name: Attendance_Screens.teacher_registerpath,
       key: ValueKey(Attendance_Screens.teacher_registerpath),
-      child: const Add_Teacher_Screeen(),
+      child: Add_Teacher_Screeen(
+        edit: medit,
+        myTeacher: editTeacher,
+      ),
     );
   }
 
-  const Add_Teacher_Screeen({Key? key}) : super(key: key);
+  const Add_Teacher_Screeen({Key? key, this.edit, this.myTeacher})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -26,7 +34,7 @@ class Add_Teacher_Screeen extends StatelessWidget {
         appBar: AppBar(
           title: Center(
             child: Text(
-              'تسجيل معلم',
+              edit! ? 'تعديل معلم' : 'تسجيل معلم',
               style: TextStyle(
                   color: Colors.black,
                   fontSize: 30,
@@ -48,6 +56,8 @@ class Add_Teacher_Screeen extends StatelessWidget {
                 onTap: () {
                   Provider.of<AppStateManager>(context, listen: false)
                       .registerTeacher(false);
+                  Provider.of<AppStateManager>(context, listen: false)
+                      .teacherTapped('id', false, TeacherModel());
                 },
                 child: RotatedBox(
                   quarterTurns: 2,
@@ -78,7 +88,8 @@ class Add_Teacher_Screeen extends StatelessWidget {
           backgroundColor: Colors.white,
         ),
         backgroundColor: Colors.grey[300],
-        body: SingleChildScrollView(child: Teacher_Form(size: size)),
+        body: SingleChildScrollView(
+            child: Teacher_Form(size: size, edit: edit, eteacher: myTeacher)),
       ),
     );
   }

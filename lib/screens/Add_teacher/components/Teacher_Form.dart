@@ -1,8 +1,10 @@
 import 'package:attendance/helper/httpexception.dart';
+import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/cities_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
+import 'package:attendance/models/teacher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,9 +14,13 @@ class Teacher_Form extends StatefulWidget {
   const Teacher_Form({
     Key? key,
     required this.size,
+    this.edit,
+    this.eteacher,
   }) : super(key: key);
 
   final Size size;
+  final bool? edit;
+  final TeacherModel? eteacher;
 
   @override
   _Teacher_FormState createState() => _Teacher_FormState();
@@ -107,8 +113,8 @@ class _Teacher_FormState extends State<Teacher_Form> {
   String subjectname = 'الماده';
   String cityname = 'المحافظه';
   List<String> years_shown = [];
-  late String subjectId_selected;
-  late String cityId_selected;
+  String? subjectId_selected;
+  String? cityId_selected;
 
   void _submit() async {
     final isValid = _formKey.currentState!.validate();
@@ -193,6 +199,105 @@ class _Teacher_FormState extends State<Teacher_Form> {
     });
   }
 
+  void _modify() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+    if (subjectname == 'الماده' ||
+        cityname == 'المحافظه' ||
+        years_shown.isEmpty) {
+      return;
+    }
+    _formKey.currentState!.save();
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await Provider.of<TeacherManager>(context, listen: false)
+          .update_teacher(
+            widget.eteacher!.id!.toString(),
+            nameController.text,
+            phoneController.text,
+            emailController.text,
+            alternativePhoneController.text,
+            // pass1Controller.text,
+            // pass2Controller.text,
+            assistantphoneController.text,
+            assisAlternativePhoneController.text,
+            schoolController.text,
+            experienceController.text,
+            notesController.text,
+            subjectId_selected,
+            _years_ids,
+            cityId_selected,
+            // assistantemailcontroller.text,
+            // assistantpasscontrooller.text,
+            // assistantnamecontroller.text
+          )
+          .then((_) {
+            _formKey.currentState?.reset();
+            nameController.text = '';
+            emailController.text = '';
+            // pass1Controller.text = '';
+            // pass2Controller.text = '';
+            phoneController.text = '';
+            alternativePhoneController.text = '';
+            yearsController.text = '';
+            languageController.text = '';
+            governomentController.text = '';
+            schoolController.text = '';
+            assistantphoneController.text = '';
+            assisAlternativePhoneController.text = '';
+            notesController.text = '';
+            experienceController.text = '';
+            // assistantemailcontroller.text = '';
+            // assistantpasscontrooller.text = '';
+            // assistantnamecontroller.text = '';
+            subjectname = 'الماده';
+            cityname = 'المحافظه';
+            subjectId_selected = '';
+            cityId_selected = '';
+            _years_ids = [];
+            years_shown = [];
+          })
+          .then((value) =>
+              Provider.of<TeacherManager>(context, listen: false).resetlist())
+          .then((value) =>
+              Provider.of<TeacherManager>(context, listen: false).getMoreData())
+          .then((_) {
+            // nameController.text = '';
+            // subjectname = 'الماده الدراسيه';
+            // teachername = 'المدرس';
+            // yearname = 'السنه الدراسيه';
+
+            Provider.of<AppStateManager>(context, listen: false)
+                .teacherTapped('', false, TeacherModel());
+          })
+          .then(
+            (value) => ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.green[300],
+                content: Text(
+                  'تم تعديل المدرس بنجاح',
+                  style: TextStyle(fontFamily: 'GE-medium'),
+                ),
+                duration: Duration(seconds: 3),
+              ),
+            ),
+          );
+    } on HttpException catch (error) {
+      _showErrorDialog(error.toString());
+    } catch (error) {
+      const errorMessage = 'حاول مره اخري';
+      _showErrorDialog(errorMessage);
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -232,6 +337,63 @@ class _Teacher_FormState extends State<Teacher_Form> {
 
   @override
   void initState() {
+    print(widget.eteacher!.id!);
+
+    widget.edit!
+        ? nameController.text = widget.eteacher!.name ?? ''
+        : nameController.text = '';
+    widget.edit!
+        ? emailController.text = widget.eteacher!.email ?? ''
+        : emailController.text = '';
+    widget.edit!
+        ? phoneController.text = widget.eteacher!.phone ?? ''
+        : phoneController.text = '';
+    widget.edit!
+        ? alternativePhoneController.text = widget.eteacher!.phone2 ?? ''
+        : alternativePhoneController.text = '';
+    widget.edit!
+        ? assistantphoneController.text = widget.eteacher!.assistantPhone ?? ''
+        : assistantphoneController.text = '';
+    widget.edit!
+        ? assisAlternativePhoneController.text = widget.eteacher!.phone2 ?? ''
+        : assisAlternativePhoneController.text = '';
+    widget.edit!
+        ? schoolController.text = widget.eteacher!.school ?? ''
+        : schoolController.text = '';
+    widget.edit!
+        ? experienceController.text = widget.eteacher!.experience ?? ''
+        : experienceController.text = '';
+    widget.edit!
+        ? notesController.text = widget.eteacher!.note ?? ''
+        : notesController.text = '';
+    widget.edit!
+        ? schoolController.text = widget.eteacher!.school ?? ''
+        : schoolController.text = '';
+
+    widget.edit!
+        ? cityId_selected = widget.eteacher!.cityId!.id!.toString()
+        : cityId_selected = '';
+    if (widget.edit!) cityname = widget.eteacher!.cityId!.name.toString();
+
+    if (widget.edit!)
+      subjectname = widget.eteacher!.subject == null
+          ? 'الماده'
+          : widget.eteacher!.subject!.name.toString();
+    if (widget.edit!)
+      subjectId_selected = widget.eteacher!.subject == null
+          ? null
+          : widget.eteacher!.subject!.id.toString();
+
+    if (widget.edit!) {
+      _years_ids = widget.eteacher!.years!.map((e) => e.id.toString()).toList();
+      years_shown =
+          widget.eteacher!.years!.map((e) => e.name.toString()).toList();
+      // print(widget.student!.secondLanguage.toString());
+    } else {
+      _years_ids = [];
+      years_shown = [];
+    }
+
     super.initState();
 
     Future.delayed(Duration.zero, () async {
@@ -692,46 +854,51 @@ class _Teacher_FormState extends State<Teacher_Form> {
                       inputType: TextInputType.name,
                       validate: (value) {},
                       focus: focus2),
-                  build_edit_field(
-                    item: 'password1',
-                    hint: 'password',
-                    controller: pass1Controller,
-                    inputType: TextInputType.name,
-                    validate: (value) {},
-                    focus: focus3,
-                  ),
-                  build_edit_field(
-                    item: 'password2',
-                    hint: 'password confirmation',
-                    controller: pass2Controller,
-                    inputType: TextInputType.name,
-                    validate: (value) {},
-                    focus: focus15,
-                  ),
-                  build_edit_field(
-                    item: 'assistant_name',
-                    hint: 'اسم المساعد ',
-                    controller: assistantnamecontroller,
-                    inputType: TextInputType.name,
-                    validate: (value) {},
-                    focus: focus12,
-                  ),
-                  build_edit_field(
-                    item: 'assitant_email',
-                    hint: 'Assistant email',
-                    controller: assistantemailcontroller,
-                    inputType: TextInputType.name,
-                    validate: (value) {},
-                    focus: focus13,
-                  ),
-                  build_edit_field(
-                    item: 'password_assistant',
-                    hint: 'Assistant Password',
-                    controller: assistantpasscontrooller,
-                    inputType: TextInputType.name,
-                    validate: (value) {},
-                    focus: focus14,
-                  ),
+                  if (!widget.edit!)
+                    build_edit_field(
+                      item: 'password1',
+                      hint: 'password',
+                      controller: pass1Controller,
+                      inputType: TextInputType.name,
+                      validate: (value) {},
+                      focus: focus3,
+                    ),
+                  if (!widget.edit!)
+                    build_edit_field(
+                      item: 'password2',
+                      hint: 'password confirmation',
+                      controller: pass2Controller,
+                      inputType: TextInputType.name,
+                      validate: (value) {},
+                      focus: focus15,
+                    ),
+                  if (!widget.edit!)
+                    build_edit_field(
+                      item: 'assistant_name',
+                      hint: 'اسم المساعد ',
+                      controller: assistantnamecontroller,
+                      inputType: TextInputType.name,
+                      validate: (value) {},
+                      focus: focus12,
+                    ),
+                  if (!widget.edit!)
+                    build_edit_field(
+                      item: 'assitant_email',
+                      hint: 'Assistant email',
+                      controller: assistantemailcontroller,
+                      inputType: TextInputType.name,
+                      validate: (value) {},
+                      focus: focus13,
+                    ),
+                  if (!widget.edit!)
+                    build_edit_field(
+                      item: 'password_assistant',
+                      hint: 'Assistant Password',
+                      controller: assistantpasscontrooller,
+                      inputType: TextInputType.name,
+                      validate: (value) {},
+                      focus: focus14,
+                    ),
                   Center(
                     child: Container(
                       width: widget.size.width * .9,
@@ -936,11 +1103,11 @@ class _Teacher_FormState extends State<Teacher_Form> {
                     child: TextButton(
                       style: ButtonStyle(
                           elevation: MaterialStateProperty.all(2),
-                          backgroundColor:
-                              MaterialStateProperty.all(kbuttonColor3)),
-                      onPressed: _submit,
+                          backgroundColor: MaterialStateProperty.all(
+                              widget.edit! ? Colors.red[200] : kbuttonColor3)),
+                      onPressed: widget.edit! ? _modify : _submit,
                       child: Text(
-                        'تسجيل',
+                        widget.edit! ? 'تعديل' : 'تسجيل',
                         style: TextStyle(
                             fontFamily: 'GE-Bold', color: Colors.black),
                       ),

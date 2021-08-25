@@ -99,6 +99,81 @@ class TeacherManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> update_teacher(
+    String? id,
+    String? name,
+    String? phone,
+    String? email,
+    String? phone2,
+    // String? password,
+    // String? passwordConfirmation,
+    String? assistantPhone,
+    String? assistantPhone2,
+    String? school,
+    String? experience,
+    String? note,
+    String? subject,
+    List<String>? years,
+    String? cityId,
+    // String? assiemail,
+    // String? assispass,
+    // String? assisname,
+  ) async {
+    try {
+      Dio dio = Dio();
+      String urld = 'https://development.mrsaidmostafa.com/api/teachers/$id';
+      var params = {
+        'name': name,
+        'phone': phone,
+        'email': email,
+        'phone2': phone2,
+        // 'password': password,
+        // 'password_confirmation': passwordConfirmation,
+        'assistant_phone': assistantPhone,
+        'assistant_phone2': assistantPhone2,
+        'school': school,
+        'experience': experience,
+        'note': note,
+        'subject_id': subject,
+        'years': years,
+        'city_id': cityId,
+        // 'assistant_email': assiemail,
+        // 'assistant_password': assispass,
+        // 'assistant_name': assisname,
+      };
+      dio.options.headers["Authorization"] = 'Bearer $_authToken';
+      dio.options.headers["Accept"] = 'application/json';
+
+      var response = await dio.put(urld, data: jsonEncode(params));
+
+      final responseData = response.data;
+      print(responseData);
+
+      // if (responseData['errors'] != null) {
+      //   List<String> errors = [];
+      //   for (var value in responseData['errors'].values) errors.add(value[0]);
+      //   throw HttpException(errors.join('  '));
+      // }
+    } on DioError catch (e) {
+      if (e.response!.data['errors'] != null) {
+        print(e.response!.data);
+        List<String> errors = [];
+        for (var value in e.response!.data['errors'].values)
+          errors.add(value[0]);
+        throw HttpException(errors.join('  '));
+      } else if (e.response!.data['message'] ==
+          'This action is unauthorized.') {
+        throw HttpException('غير مسموح لك بتعديل بيانات طالب');
+      } else {
+        print(e.response);
+
+        throw (e);
+      }
+    }
+
+    notifyListeners();
+  }
+
   Future<void> get_teachers() async {
     var url = Uri.https('development.mrsaidmostafa.com', '/api/teachers');
     try {
@@ -212,6 +287,29 @@ class TeacherManager extends ChangeNotifier {
 
   void seterror(bool value) {
     _error = value;
+    notifyListeners();
+  }
+
+  Future<void> delete_teacher(int id) async {
+    var url = Uri.https('development.mrsaidmostafa.com', '/api/teachers/$id');
+    try {
+      var response = await http.delete(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+      final responseData = json.decode(response.body);
+      print(responseData);
+      if (responseData['massage'] ==
+          'The teacher has been deleted successfully.') {
+        _teachers.removeWhere((e) => e.id == id);
+      }
+    } catch (error) {
+      print(error);
+    }
+
     notifyListeners();
   }
 }
