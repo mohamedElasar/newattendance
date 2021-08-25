@@ -18,7 +18,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
+ import 'package:sqflite/sqflite.dart';
 
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -1324,8 +1324,7 @@ class _ChoicesState extends State<Choices> {
                                 //                   .toString();
                                 //             });
                                 setState(() {
-                                  app_name =
-                                      appointment_list[index]['classname'];
+                                  app_name = appointment_list[index]['classname'];
                                   year_level = true;
                                   subject_level = true;
                                   teacher_level = true;
