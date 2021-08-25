@@ -6,22 +6,27 @@ import 'package:attendance/managers/group_manager.dart';
 import 'package:attendance/managers/stage_manager.dart';
 import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
-
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:attendance/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'managers/App_State_manager.dart';
 import 'managers/year_manager.dart';
 import 'navigation/app_router.dart';
 import 'dart:io';
 import 'package:desktop_window/desktop_window.dart';
-
+import 'package:sqflite/sqflite.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     // setWindowTitle('App title');
+    // Initialize FFI
+    sqfliteFfiInit();
+    // Change the default factory
+    databaseFactory = databaseFactoryFfi;
     DesktopWindow.setWindowSize(Size(700, 900));
     DesktopWindow.setMinWindowSize(Size(700, 900));
     DesktopWindow.setMaxWindowSize(Size(700, 900));
@@ -61,80 +66,86 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => _appStateManager),
-        ChangeNotifierProvider(create: (context) => _auth_Manager),
-        ChangeNotifierProvider(create: (context) => _citymanager),
-        ChangeNotifierProxyProvider<Auth_manager, YearManager>(
-          create: (ctx) => _yearManager,
-          update: (ctx, auth, prevyear) => prevyear!
-            // ignore: unnecessary_null_comparison
-            ..receiveToken(auth, prevyear == null ? [] : prevyear.years),
-        ),
-        ChangeNotifierProxyProvider<Auth_manager, StageManager>(
-          create: (ctx) => _stageManager,
-          update: (ctx, auth, prevstage) => prevstage!
-            // ignore: unnecessary_null_comparison
-            ..receiveToken(auth, prevstage == null ? [] : prevstage.stages!),
-        ),
-        ChangeNotifierProxyProvider<Auth_manager, SubjectManager>(
-          create: (ctx) => _subjectmanager,
-          update: (ctx, auth, prevstage) => prevstage!
-            // ignore: unnecessary_null_comparison
-            ..receiveToken(auth, prevstage == null ? [] : prevstage.subjects!),
-        ),
-        ChangeNotifierProxyProvider<Auth_manager, TeacherManager>(
-          create: (ctx) => _teachermanager,
-          update: (ctx, auth, prevstage) => prevstage!
-            // ignore: unnecessary_null_comparison
-            ..receiveToken(auth, prevstage == null ? [] : prevstage.teachers),
-        ),
-        ChangeNotifierProxyProvider<Auth_manager, GroupManager>(
-          create: (ctx) => _groupmanager,
-          update: (ctx, auth, prevstage) => prevstage!
-            // ignore: unnecessary_null_comparison
-            ..receiveToken(auth, prevstage == null ? [] : prevstage.groups),
-        ),
-        ChangeNotifierProxyProvider<Auth_manager, StudentManager>(
-          create: (ctx) => _studentsmanager,
-          update: (ctx, auth, prevstage) => prevstage!
-            // ignore: unnecessary_null_comparison
-            ..receiveToken(auth, prevstage == null ? [] : prevstage.students),
-        ),
-        ChangeNotifierProxyProvider<Auth_manager, AppointmentManager>(
-          create: (ctx) => _appointmentmanager,
-          update: (ctx, auth, prevstage) => prevstage!
-            ..receiveToken(
-                // ignore: unnecessary_null_comparison
-                auth,
-                prevstage == null ? [] : prevstage.appointments!),
-        ),
-      ],
-      child: MaterialApp(
-        localizationsDelegates: [
-          GlobalCupertinoLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
+    return StreamProvider<DataConnectionStatus>(
+      initialData: DataConnectionStatus.connected,
+       create: (_) {
+        return DataConnectionChecker().onStatusChange;
+      },
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => _appStateManager),
+          ChangeNotifierProvider(create: (context) => _auth_Manager),
+          ChangeNotifierProvider(create: (context) => _citymanager),
+          ChangeNotifierProxyProvider<Auth_manager, YearManager>(
+            create: (ctx) => _yearManager,
+            update: (ctx, auth, prevyear) => prevyear!
+              // ignore: unnecessary_null_comparison
+              ..receiveToken(auth, prevyear == null ? [] : prevyear.years),
+          ),
+          ChangeNotifierProxyProvider<Auth_manager, StageManager>(
+            create: (ctx) => _stageManager,
+            update: (ctx, auth, prevstage) => prevstage!
+              // ignore: unnecessary_null_comparison
+              ..receiveToken(auth, prevstage == null ? [] : prevstage.stages!),
+          ),
+          ChangeNotifierProxyProvider<Auth_manager, SubjectManager>(
+            create: (ctx) => _subjectmanager,
+            update: (ctx, auth, prevstage) => prevstage!
+              // ignore: unnecessary_null_comparison
+              ..receiveToken(auth, prevstage == null ? [] : prevstage.subjects!),
+          ),
+          ChangeNotifierProxyProvider<Auth_manager, TeacherManager>(
+            create: (ctx) => _teachermanager,
+            update: (ctx, auth, prevstage) => prevstage!
+              // ignore: unnecessary_null_comparison
+              ..receiveToken(auth, prevstage == null ? [] : prevstage.teachers),
+          ),
+          ChangeNotifierProxyProvider<Auth_manager, GroupManager>(
+            create: (ctx) => _groupmanager,
+            update: (ctx, auth, prevstage) => prevstage!
+              // ignore: unnecessary_null_comparison
+              ..receiveToken(auth, prevstage == null ? [] : prevstage.groups),
+          ),
+          ChangeNotifierProxyProvider<Auth_manager, StudentManager>(
+            create: (ctx) => _studentsmanager,
+            update: (ctx, auth, prevstage) => prevstage!
+              // ignore: unnecessary_null_comparison
+              ..receiveToken(auth, prevstage == null ? [] : prevstage.students),
+          ),
+          ChangeNotifierProxyProvider<Auth_manager, AppointmentManager>(
+            create: (ctx) => _appointmentmanager,
+            update: (ctx, auth, prevstage) => prevstage!
+              ..receiveToken(
+                  // ignore: unnecessary_null_comparison
+                  auth,
+                  prevstage == null ? [] : prevstage.appointments!),
+          ),
         ],
-        supportedLocales: [
-          Locale("ar", "AE"),
-        ],
-        locale: Locale("ar", "AE"),
-        debugShowCheckedModeBanner: false,
-        title: 'حضور',
-        theme: ThemeData(
-            // canvasColor: Colors.transparent,
-            ),
-        home: FutureBuilder(
-          future: _auth_Manager.tryAutoLogin(),
-          builder: (context, datasnapshot) =>
-              datasnapshot.connectionState == ConnectionState.waiting
-                  ? Splash_Screen()
-                  : Router(
-                      routerDelegate: GetRouter(),
-                      backButtonDispatcher: RootBackButtonDispatcher(),
-                    ),
+        child: MaterialApp(
+          localizationsDelegates: [
+            GlobalCupertinoLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: [
+            Locale("ar", "AE"),
+          ],
+          locale: Locale("ar", "AE"),
+          debugShowCheckedModeBanner: false,
+          title: 'حضور',
+          theme: ThemeData(
+              // canvasColor: Colors.transparent,
+              ),
+          home: FutureBuilder(
+            future: _auth_Manager.tryAutoLogin(),
+            builder: (context, datasnapshot) =>
+                datasnapshot.connectionState == ConnectionState.waiting
+                    ? Splash_Screen()
+                    : Router(
+                        routerDelegate: GetRouter(),
+                        backButtonDispatcher: RootBackButtonDispatcher(),
+                      ),
+          ),
         ),
       ),
     );

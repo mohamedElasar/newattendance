@@ -1,6 +1,6 @@
 // import 'dart:html';
 import 'dart:io';
-
+import 'dart:async';
 import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/managers/App_State_manager.dart';
 import 'package:attendance/managers/Appointment_manager.dart';
@@ -10,15 +10,31 @@ import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/managers/teacher_manager.dart';
 import 'package:attendance/managers/year_manager.dart';
 import 'package:attendance/models/teacher.dart';
+// import 'package:connectivity/connectivity.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
 
+import 'package:sqflite_common/sqlite_api.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import 'package:data_connection_checker/data_connection_checker.dart';
 import '../../../constants.dart';
 import '../Home_Screen.dart';
 
+bool no_internet = false;
+List year_list = [];
+List appointment_list = [];
+List teacher_list = [];
+List group_list = [];
+List subject_list = [];
+Database? database;
+String path = '';
 late String year_id_selected;
 String yearname = 'السنه الدراسيه';
 late String subjectId_selected;
@@ -63,6 +79,33 @@ class Choices extends StatefulWidget {
 late String scanResult_code;
 
 class _ChoicesState extends State<Choices> {
+  // static late ConnectivityResult _connectionStatus;
+  // Connectivity? connectivity;
+  // StreamSubscription<ConnectivityResult>? subscription;
+  bool check_connectivity(context) {
+    setState(() {
+      Provider.of<DataConnectionStatus>(context);
+    });
+    if (Provider.of<DataConnectionStatus>(context) ==
+        DataConnectionStatus.disconnected) {
+      return false;
+      //print('no interrrnet');
+    } else {
+      // print('yes interrrnet');
+      return true;
+    }
+
+    // var connectivityResult = await (Connectivity().checkConnectivity());
+    // if (connectivityResult == ConnectivityResult.wifi) {
+    //   return true;
+    // } else {
+    //   setState(() {
+    //     no_internet = true;
+    //   });
+    //   return false;
+    // }
+  }
+
   ScrollController _sc1 = new ScrollController();
   ScrollController _sc2 = new ScrollController();
   ScrollController _sc3 = new ScrollController();
@@ -83,8 +126,66 @@ class _ChoicesState extends State<Choices> {
   bool _scanloading = false;
   bool _isinit = true;
 
+  void create_table() async {
+    await deleteDatabase(path);
+    var databasesPath = await getDatabasesPath();
+    path = join(databasesPath, 'home.db');
+
+    database = await openDatabase(path, version: 1,
+        onCreate: (Database db, int version) async {
+      await db.execute(
+          'CREATE TABLE Homedata (id INTEGER PRIMARY KEY,year STRING, subject STRING ,teacher STRING ,groupname STRING ,classname STRING)');
+    });
+  }
+
+  void add_record(String year, String subject, String teacher, String groupname,
+      String classname) async {
+    await database!.transaction((txn) async {
+      int id1 = await txn.rawInsert(
+          'INSERT INTO Homedata(year,subject,teacher,groupname,classname)VALUES("$year","$subject","$teacher","$groupname","$classname")');
+      print('inserted1: $id1');
+      // count_deree + 1;
+
+      //
+    });
+    // // Update some record
+    // if (count_deree > 1) {
+    //   int count = await database.rawUpdate(
+    //       'UPDATE Test SET degree = ?, id_value = ? WHERE id_value = ?',
+    //       ['$result', '$Student__id', '$Student__id']);
+    //   print('updated: $count');
+    // }
+
+    // Get the records
+    List<Map> list = await database!.rawQuery('SELECT * FROM Homedata');
+    year_list = await database!.rawQuery('SELECT DISTINCT year FROM Homedata ');
+    // id_list = await database.rawQuery('SELECT id_value FROM Test');
+
+    print('sqflite degreeeeeeeeeee');
+    print(year_list);
+    print('sqflite listttttttttttttttttttttttttt');
+    print(list);
+
+    //await deleteDatabase(path);
+    print('sqflite subject_list listttttttttttttttttttttttttt');
+    print(subject_list);
+  }
+
   @override
   void initState() {
+    // connectivity = new Connectivity();
+    // subscription = connectivity!.onConnectivityChanged
+    //     .listen((ConnectivityResult myresult) {
+    //   _connectionStatus = myresult;
+    //   print('_connectionStatus');
+    //   print(_connectionStatus);
+    //   if (myresult == ConnectivityResult.wifi)
+    //   // ||
+    //   //     result == ConnectivityResult.mobile)
+    //   {
+    //     setState(() {});
+    //   }
+    // });
     Future.delayed(Duration.zero, () async {
       yearname = 'السنه الدراسيه';
       subjectname = 'الماده الدراسيه';
@@ -95,13 +196,13 @@ class _ChoicesState extends State<Choices> {
       }
       group_name = 'المجموعه';
       app_name = 'الحصه';
-      Provider.of<GroupManager>(context, listen: false).resetlist();
-      Provider.of<TeacherManager>(context, listen: false).resetlist();
+      Provider.of<GroupManager>(this.context, listen: false).resetlist();
+      Provider.of<TeacherManager>(this.context, listen: false).resetlist();
       // Provider.of<YearManager>(context, listen: false).resetlist();
-      Provider.of<SubjectManager>(context, listen: false).resetlist();
-      Provider.of<YearManager>(context, listen: false).resetlist();
+      Provider.of<SubjectManager>(this.context, listen: false).resetlist();
+      Provider.of<YearManager>(this.context, listen: false).resetlist();
       try {
-        await Provider.of<YearManager>(context, listen: false)
+        await Provider.of<YearManager>(this.context, listen: false)
             .getMoreData()
             .then((value) {
           setState(() {
@@ -115,14 +216,14 @@ class _ChoicesState extends State<Choices> {
     _sc1.addListener(
       () {
         if (_sc1.position.pixels == _sc1.position.maxScrollExtent) {
-          Provider.of<YearManager>(context, listen: false).getMoreData();
+          Provider.of<YearManager>(this.context, listen: false).getMoreData();
         }
       },
     );
     _sc2.addListener(
       () {
         if (_sc2.position.pixels == _sc2.position.maxScrollExtent) {
-          Provider.of<SubjectManager>(context, listen: false)
+          Provider.of<SubjectManager>(this.context, listen: false)
               .getMoreDatafiltered(year_id_selected.toString());
         }
       },
@@ -130,7 +231,7 @@ class _ChoicesState extends State<Choices> {
     _sc3.addListener(
       () {
         if (_sc3.position.pixels == _sc3.position.maxScrollExtent) {
-          Provider.of<TeacherManager>(context, listen: false)
+          Provider.of<TeacherManager>(this.context, listen: false)
               .getMoreDatafiltered(year_id_selected, subjectId_selected);
         }
       },
@@ -138,11 +239,96 @@ class _ChoicesState extends State<Choices> {
     _sc4.addListener(
       () {
         if (_sc4.position.pixels == _sc4.position.maxScrollExtent) {
-          Provider.of<GroupManager>(context, listen: false).getMoreDatafiltered(
-              year_id_selected, subjectId_selected, teacher_id_selected);
+          Provider.of<GroupManager>(this.context, listen: false)
+              .getMoreDatafiltered(
+                  year_id_selected, subjectId_selected, teacher_id_selected);
         }
       },
     );
+    create_table();
+    Future.delayed(Duration.zero, () async {
+      try {
+        GroupManager group_manager = new GroupManager();
+        await Provider.of<GroupManager>(this.context, listen: false)
+            .get_groups_offline()
+            .then((value) {
+          // print('group name');
+          print('group nametttttttttttttt');
+          print(GroupManager.groupsoffline.length);
+          //print(group_manager.groups);
+          setState(() {
+            _isloadingyears = false;
+          });
+        });
+      } catch (e) {}
+    });
+    //
+    print('GroupManager.groupsoffline.length');
+    print(GroupManager.groupsoffline.length);
+    for (var i = 0; i < GroupManager.groupsoffline.length; i++) {
+      print('group nameee');
+      print(GroupManager.groupsoffline[i].id);
+
+      Future.delayed(Duration.zero, () async {
+        try {
+          GroupManager group_manager = new GroupManager();
+          await Provider.of<GroupManager>(this.context, listen: false)
+              .get_group_offline(GroupManager.groupsoffline[i].id!)
+              .then((value) {
+            print('group data');
+            print(GroupManager.group_info['name']);
+            setState(() {
+              _isloadingyears = false;
+            });
+            for (var j = 0;
+                j < GroupManager.group_info['appointments'].length;
+                j++) {
+              add_record(
+                GroupManager.groupsoffline[i].year!.name!,
+                GroupManager.groupsoffline[i].subject!.name!,
+                GroupManager.groupsoffline[i].teacher!.name!,
+                GroupManager.groupsoffline[i].name!,
+                GroupManager.group_info['appointments'][j]['name'],
+              );
+            }
+          });
+          print('NO OF CLASSES');
+          print(GroupManager.group_info['appointments'].length);
+          // for (var j = 0;
+          //     j < GroupManager.group_info['appointments'].length;
+          //     j++) {
+          // add_record(
+          //   GroupManager.group_info['year']['name'],
+          //   GroupManager.group_info['subject']['name'],
+          //   GroupManager.group_info['teacher']['name'],
+          //   GroupManager.group_info['name'],
+          //   GroupManager.group_info['appointments'][0]['name'],
+          // );
+          // }
+
+          // print('group name');
+          // print(await GroupManager.groupsoffline);
+        } catch (e) {}
+      });
+    }
+    // add_record(
+
+    //       //GroupManager.group_info['year']['name'],
+    //     //  GroupManager.group_info['subject']['name'],
+    //       //GroupManager.group_info['teacher']['name'],
+    //       //GroupManager.group_info['name'],
+    //        GroupManager.group_info['appointments'][0]['name'],
+
+    //      );
+//  add_record(
+
+//            GroupManager.group_info['year']['name'],
+//             GroupManager.group_info['subject']['name'],
+//             GroupManager.group_info['teacher']['name'],
+//             GroupManager.group_info['name'],
+//             GroupManager.group_info['appointments'][j]['name'],
+
+//            );
     super.initState();
   }
 
@@ -323,6 +509,865 @@ class _ChoicesState extends State<Choices> {
         });
   }
 
+  void _modalBottomSheetMenuyearOffline(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+              height: 250.0,
+              color: Colors.transparent,
+              child: Column(children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: kbuttonColor3,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'السنه الدراسيه',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GE-bold',
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                    child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0))),
+                  child: ListView.separated(
+                      separatorBuilder: (BuildContext ctxt, int index) =>
+                          Divider(
+                            color: Colors.grey,
+                            height: 2,
+                          ),
+                      itemCount: year_list.length,
+                      itemBuilder: (BuildContext ctxt, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: GestureDetector(
+                              onTap: () async {
+                                Provider.of<SubjectManager>(context,
+                                        listen: false)
+                                    .resetlist();
+                                setState(() {
+                                  //year_id_selected =
+                                  yearname = year_list[index]['year'];
+                                  year_level = true;
+                                  subject_level = false;
+                                  teacher_level = false;
+                                  group_level = false;
+                                  _isloadingsubjects = true;
+                                  subjectname = 'الماده الدراسيه';
+                                  teachername = widget.usser != user.teacher
+                                      ? 'المدرس'
+                                      : widget.teacher!.name!;
+                                  group_name = 'المجموعه';
+                                  app_name = 'الحصه';
+                                });
+                                Navigator.pop(context);
+                                Provider.of<AppStateManager>(context,
+                                        listen: false)
+                                    .setHomeOptions(false);
+                                subject_list = await database!.rawQuery(
+                                    'SELECT DISTINCT subject FROM Homedata where year LIKE "%${year_list[index]['year']}%" ');
+                                // await Provider.of<SubjectManager>(context,
+                                //         listen: false)
+                                //     .getMoreDatafiltered(
+                                //         year_id_selected.toString())
+                                //     .then((value) {
+                                //   setState(() {
+                                //     _isloadingsubjects = false;
+                                //   });
+                                // });
+                                //  subject_list =  await database!.rawQuery('SELECT DISTINCT year FROM Homedata ');
+                                // id_list = await database.rawQuery('SELECT id_value FROM Test');
+
+                                print('sqflite subject');
+                                print(subject_list);
+                              },
+                              child: Text(year_list[index]['year'])),
+                        );
+                      }),
+                ))
+              ]));
+        });
+  }
+
+  void _modalBottomSheetMenuSubjectOffline(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+              height: 250.0,
+              color: Colors.transparent,
+              child: Column(children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: kbackgroundColor1,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'المادة الدراسية',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GE-bold',
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                    child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0))),
+                  child: ListView.separated(
+                      separatorBuilder: (BuildContext ctxt, int index) =>
+                          Divider(
+                            color: Colors.grey,
+                            height: 2,
+                          ),
+                      itemCount: subject_list.length,
+                      itemBuilder: (BuildContext ctxt, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: GestureDetector(
+                              onTap: () async {
+                                Provider.of<TeacherManager>(context,
+                                        listen: false)
+                                    .resetlist();
+                                setState(() {
+                                  //year_id_selected =
+                                  subjectname = subject_list[index]['subject'];
+                                  year_level = true;
+                                  subject_level = true;
+                                  teacher_level = false;
+                                  group_level = false;
+                                  _isloadingsubjects = false;
+                                  _isloadingteachers = true;
+                                  teachername = 'المدرس';
+                                  // group_name = widget.usser != user.
+                                  //     ? 'المدرس'
+                                  //     : widget.teacher!.name!;
+                                  group_name = 'المجموعه';
+                                  app_name = 'الحصه';
+                                });
+                                Navigator.pop(context);
+                                Provider.of<AppStateManager>(context,
+                                        listen: false)
+                                    .setHomeOptions(false);
+
+                                ///
+                                // Provider.of<TeacherManager>(context,
+                                //         listen: false)
+                                //     .resetlist();
+                                // setState(() {
+                                //   // subjectId_selected =
+                                //   // subjectmanager
+                                //   //     .subjects![index].id
+                                //   //     .toString();
+
+                                //   subject_level = true;
+                                //   teacher_level = widget.usser != user.teacher
+                                //       ? false
+                                //       : true;
+                                //   group_level = false;
+                                //   _isloadingteachers =
+                                //       widget.usser != user.teacher
+                                //           ? true
+                                //           : false;
+                                //   if (widget.usser == user.teacher) {
+                                //     _isloadinggroups = true;
+                                //   }
+                                //   teachername = widget.usser != user.teacher
+                                //       ? 'المدرس'
+                                //       : widget.teacher!.name!;
+                                //   group_name = 'المجموعه';
+                                //   app_name = 'الحصه';
+                                // });
+                                // Provider.of<AppStateManager>(context,
+                                //         listen: false)
+                                //     .setHomeOptions(false);
+                                // Navigator.pop(context);
+
+                                // widget.usser != user.teacher
+                                //     ? await Provider.of<TeacherManager>(
+                                //             context,
+                                //             listen: false)
+                                //         .getMoreDatafiltered(year_id_selected,
+                                //             subjectId_selected)
+                                //         .then((value) {
+                                //         setState(() {
+                                //           _isloadingteachers = false;
+                                //         });
+                                //       })
+                                //     : await Provider.of<GroupManager>(context,
+                                //             listen: false)
+                                //         .getMoreDatafiltered(
+                                //             year_id_selected,
+                                //             subjectId_selected,
+                                //             teacher_id_selected)
+                                //         .then((value) {
+                                //         setState(() {
+                                //           _isloadinggroups = false;
+                                //         });
+                                //       });
+                                //                             Provider.of<SubjectManager>(context,
+                                //                                     listen: false)
+                                //                                 .resetlist();
+                                //                             setState(() {
+                                //                               year_id_selected =
+                                //                                   yearname = year_list[index]['year'];
+                                //                               year_level = true;
+                                //                               subject_level = false;
+                                //                               teacher_level = false;
+                                //                               group_level = false;
+                                //                               _isloadingsubjects = true;
+                                //                               subjectname = 'الماده الدراسيه';
+                                //                               teachername = widget.usser != user.teacher
+                                //                                   ? 'المدرس'
+                                //                                   : widget.teacher!.name!;
+                                //                               group_name = 'المجموعه';
+                                //                               app_name = 'الحصه';
+                                //                             });
+                                //                             Navigator.pop(context);
+                                //                             Provider.of<AppStateManager>(context,
+                                //                                     listen: false)
+                                //                                 .setHomeOptions(false);
+
+                                //                             // await Provider.of<SubjectManager>(context,
+                                //                             //         listen: false)
+                                //                             //     .getMoreDatafiltered(
+                                //                             //         year_id_selected.toString())
+                                //                             //     .then((value) {
+                                //                             //   setState(() {
+                                //                             //     _isloadingsubjects = false;
+                                //                             //   });
+                                //                             // });
+                                teacher_list = await database!.rawQuery(
+                                    'SELECT DISTINCT teacher FROM Homedata where subject LIKE "%${subject_list[index]['subject']}%" ');
+                                // id_list = await database.rawQuery('SELECT id_value FROM Test');
+
+                                print('sqflite teacher');
+                                print(teacher_list);
+                              },
+                              child: Text(subject_list[index]['subject'])),
+                        );
+                      }),
+                ))
+              ]));
+        });
+  }
+
+  void _modalBottomSheetMenuteacherOffline(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+              height: 250.0,
+              color: Colors.transparent,
+              child: Column(children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: kbackgroundColor1,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'المدرس',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GE-bold',
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                    child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0))),
+                  child: ListView.separated(
+                      separatorBuilder: (BuildContext ctxt, int index) =>
+                          Divider(
+                            color: Colors.grey,
+                            height: 2,
+                          ),
+                      itemCount: teacher_list.length,
+                      itemBuilder: (BuildContext ctxt, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: GestureDetector(
+                              onTap: () async {
+                                // Provider.of<TeacherManager>(context,
+                                //         listen: false)
+                                //     .resetlist();
+                                // setState(() {
+                                //   // subjectId_selected = subjectmanager
+                                //   //     .subjects![index].id
+                                //   //     .toString();
+                                //   subjectname = subject_list[index]['subject'];
+                                //   subject_level = true;
+                                //   teacher_level = widget.usser != user.teacher
+                                //       ? false
+                                //       : true;
+
+                                //   _isloadingteachers =
+                                //       widget.usser != user.teacher
+                                //           ? true
+                                //           : false;
+                                //   if (widget.usser == user.teacher) {
+                                //     _isloadinggroups = true;
+                                //   }
+                                //   teachername = widget.usser != user.teacher
+                                //       ? 'المدرس'
+                                //       : widget.teacher!.name!;
+                                //   group_name = 'المجموعه';
+                                //   app_name = 'الحصه';
+                                // });
+                                // Provider.of<AppStateManager>(context,
+                                //         listen: false)
+                                //     .setHomeOptions(false);
+                                // Navigator.pop(context);
+
+                                // // widget.usser != user.teacher
+                                // //     ? await Provider.of<TeacherManager>(
+                                // //             context,
+                                // //             listen: false)
+                                // //         .getMoreDatafiltered(year_id_selected,
+                                // //             subjectId_selected)
+                                // //         .then((value) {
+                                // //         setState(() {
+                                // //           _isloadingteachers = false;
+                                // //         });
+                                // //       })
+                                // //     : await Provider.of<GroupManager>(context,
+                                // //             listen: false)
+                                // //         .getMoreDatafiltered(
+                                // //             year_id_selected,
+                                // //             subjectId_selected,
+                                // //             teacher_id_selected)
+                                // //         .then((value) {
+                                // //         setState(() {
+                                // //           _isloadinggroups = false;
+                                // //         });
+                                // //       });
+                                // Provider.of<TeacherManager>(context,
+                                //         listen: false)
+                                //     .resetlist();
+                                // setState(() {
+                                //   // year_id_selected =
+                                //    teachername =
+                                //       teacher_list[index]['teacher'];
+                                //   year_level = true;
+                                //   subject_level = true;
+                                //   teacher_level = true;
+                                //   group_level = true;
+                                //   _isloadingsubjects = true;
+                                //   subjectname = 'الماده الدراسيه';
+                                //   teachername = widget.usser != user.teacher
+                                //       ? 'المدرس'
+                                //       : widget.teacher!.name!;
+                                //   group_name = 'المجموعه';
+                                //   app_name = 'الحصه';
+                                // });
+                                // Navigator.pop(context);
+                                // Provider.of<AppStateManager>(context,
+                                //         listen: false)
+                                //     .setHomeOptions(false);
+
+                                // await Provider.of<SubjectManager>(context,
+                                //         listen: false)
+                                //     .getMoreDatafiltered(
+                                //         year_id_selected.toString())
+                                //     .then((value) {
+                                //   setState(() {
+                                //     _isloadingsubjects = false;
+                                //   });
+                                // });
+
+                                Provider.of<GroupManager>(context,
+                                        listen: false)
+                                    .resetlist();
+                                setState(() {
+                                  //year_id_selected =
+                                  teachername = teacher_list[index]['teacher'];
+                                  year_level = true;
+                                  subject_level = true;
+                                  teacher_level = true;
+                                  group_level = false;
+                                  _isloadingsubjects = false;
+                                  _isloadingteachers = false;
+                                  _isloadinggroups = true;
+
+                                  // group_name = widget.usser != user.
+                                  //     ? 'المدرس'
+                                  //     : widget.teacher!.name!;
+                                  group_name = 'المجموعه';
+                                  app_name = 'الحصه';
+                                });
+                                Navigator.pop(context);
+                                Provider.of<AppStateManager>(context,
+                                        listen: false)
+                                    .setHomeOptions(false);
+                                ////
+
+                                // Provider.of<GroupManager>(context,
+                                //         listen: false)
+                                //     .resetlist();
+                                // setState(() {
+                                //   // teacher_id_selected = teachermanager
+                                //   //     .teachers[index].id
+                                //   //     .toString();
+                                //   teachername = teacher_list[index]['teacher'];
+                                //   teacher_level = true;
+                                //   group_level = false;
+                                //   _isloadinggroups = true;
+
+                                //   group_name = 'المجموعه';
+                                //   app_name = 'الحصه';
+                                // });
+                                // Navigator.pop(context);
+                                // Provider.of<AppStateManager>(context,
+                                //         listen: false)
+                                //     .setHomeOptions(false);
+                                // await Provider.of<GroupManager>(context,
+                                //         listen: false)
+                                //     .getMoreDatafiltered(
+                                //         year_id_selected,
+                                //         subjectId_selected,
+                                //         teacher_id_selected)
+                                //     .then((value) {
+                                //   // print('valueeeeeeeeeeeeeeeeee');
+                                //   // //print(value);
+                                //   setState(() {
+                                //     _isloadinggroups = false;
+                                //   });
+                                // });
+                                group_list = await database!.rawQuery(
+                                    'SELECT DISTINCT groupname FROM Homedata WHERE teacher LIKE "%${teacher_list[index]['teacher']}%" ');
+                                // id_list = await database.rawQuery('SELECT id_value FROM Test');
+
+                                print('sqflite groupPPPPPPPP');
+                                print(group_list);
+                              },
+                              child: Text(teacher_list[index]['teacher'])),
+                        );
+                      }),
+                ))
+              ]));
+        });
+  }
+
+  void _modalBottomSheetMenugroupOffline(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+              height: 250.0,
+              color: Colors.transparent,
+              child: Column(children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: kbackgroundColor3,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'المجموعات',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GE-bold',
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                    child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0))),
+                  child: ListView.separated(
+                      separatorBuilder: (BuildContext ctxt, int index) =>
+                          Divider(
+                            color: Colors.grey,
+                            height: 2,
+                          ),
+                      itemCount: group_list.length,
+                      itemBuilder: (BuildContext ctxt, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: GestureDetector(
+                              onTap: () async {
+                                // Provider.of<TeacherManager>(context,
+                                //         listen: false)
+                                //     .resetlist();
+                                // setState(() {
+                                //   // subjectId_selected = subjectmanager
+                                //   //     .subjects![index].id
+                                //   //     .toString();
+                                //   subjectname = subject_list[index]['subject'];
+                                //   subject_level = true;
+                                //   teacher_level = widget.usser != user.teacher
+                                //       ? false
+                                //       : true;
+                                //   group_level = false;
+                                //   _isloadingteachers =
+                                //       widget.usser != user.teacher
+                                //           ? true
+                                //           : false;
+                                //   if (widget.usser == user.teacher) {
+                                //     _isloadinggroups = true;
+                                //   }
+                                //   teachername = widget.usser != user.teacher
+                                //       ? 'المدرس'
+                                //       : widget.teacher!.name!;
+                                //   group_name = 'المجموعه';
+                                //   app_name = 'الحصه';
+                                // });
+                                // Provider.of<AppStateManager>(context,
+                                //         listen: false)
+                                //     .setHomeOptions(false);
+                                // Navigator.pop(context);
+
+                                // // widget.usser != user.teacher
+                                // //     ? await Provider.of<TeacherManager>(
+                                // //             context,
+                                // //             listen: false)
+                                // //         .getMoreDatafiltered(year_id_selected,
+                                // //             subjectId_selected)
+                                // //         .then((value) {
+                                // //         setState(() {
+                                // //           _isloadingteachers = false;
+                                // //         });
+                                // //       })
+                                // //     : await Provider.of<GroupManager>(context,
+                                // //             listen: false)
+                                // //         .getMoreDatafiltered(
+                                // //             year_id_selected,
+                                // //             subjectId_selected,
+                                // //             teacher_id_selected)
+                                // //         .then((value) {
+                                // //         setState(() {
+                                // //           _isloadinggroups = false;
+                                // //         });
+                                // //       });
+                                // //                             Provider.of<SubjectManager>(context,
+                                // //                                     listen: false)
+                                // //                                 .resetlist();
+                                // //                             setState(() {
+                                // //                               year_id_selected =
+                                // //                                   yearname = year_list[index]['year'];
+                                // //                               year_level = true;
+                                // //                               subject_level = false;
+                                // //                               teacher_level = false;
+                                // //                               group_level = false;
+                                // //                               _isloadingsubjects = true;
+                                // //                               subjectname = 'الماده الدراسيه';
+                                // //                               teachername = widget.usser != user.teacher
+                                // //                                   ? 'المدرس'
+                                // //                                   : widget.teacher!.name!;
+                                // //                               group_name = 'المجموعه';
+                                // //                               app_name = 'الحصه';
+                                // //                             });
+                                // //                             Navigator.pop(context);
+                                // //                             Provider.of<AppStateManager>(context,
+                                // //                                     listen: false)
+                                // //                                 .setHomeOptions(false);
+
+                                // //                             // await Provider.of<SubjectManager>(context,
+                                // //                             //         listen: false)
+                                // //                             //     .getMoreDatafiltered(
+                                // //                             //         year_id_selected.toString())
+                                // //                             //     .then((value) {
+                                // //                             //   setState(() {
+                                // //                             //     _isloadingsubjects = false;
+                                // //                             //   });
+                                // //                             // });
+                                // teacher_list =await database!.rawQuery(
+                                //     'SELECT DISTINCT teacher FROM Homedata where year LIKE "%${year_list[index]['subject']}%" ');
+                                // // id_list = await database.rawQuery('SELECT id_value FROM Test');
+
+                                // print('sqflite degreeeeeeeeeee');
+                                // print(subject_list);
+
+                                // Provider.of<AppStateManager>(context,
+                                //             listen: false)
+                                //         .setgroupID(
+                                //             groupmanager.groups[index].id
+                                //                 .toString(),
+                                //             groupmanager.groups[index]);
+                                // Provider.of<AppointmentManager>(context,
+                                //       listen: false)
+                                //   .resetlist();
+
+                                setState(() {
+                                  group_name = group_list[index]['groupname'];
+                                  year_level = true;
+                                  subject_level = true;
+                                  teacher_level = true;
+                                  group_level = true;
+                                  _isloadingappointment = true;
+                                  _isloadingsubjects = false;
+                                  _isloadingteachers = false;
+                                  _isloadinggroups = false;
+
+                                  // group_name = widget.usser != user.
+                                  //     ? 'المدرس'
+                                  //     : widget.teacher!.name!;
+                                  // group_name = 'المجموعه';
+                                  app_name = 'الحصه';
+                                });
+                                Navigator.pop(context);
+                                Provider.of<AppStateManager>(context,
+                                        listen: false)
+                                    .setHomeOptions(false);
+                                appointment_list = await database!.rawQuery(
+                                    'SELECT  classname FROM Homedata WHERE groupname LIKE "%${group_list[index]['groupname']}%" ');
+                                // id_list = await database.rawQuery('SELECT id_value FROM Test');
+
+                                print('sqflite appointment');
+                                print(appointment_list);
+                                // await Provider.of<AppointmentManager>(
+                                //         context,
+                                //         listen: false)
+                                //     .get_appointments(group_id_selected)
+                                //     .then((value) => setState(() {
+                                //           _isloadingappointment = false;
+                                //         }));
+                              },
+                              child: Text(group_list[index]['groupname'])),
+                        );
+                      }),
+                ))
+              ]));
+        });
+  }
+
+  void _modalBottomSheetMenuappointOffline(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+              height: 250.0,
+              color: Colors.transparent,
+              child: Column(children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: kbuttonColor3,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'اختار حصة',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GE-bold',
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                    child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0))),
+                  child: ListView.separated(
+                      separatorBuilder: (BuildContext ctxt, int index) =>
+                          Divider(
+                            color: Colors.grey,
+                            height: 2,
+                          ),
+                      itemCount: appointment_list.length,
+                      itemBuilder: (BuildContext ctxt, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: GestureDetector(
+                              onTap: () async {
+                                // Provider.of<TeacherManager>(context,
+                                //         listen: false)
+                                //     .resetlist();
+                                // setState(() {
+                                //   // subjectId_selected = subjectmanager
+                                //   //     .subjects![index].id
+                                //   //     .toString();
+                                //   subjectname = subject_list[index]['subject'];
+                                //   subject_level = true;
+                                //   teacher_level = widget.usser != user.teacher
+                                //       ? false
+                                //       : true;
+                                //   group_level = false;
+                                //   _isloadingteachers =
+                                //       widget.usser != user.teacher
+                                //           ? true
+                                //           : false;
+                                //   if (widget.usser == user.teacher) {
+                                //     _isloadinggroups = true;
+                                //   }
+                                //   teachername = widget.usser != user.teacher
+                                //       ? 'المدرس'
+                                //       : widget.teacher!.name!;
+                                //   group_name = 'المجموعه';
+                                //   app_name = 'الحصه';
+                                // });
+                                // Provider.of<AppStateManager>(context,
+                                //         listen: false)
+                                //     .setHomeOptions(false);
+                                // Navigator.pop(context);
+
+                                // // widget.usser != user.teacher
+                                // //     ? await Provider.of<TeacherManager>(
+                                // //             context,
+                                // //             listen: false)
+                                // //         .getMoreDatafiltered(year_id_selected,
+                                // //             subjectId_selected)
+                                // //         .then((value) {
+                                // //         setState(() {
+                                // //           _isloadingteachers = false;
+                                // //         });
+                                // //       })
+                                // //     : await Provider.of<GroupManager>(context,
+                                // //             listen: false)
+                                // //         .getMoreDatafiltered(
+                                // //             year_id_selected,
+                                // //             subjectId_selected,
+                                // //             teacher_id_selected)
+                                // //         .then((value) {
+                                // //         setState(() {
+                                // //           _isloadinggroups = false;
+                                // //         });
+                                // //       });
+                                // //                             Provider.of<SubjectManager>(context,
+                                // //                                     listen: false)
+                                // //                                 .resetlist();
+                                // //                             setState(() {
+                                // //                               year_id_selected =
+                                // //                                   yearname = year_list[index]['year'];
+                                // //                               year_level = true;
+                                // //                               subject_level = false;
+                                // //                               teacher_level = false;
+                                // //                               group_level = false;
+                                // //                               _isloadingsubjects = true;
+                                // //                               subjectname = 'الماده الدراسيه';
+                                // //                               teachername = widget.usser != user.teacher
+                                // //                                   ? 'المدرس'
+                                // //                                   : widget.teacher!.name!;
+                                // //                               group_name = 'المجموعه';
+                                // //                               app_name = 'الحصه';
+                                // //                             });
+                                // //                             Navigator.pop(context);
+                                // //                             Provider.of<AppStateManager>(context,
+                                // //                                     listen: false)
+                                // //                                 .setHomeOptions(false);
+
+                                // //                             // await Provider.of<SubjectManager>(context,
+                                // //                             //         listen: false)
+                                // //                             //     .getMoreDatafiltered(
+                                // //                             //         year_id_selected.toString())
+                                // //                             //     .then((value) {
+                                // //                             //   setState(() {
+                                // //                             //     _isloadingsubjects = false;
+                                // //                             //   });
+                                // //                             // });
+                                // teacher_list =await database!.rawQuery(
+                                //     'SELECT DISTINCT teacher FROM Homedata where year LIKE "%${year_list[index]['subject']}%" ');
+                                // // id_list = await database.rawQuery('SELECT id_value FROM Test');
+
+                                // print('sqflite degreeeeeeeeeee');
+                                // print(subject_list);
+
+                                // Provider.of<AppStateManager>(context,
+                                //             listen: false)
+                                //         .setgroupID(
+                                //             groupmanager.groups[index].id
+                                //                 .toString(),
+                                //             groupmanager.groups[index]);
+                                // Provider.of<AppointmentManager>(context,
+                                //       listen: false)
+                                //   .resetlist();
+                                ///////
+                                //  setState(() {
+                                //               // app_id_selected =
+                                //               //     appointmentmanager
+                                //               //         .appointments![index].id
+                                //               //         .toString();
+                                //               app_name = appointmentmanager
+                                //                   .appointments![index].name
+                                //                   .toString();
+                                //             });
+                                setState(() {
+                                  app_name =
+                                      appointment_list[index]['classname'];
+                                  year_level = true;
+                                  subject_level = true;
+                                  teacher_level = true;
+                                  group_level = true;
+                                  _isloadingappointment = false;
+                                  _isloadingsubjects = false;
+                                  _isloadingteachers = false;
+                                  _isloadinggroups = false;
+
+                                  // // group_name = widget.usser != user.
+                                  // //     ? 'المدرس'
+                                  // //     : widget.teacher!.name!;
+                                  // // group_name = 'المجموعه';
+                                  // app_name = 'الحصه';
+                                });
+                                Navigator.pop(context);
+                                Provider.of<AppStateManager>(context,
+                                        listen: false)
+                                    .setHomeOptions(false);
+                                appointment_list = await database!.rawQuery(
+                                    'SELECT DISTINCT classname FROM Homedata WHERE groupname LIKE "%${group_list[index]['groupname']}%" ');
+                                // id_list = await database.rawQuery('SELECT id_value FROM Test');
+
+                                print('sqflite appointment');
+                                print(appointment_list);
+                                // await Provider.of<AppointmentManager>(
+                                //         context,
+                                //         listen: false)
+                                //     .get_appointments(group_id_selected)
+                                //     .then((value) => setState(() {
+                                //           _isloadingappointment = false;
+                                //         }));
+                              },
+                              child:
+                                  Text(appointment_list[index]['classname'])),
+                        );
+                      }),
+                ))
+              ]));
+        });
+  }
+
   void _modalBottomSheetMenuyear(BuildContext context) {
     FocusScope.of(context).unfocus();
 
@@ -350,6 +1395,25 @@ class _ChoicesState extends State<Choices> {
                     ),
                   ),
                 ),
+// (!check_connectivity(this.context)) ?
+//  Expanded(
+//               child: Container(
+//             decoration: BoxDecoration(
+//                 color: Colors.white,
+//                 borderRadius: BorderRadius.only(
+//                     topLeft: Radius.circular(20.0),
+//                     topRight: Radius.circular(20.0))),
+//             child: ListView.separated(
+//                 separatorBuilder: (BuildContext ctxt, int index) => Divider(
+//                       color: Colors.black,
+//                       height: 2,
+//                     ),
+//                 itemCount: year_list.length,
+//                 itemBuilder: (BuildContext ctxt, int index) {
+//                   return Text(year_list[index]['year'] + '8iiii');
+//                 }),
+//           )):
+
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
@@ -359,6 +1423,8 @@ class _ChoicesState extends State<Choices> {
                             topRight: Radius.circular(20.0))),
                     child: Consumer<YearManager>(
                       builder: (_, yearmanager, child) {
+                        //if offline
+
                         if (yearmanager.years.isEmpty) {
                           if (yearmanager.loading) {
                             return Center(
@@ -382,6 +1448,8 @@ class _ChoicesState extends State<Choices> {
                             ));
                           }
                         } else {
+                          //    var connectivityResult = await (Connectivity().checkConnectivity());
+                          //  if (connectivityResult == ConnectivityResult.wifi) {}
                           return ListView.builder(
                             controller: _sc1,
                             itemCount: yearmanager.years.length +
@@ -1041,7 +2109,7 @@ class _ChoicesState extends State<Choices> {
 
   void _showErrorDialog(String message, String title) {
     showDialog(
-      context: context,
+      context: this.context,
       builder: (ctx) => AlertDialog(
         title: Text(
           title,
@@ -1085,6 +2153,42 @@ class _ChoicesState extends State<Choices> {
       height: widget.size.height * .7,
       child: Column(
         children: [
+          // GestureDetector(
+          //     onTap: () {
+          //       // if (check_connectivity() == false) {
+          //       //   setState(() {
+          //       //     no_internet = true;
+          //       //     print('no   ooooooooooooooo');
+          //       //   });
+          //       //   if (Provider.of<DataConnectionStatus>(context) ==
+          //       //       DataConnectionStatus.disconnected) {
+          //       //     print('no interrrnet');
+          //       //   } else {
+          //       //     print('yes interrrnet');
+          //       //   }
+          //       // }
+          //     },
+          //     child: Text('hhhhhhhhhhhhh')),
+          // !check_connectivity(this.context)
+          //     ? Expanded(
+          //         child: Container(
+          //         decoration: BoxDecoration(
+          //             color: Colors.white,
+          //             borderRadius: BorderRadius.only(
+          //                 topLeft: Radius.circular(20.0),
+          //                 topRight: Radius.circular(20.0))),
+          //         child: ListView.separated(
+          //             separatorBuilder: (BuildContext ctxt, int index) =>
+          //                 Divider(
+          //                   color: Colors.black,
+          //                   height: 2,
+          //                 ),
+          //             itemCount: year_list.length,
+          //             itemBuilder: (BuildContext ctxt, int index) {
+          //               return Text(year_list[index]['year'] + '8iiii');
+          //             }),
+          //       ))
+          //     : SizedBox(),
           Container(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1094,7 +2198,9 @@ class _ChoicesState extends State<Choices> {
                   color: kbuttonColor3,
                   items: years_levels,
                   size: widget.size,
-                  fnc: () => _modalBottomSheetMenuyear(context),
+                  fnc: check_connectivity(context) == true
+                      ? () => _modalBottomSheetMenuyear(context)
+                      : () => _modalBottomSheetMenuyearOffline(context),
                   loading: _isloadingyears,
                   active: true,
                 ),
@@ -1103,7 +2209,9 @@ class _ChoicesState extends State<Choices> {
                   color: kbackgroundColor1,
                   items: subjects,
                   size: widget.size,
-                  fnc: () => _modalBottomSheetMenusubject(context),
+                  fnc: check_connectivity(context) == true
+                      ? () => _modalBottomSheetMenusubject(context)
+                      : () => _modalBottomSheetMenuSubjectOffline(context),
                   active: year_level == true,
                   loading: _isloadingsubjects,
                 ),
@@ -1119,9 +2227,23 @@ class _ChoicesState extends State<Choices> {
                   color: kbackgroundColor1,
                   items: teachers,
                   size: widget.size,
-                  fnc: widget.usser != user.teacher
+                  fnc: check_connectivity(context) == true
                       ? () => _modalBottomSheetMenuteacher(context)
-                      : () {},
+                      : () => _modalBottomSheetMenuteacherOffline(context),
+                  // (){
+                  //   if(widget.usser != user.teacher){
+                  //          return _modalBottomSheetMenuteacher(context);
+                  //   }
+                  //   if(check_connectivity(context) == true){
+                  //           return _modalBottomSheetMenuteacher(context);
+                  //   }
+
+                  //   else{
+                  //      return _modalBottomSheetMenuteacherOffline(context);
+
+                  //   }
+                  // } ,
+
                   active: subject_level == true,
                   loading: _isloadingteachers,
                 ),
@@ -1130,7 +2252,9 @@ class _ChoicesState extends State<Choices> {
                   color: kbackgroundColor3,
                   items: groups,
                   size: widget.size,
-                  fnc: () => _modalBottomSheetMenugroup(context),
+                  fnc: check_connectivity(context) == true
+                      ? () => _modalBottomSheetMenugroup(context)
+                      : () => _modalBottomSheetMenugroupOffline(context),
                   active: teacher_level == true,
                   loading: _isloadinggroups,
                 ),
@@ -1323,11 +2447,15 @@ class _ChoicesState extends State<Choices> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: InkWell(
-                    onTap: group_level
-                        ? () {
-                            _modalBottomSheetMenuappoint(context);
-                          }
-                        : null,
+                    onTap: check_connectivity(context) == true
+                        //||group_level
+                        ? () => _modalBottomSheetMenuappoint(context)
+                        : () => _modalBottomSheetMenuappointOffline(context),
+                    //  group_level
+                    //     ? () {
+                    //        _modalBottomSheetMenuappoint(context);
+                    //       }
+                    //     : null,
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 5),
                       child: Row(
@@ -1471,6 +2599,7 @@ class _ChoicesState extends State<Choices> {
                               context,
                               listen: false)
                           .attendlesson(res, app_id_selected!);
+                      //if ofline
 
                       if (resp['last_appointment_attend'] == false) {
                         ScaffoldMessenger.of(context).showSnackBar(

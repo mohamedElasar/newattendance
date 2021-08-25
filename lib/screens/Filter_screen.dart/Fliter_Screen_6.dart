@@ -813,7 +813,7 @@ class _MyListItemState extends State<MyListItem> {
                 ? null
                 : () {
                     // _onTap();
-                   // _onSelected(widget.index);
+                   _onSelected(widget.index);
                     print('indexxxxxxxxxxx');
                     print(widget.index);
                     print('_selectedIndexXXX');
@@ -843,6 +843,7 @@ class _MyListItemState extends State<MyListItem> {
                         } else {
                           setState(() {
                             _press_enabled = true;
+                            
                             my_student_absence.remove('absence');
                             my_lesson_id.remove(
                                 widget.appmgr.group_students[widget.index].id);

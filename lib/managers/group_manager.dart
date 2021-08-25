@@ -20,9 +20,13 @@ class GroupManager extends ChangeNotifier {
   List<StudentModelCompare> _students_compare = [];
   List<StudentModelCompare>? get students_compare => _students_compare;
 
+  static List<GroupModelSimple> _groups_offline = [];
   List<GroupModelSimple> _groups = [];
+  static var group_info ;
+
   List<AppointmentModel> _group_students = [];
   List<AppointmentModel> get group_students => _group_students;
+  static List<GroupModelSimple> get groupsoffline => _groups_offline;
   List<GroupModelSimple> get groups => _groups;
   get hasmore => _hasMore;
   get pageNumber => _pageNumber;
@@ -142,7 +146,6 @@ class GroupManager extends ChangeNotifier {
     notifyListeners();
   }
 
-
   // Future<void> add_degree_off(
   //     var? degree,
   //     // String? year,
@@ -184,7 +187,6 @@ class GroupManager extends ChangeNotifier {
 
   //   notifyListeners();
   // }
-
 
   Future<void> addgroup(
     String? name,
@@ -246,6 +248,36 @@ class GroupManager extends ChangeNotifier {
       var list =
           stagesList.map((data) => GroupModelSimple.fromJson(data)).toList();
       _groups = list;
+      print('groups');
+      print(_groups[8].name);
+      // _loading = false;
+      // add exception
+
+    } catch (error) {
+      print(error);
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> get_groups_offline() async {
+    var url = Uri.https('development.mrsaidmostafa.com', '/api/groups');
+    try {
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+      final responseData = json.decode(response.body);
+
+      List<dynamic> stagesList = responseData['data'];
+      var list =
+          stagesList.map((data) => GroupModelSimple.fromJson(data)).toList();
+      _groups_offline = list;
+      print('groups');
+      print(_groups_offline[8].name);
       // _loading = false;
       // add exception
 
@@ -275,6 +307,40 @@ class GroupManager extends ChangeNotifier {
       var list =
           stagesList.map((data) => AppointmentModel.fromJson(data)).toList();
       _group_students = list;
+      _loading = false;
+      // add exception
+      //  for (var i = 0; i < stagesList.length; i++) {
+      //   lesson__id.add(stagesList[i]['id']);
+      //   print('iddddddddddddddddd');
+      //   print(lesson__id);
+      // }
+    } catch (error) {
+      print(error);
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> get_group_offline(int id) async {
+    var url = Uri.https('development.mrsaidmostafa.com', '/api/groups/$id');
+    try {
+      var response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $_authToken'
+        },
+      );
+      final responseData = json.decode(response.body);
+      // print('responseDataaaaaa');
+      // print(responseData);
+      var stages = responseData['data'];
+      print('one group offline');
+      print(stages);
+      group_info = stages;
+      // var list =
+      //     stagesList.map((data) => AppointmentModel.fromJson(data)).toList();
+      // _group_students = list;
       _loading = false;
       // add exception
       //  for (var i = 0; i < stagesList.length; i++) {

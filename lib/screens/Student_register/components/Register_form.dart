@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:attendance/helper/httpexception.dart';
 import 'package:attendance/managers/Student_manager.dart';
 import 'package:attendance/managers/cities_manager.dart';
@@ -6,14 +8,18 @@ import 'package:attendance/managers/subject_manager.dart';
 import 'package:attendance/models/StudentSearchModel.dart';
 import 'package:attendance/models/city.dart';
 import 'package:attendance/models/student.dart';
+// import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
+// import 'package:sqflite/sqflite.dart';
 
 import '../../../constants.dart';
 
 // import 'contacts_widget.dart';
+String path = '';
 
 class Register_Form extends StatefulWidget {
   const Register_Form({
@@ -32,8 +38,12 @@ class Register_Form extends StatefulWidget {
 }
 
 class _Register_FormState extends State<Register_Form> {
+  // static late ConnectivityResult _connectionStatus;
+  // Connectivity? connectivity;
+  // StreamSubscription<ConnectivityResult>? subscription;
   final GlobalKey<FormState> _formKey = GlobalKey();
   void _submit() async {
+    Context context;
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
       return;
@@ -46,81 +56,143 @@ class _Register_FormState extends State<Register_Form> {
     }
     _formKey.currentState!.save();
     // print('asdasdasd');
-    setState(() {
-      _isLoading = true;
-    });
+    // setState(() {
+    //   _isLoading = true;
+    //   ConnectivityResult.wifi;
+    // });
     print(_groups_id.join(','));
-    try {
-      await Provider.of<StudentManager>(context, listen: false)
-          .add_student(
-        nameController.text,
-        emailController.text,
-        phonecontroller.text,
-        schoolController.text,
-        notesController.text,
-        cityId_selected,
-        _groups_id,
-        parentNameController.text,
-        relationController.text,
-        parentphoneController.text,
-        parentWhatsController.text,
-        _register_data['gender'],
-        studyTypeController.text,
-        langId_selected,
-        discountController.text,
-        barCodeController.text,
-        passwordcontroller.text,
-        confirmpasswordController.text,
-        parentemailController.text,
-        parentpasswordController.text,
-      )
-          .then((_) {
-        nameController.text = '';
-        parentNameController.text = '';
-        relationController.text = '';
-        parentPhoneController.text = '';
-        parentWhatsController.text = '';
-        schoolController.text = '';
-        barCodeController.text = '';
-        groupController.text = '';
-        discountController.text = '';
-        languageController.text = '';
-        notesController.text = '';
-        emailController.text = '';
-        studyTypeController.text = '';
-        phonecontroller.text = '';
-        passwordcontroller.text = '';
-        confirmpasswordController.text = '';
-        parentphoneController.text = '';
-        parentemailController.text = '';
-        parentpasswordController.text = '';
-        _register_data['gender'] = null;
-        _register_data['language'] = null;
-        cityname = 'المحافظه';
-        langname = 'اللغه الثانيه';
-        _groups_id = [];
-        _groups_shown = [];
-      }).then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Colors.green[300],
-                content: Text(
-                  'تم اضافه الطالب بنجاح',
-                  style: TextStyle(fontFamily: 'GE-medium'),
-                ),
-                duration: Duration(seconds: 3),
-              )));
-    } on HttpException catch (error) {
-      _showErrorDialog(error.toString());
-    } catch (error) {
-      print(error);
-      const errorMessage = 'حاول مره اخري';
-      _showErrorDialog(errorMessage);
-    }
-    setState(() {
-      _isLoading = false;
-    });
+    // var connectivityResult = await (Connectivity().checkConnectivity());
+    // if (connectivityResult == ConnectivityResult.wifi) {
+      try {
+        await Provider.of<StudentManager>(this.context, listen: false)
+            .add_student(
+          nameController.text,
+          emailController.text,
+          phonecontroller.text,
+          schoolController.text,
+          notesController.text,
+          cityId_selected,
+          _groups_id,
+          parentNameController.text,
+          relationController.text,
+          parentphoneController.text,
+          parentWhatsController.text,
+          _register_data['gender'],
+          studyTypeController.text,
+          langId_selected,
+          discountController.text,
+          barCodeController.text,
+          passwordcontroller.text,
+          confirmpasswordController.text,
+          parentemailController.text,
+          parentpasswordController.text,
+        )
+            .then((_) {
+          nameController.text = '';
+          parentNameController.text = '';
+          relationController.text = '';
+          parentPhoneController.text = '';
+          parentWhatsController.text = '';
+          schoolController.text = '';
+          barCodeController.text = '';
+          groupController.text = '';
+          discountController.text = '';
+          languageController.text = '';
+          notesController.text = '';
+          emailController.text = '';
+          studyTypeController.text = '';
+          phonecontroller.text = '';
+          passwordcontroller.text = '';
+          confirmpasswordController.text = '';
+          parentphoneController.text = '';
+          parentemailController.text = '';
+          parentpasswordController.text = '';
+          _register_data['gender'] = null;
+          _register_data['language'] = null;
+          cityname = 'المحافظه';
+          langname = 'اللغه الثانيه';
+          _groups_id = [];
+          _groups_shown = [];
+        }).then((value) => ScaffoldMessenger.of(this.context).showSnackBar(SnackBar(
+                  backgroundColor: Colors.green[300],
+                  content: Text(
+                    'تم اضافه الطالب بنجاح',
+                    style: TextStyle(fontFamily: 'GE-medium'),
+                  ),
+                  duration: Duration(seconds: 3),
+                )));
+      } on HttpException catch (error) {
+        _showErrorDialog(error.toString(), this.context);
+      } catch (error) {
+        print(error);
+        const errorMessage = 'حاول مره اخري';
+        _showErrorDialog(errorMessage, this.context);
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    // } else {
+    //   setState(() {
+    //     connectivityResult;
+    //   });
+    //   print("no connection");
+
+      // var databasesPath = await getDatabasesPath();
+      // path = join(databasesPath, 'studentregister.db');
+
+//Delete the database
+      //await deleteDatabase(path);
+
+// open the database
+      // Database database = await openDatabase(path, version: 1,
+      //     onCreate: (Database db, int version) async {
+      //   // When creating the db, create the table
+      //   await db.execute(
+      //       'CREATE TABLE Student (id INTEGER PRIMARY KEY,  name TEXT,email  TEXT,phone TEXT,school TEXT,notes TEXT,cityId  TEXT,groups_id  TEXT, parentName TEXT, relation TEXT,parentphone TEXT,parentWhats TEXT,gender  TEXT,studyType TEXT, langId TEXT,discount TEXT,barCode TEXT,password TEXT,confirmpassword TEXT,parentemail TEXT,parentpassword TEXT, )');
+      // });
+
+      // await database.transaction((txn) async {
+      //   int id1 = await txn.rawInsert(
+      //       'INSERT INTO Student( name ,email  ,phone ,school ,notes ,cityId  ,groups_id  , parentName , relation ,parentphone ,parentWhats ,gender  ,studyType , langId ,discount ,barCode ,password ,confirmpassword ,parentemail ,parentpassword , ) VALUES( $nameController.text,$emailController.text,$phonecontroller.text,$schoolController.text,$notesController.text,$cityId_selected,$_groups_id,$parentNameController.text,$relationController.text,$parentphoneController.text,$parentWhatsController.text,${_register_data['gender']},$studyTypeController.text,$langId_selected,$discountController.text,$barCodeController.text,$passwordcontroller.text,confirmpasswordController.text,$parentemailController.text,$parentpasswordController.text,)');
+      //   print('inserted1: $id1');
+      //   // count_deree + 1;
+
+      //   //
+      // });
+      // // Update some record
+      // if (count_deree > 1) {
+      //   int count = await database.rawUpdate(
+      //       'UPDATE Test SET degree = ?, id_value = ? WHERE id_value = ?',
+      //       ['$result', '$Student__id', '$Student__id']);
+      //   print('updated: $count');
+      // }
+
+      // Get the records
+      // List<Map> list = await database.rawQuery('SELECT * FROM Test');
+      // degree_list = await database.rawQuery('SELECT degree FROM Test');
+      // id_list = await database.rawQuery('SELECT id_value FROM Test');
+
+      // print('sqflite degree');
+      // print(degree_list[0]['degree']);
+      print('sqflite list');
+      // print(list);
+
+      //for(true){}
+      // print('_connectionStatus');
+      // print(_connectionStatus.toString());
+      // setState(() {
+      //   if (_connectionStatus == ConnectivityResult.none) {
+      //     print("no connection again");
+      //   } else {
+      //     print("reconnected");
+      //   }
+      // });
+
+    //}
   }
 
   void _modify() async {
+    Context context;
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
       return;
@@ -137,7 +209,7 @@ class _Register_FormState extends State<Register_Form> {
       _isLoading = true;
     });
     try {
-      await Provider.of<StudentManager>(context, listen: false)
+      await Provider.of<StudentManager>(this.context, listen: false)
           .modify_student(
               widget.student!.id.toString(),
               nameController.text,
@@ -159,14 +231,14 @@ class _Register_FormState extends State<Register_Form> {
               passwordcontroller.text,
               confirmpasswordController.text)
           .then(
-            (value) => Provider.of<StudentManager>(context, listen: false)
+            (value) => Provider.of<StudentManager>(this.context, listen: false)
               ..getMoreDatafilteredId(
                 widget.student!.id.toString(),
               ),
           )
           .then((_) {
-        Navigator.pop(context);
-      }).then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        Navigator.pop(this.context);
+      }).then((value) => ScaffoldMessenger.of(this.context).showSnackBar(SnackBar(
                 backgroundColor: Colors.green[300],
                 content: Text(
                   'تم تعديل الطالب بنجاح',
@@ -175,17 +247,17 @@ class _Register_FormState extends State<Register_Form> {
                 duration: Duration(seconds: 3),
               )));
     } on HttpException catch (error) {
-      _showErrorDialog(error.toString());
+      _showErrorDialog(error.toString(), this.context);
     } catch (error) {
       const errorMessage = 'حاول مره اخري';
-      _showErrorDialog(errorMessage);
+      _showErrorDialog(errorMessage, this.context);
     }
     setState(() {
       _isLoading = false;
     });
   }
 
-  void _showErrorDialog(String message) {
+  void _showErrorDialog(String message, context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -707,115 +779,134 @@ class _Register_FormState extends State<Register_Form> {
     super.initState();
     // print(widget.student!.id);
     // print(widget.edit);
-    widget.edit!
-        ? nameController.text = widget.student!.name ?? ''
-        : nameController.text = '';
-    widget.edit!
-        ? parentNameController.text = widget.student!.parent ?? ''
-        : parentNameController.text = '';
-    widget.edit!
-        ? relationController.text = widget.student!.relationType ?? ''
-        : relationController.text = '';
-    widget.edit!
-        ? parentPhoneController.text = widget.student!.parentPhone ?? ''
-        : parentPhoneController.text = '';
-    widget.edit!
-        ? parentWhatsController.text = widget.student!.parentWhatsapp ?? ''
-        : parentWhatsController.text = '';
-    widget.edit!
-        ? schoolController.text = widget.student!.school ?? ''
-        : schoolController.text = '';
-    widget.edit!
-        ? barCodeController.text = widget.student!.code!.name ?? ''
-        : barCodeController.text = '';
-    widget.edit!
-        ? discountController.text = widget.student!.discount ?? ''
-        : discountController.text = '';
-    widget.edit!
-        ? notesController.text = widget.student!.note ?? ''
-        : notesController.text = '';
-    widget.edit!
-        ? emailController.text = widget.student!.email ?? ''
-        : emailController.text = '';
-    widget.edit!
-        ? studyTypeController.text = widget.student!.studyType ?? ''
-        : studyTypeController.text = '';
-    widget.edit!
-        ? phonecontroller.text = widget.student!.phone!
-        : phonecontroller.text = '';
-    widget.edit!
-        ? cityId_selected = widget.student!.city!.id!.toString()
-        : cityId_selected = '';
+    // connectivity = new Connectivity();
+    // subscription = connectivity!.onConnectivityChanged
+    //     .listen((ConnectivityResult myresult) {
+    //   _connectionStatus = myresult;
+    //   print('_connectionStatus');
+    //   print(_connectionStatus);
+    //   if (myresult == ConnectivityResult.wifi)
+    //   // ||
+    //   //     result == ConnectivityResult.mobile)
+    //   {
+    //     setState(() {});
+    //   }
+      widget.edit!
+          ? nameController.text = widget.student!.name ?? ''
+          : nameController.text = '';
+      widget.edit!
+          ? parentNameController.text = widget.student!.parent ?? ''
+          : parentNameController.text = '';
+      widget.edit!
+          ? relationController.text = widget.student!.relationType ?? ''
+          : relationController.text = '';
+      widget.edit!
+          ? parentPhoneController.text = widget.student!.parentPhone ?? ''
+          : parentPhoneController.text = '';
+      widget.edit!
+          ? parentWhatsController.text = widget.student!.parentWhatsapp ?? ''
+          : parentWhatsController.text = '';
+      widget.edit!
+          ? schoolController.text = widget.student!.school ?? ''
+          : schoolController.text = '';
+      widget.edit!
+          ? barCodeController.text = widget.student!.code!.name ?? ''
+          : barCodeController.text = '';
+      widget.edit!
+          ? discountController.text = widget.student!.discount ?? ''
+          : discountController.text = '';
+      widget.edit!
+          ? notesController.text = widget.student!.note ?? ''
+          : notesController.text = '';
+      widget.edit!
+          ? emailController.text = widget.student!.email ?? ''
+          : emailController.text = '';
+      widget.edit!
+          ? studyTypeController.text = widget.student!.studyType ?? ''
+          : studyTypeController.text = '';
+      widget.edit!
+          ? phonecontroller.text = widget.student!.phone!
+          : phonecontroller.text = '';
+      widget.edit!
+          ? cityId_selected = widget.student!.city!.id!.toString()
+          : cityId_selected = '';
 
-    widget.edit!
-        ? parentphoneController.text = widget.student!.parentPhone ?? ''
-        : parentphoneController.text = '';
-    if (widget.edit! && widget.student!.gender == 'ذكر')
-      _register_data['gender'] = 'ذكر';
-    if (widget.edit! && widget.student!.gender != 'ذكر')
-      _register_data['gender'] = 'أنثي';
-    if (widget.edit!) cityname = widget.student!.city!.name.toString();
-    if (widget.edit!) cityId_selected = widget.student!.city!.id.toString();
-    if (widget.edit!)
-      langname = widget.student!.secLang == null
-          ? 'اللغه الثانيه'
-          : widget.student!.secLang!.name.toString();
-    if (widget.edit!)
-      langId_selected = widget.student!.secLang == null
-          ? null
-          : widget.student!.secLang!.id.toString();
-    if (widget.edit!) {
-      _groups_id = widget.student!.groups!.map((e) => e.id.toString()).toList();
-      _groups_shown =
-          widget.student!.groups!.map((e) => e.name.toString()).toList();
-      // print(widget.student!.secondLanguage.toString());
-    } else {
-      _groups_id = [];
-      _groups_shown = [];
-    }
+      widget.edit!
+          ? parentphoneController.text = widget.student!.parentPhone ?? ''
+          : parentphoneController.text = '';
+      if (widget.edit! && widget.student!.gender == 'ذكر')
+        _register_data['gender'] = 'ذكر';
+      if (widget.edit! && widget.student!.gender != 'ذكر')
+        _register_data['gender'] = 'أنثي';
+      if (widget.edit!) cityname = widget.student!.city!.name.toString();
+      if (widget.edit!) cityId_selected = widget.student!.city!.id.toString();
+      if (widget.edit!)
+        langname = widget.student!.secLang == null
+            ? 'اللغه الثانيه'
+            : widget.student!.secLang!.name.toString();
+      if (widget.edit!)
+        langId_selected = widget.student!.secLang == null
+            ? null
+            : widget.student!.secLang!.id.toString();
+      if (widget.edit!) {
+        _groups_id =
+            widget.student!.groups!.map((e) => e.id.toString()).toList();
+        _groups_shown =
+            widget.student!.groups!.map((e) => e.name.toString()).toList();
+        // print(widget.student!.secondLanguage.toString());
+      } else {
+        _groups_id = [];
+        _groups_shown = [];
+      }
 
-    Future.delayed(Duration.zero, () async {
-      Provider.of<CitiesManager>(context, listen: false).resetlist();
-      Provider.of<GroupManager>(context, listen: false).resetlist();
-      Provider.of<SubjectManager>(context, listen: false).resetlist();
-      try {
-        await Provider.of<CitiesManager>(context, listen: false)
-            .getMoreData()
-            .then((value) =>
-                Provider.of<GroupManager>(context, listen: false).getMoreData())
-            .then((value) => Provider.of<SubjectManager>(context, listen: false)
-                .getMoreData())
-            .then((_) {
-          setState(() {
-            _isLoading = false;
+      Future.delayed(Duration.zero, () async {
+        Provider.of<CitiesManager>(this.context, listen: false).resetlist();
+        Provider.of<GroupManager>(this.context, listen: false).resetlist();
+        Provider.of<SubjectManager>(this.context, listen: false).resetlist();
+        try {
+          await Provider.of<CitiesManager>(this.context, listen: false)
+              .getMoreData()
+              .then((value) =>
+                  Provider.of<GroupManager>(this.context, listen: false)
+                      .getMoreData())
+              .then((value) =>
+                  Provider.of<SubjectManager>(this.context, listen: false)
+                      .getMoreData())
+              .then((_) {
+            setState(() {
+              _isLoading = false;
+            });
           });
-        });
-      } catch (e) {}
-      if (!mounted) return;
+        } catch (e) {}
+        if (!mounted) return;
 
-      _sc.addListener(
-        () {
-          if (_sc.position.pixels == _sc.position.maxScrollExtent) {
-            Provider.of<CitiesManager>(context, listen: false).getMoreData();
-          }
-        },
-      );
-      _sc2.addListener(
-        () {
-          if (_sc2.position.pixels == _sc2.position.maxScrollExtent) {
-            Provider.of<GroupManager>(context, listen: false).getMoreData();
-          }
-        },
-      );
-      _sc3.addListener(
-        () {
-          if (_sc3.position.pixels == _sc3.position.maxScrollExtent) {
-            Provider.of<SubjectManager>(context, listen: false).getMoreData();
-          }
-        },
-      );
-    });
-  }
+        _sc.addListener(
+          () {
+            if (_sc.position.pixels == _sc.position.maxScrollExtent) {
+              Provider.of<CitiesManager>(this.context, listen: false)
+                  .getMoreData();
+            }
+          },
+        );
+        _sc2.addListener(
+          () {
+            if (_sc2.position.pixels == _sc2.position.maxScrollExtent) {
+              Provider.of<GroupManager>(this.context, listen: false)
+                  .getMoreData();
+            }
+          },
+        );
+        _sc3.addListener(
+          () {
+            if (_sc3.position.pixels == _sc3.position.maxScrollExtent) {
+              Provider.of<SubjectManager>(this.context, listen: false)
+                  .getMoreData();
+            }
+          },
+        );
+      });
+    }
+  
 
   @override
   Widget build(BuildContext context) {
