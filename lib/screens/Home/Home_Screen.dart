@@ -39,7 +39,6 @@ class Home_Screen extends StatefulWidget {
 class _Home_ScreenState extends State<Home_Screen> {
   @override
   Widget build(BuildContext context) {
-    print(widget.myuser);
     final size = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
@@ -67,7 +66,6 @@ class _Home_ScreenState extends State<Home_Screen> {
                       size: size,
                       usser: widget.myuser,
                       teacher: widget.myteacher),
-
                   // build_chip_container_down(null, 'مجموعه الحضور'),
                   // SizedBox(
                   //   height: 10,
@@ -128,118 +126,41 @@ class _Home_ScreenState extends State<Home_Screen> {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: <Widget>[
-                  if (widget.myuser != user.assistant0)
-                    ListTile(
-                      title: Padding(
-                        padding: const EdgeInsets.all(1.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 0.7,
-                            ),
+                  ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.7,
                           ),
-                          height: 40,
-                          child: Material(
-                            // elevation: 5.0,
-                            borderRadius: BorderRadius.circular(5.0),
-                            child: Center(
-                              child: Text(
-                                "ادخال طالب",
-                                style: TextStyle(
-                                    fontSize: 19, fontWeight: FontWeight.bold),
-                              ),
+                        ),
+                        height: 40,
+                        child: Material(
+                          // elevation: 5.0,
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Center(
+                            child: Text(
+                              "ادخال طالب",
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
                       ),
-                      onTap: () {
-                        Provider.of<AppStateManager>(context, listen: false)
-                            .registerStudent(true);
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (context) => Student_Register_Screen()));
-                      },
                     ),
+                    onTap: () {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .registerStudent(true);
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => Student_Register_Screen()));
+                    },
+                  ),
                   if (widget.myuser != user.assistant)
-                    if (widget.myuser != user.assistant0)
-                      ListTile(
-                        title: Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                              border: Border.all(
-                                color: Colors.grey,
-                                width: 0.7,
-                              ),
-                            ),
-                            height: 40,
-                            child: Material(
-                              // elevation: 5.0,
-                              borderRadius: BorderRadius.circular(5.0),
-                              child: Center(
-                                child: Text(
-                                  "ادخال معلم",
-                                  style: TextStyle(
-                                      fontSize: 19,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          Provider.of<AppStateManager>(context, listen: false)
-                              .registerTeacher(true);
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => Add_Teacher_Screeen()));
-                        },
-                      ),
-                  if (widget.myuser != user.assistant)
-                    if (widget.myuser != user.assistant0)
-                      ListTile(
-                        title: Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                              border: Border.all(
-                                color: Colors.grey,
-                                width: 0.7,
-                              ),
-                            ),
-                            height: 40,
-                            child: Material(
-                              // elevation: 5.0,
-                              borderRadius: BorderRadius.circular(5.0),
-                              child: Center(
-                                child: Text(
-                                  "ادخال مساعد معلم",
-                                  style: TextStyle(
-                                      fontSize: 19,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          Provider.of<AppStateManager>(context, listen: false)
-                              .registerAssistant(true);
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => Add_Teacher_Screeen()));
-                        },
-                      ),
-                  if (widget.myuser != user.assistant0)
                     ListTile(
                       title: Padding(
                         padding: const EdgeInsets.all(1.0),
@@ -257,7 +178,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                             borderRadius: BorderRadius.circular(5.0),
                             child: Center(
                               child: Text(
-                                "ادخال مجموعة",
+                                "ادخال معلم",
                                 style: TextStyle(
                                     fontSize: 19, fontWeight: FontWeight.bold),
                               ),
@@ -267,11 +188,11 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                       onTap: () {
                         Provider.of<AppStateManager>(context, listen: false)
-                            .registerGroup(true);
+                            .registerTeacher(true);
                         // Navigator.push(
                         //     context,
                         //     MaterialPageRoute(
-                        //         builder: (context) => Add_group_screen()));
+                        //         builder: (context) => Add_Teacher_Screeen()));
                       },
                     ),
                   ListTile(
@@ -291,7 +212,41 @@ class _Home_ScreenState extends State<Home_Screen> {
                           borderRadius: BorderRadius.circular(5.0),
                           child: Center(
                             child: Text(
-                              "اظهار المجموعات",
+                              "ادخال مجموعة",
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    onTap: () {
+                      Provider.of<AppStateManager>(context, listen: false)
+                          .registerGroup(true);
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => Add_group_screen()));
+                    },
+                  ),
+                  ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.7,
+                          ),
+                        ),
+                        height: 40,
+                        child: Material(
+                          // elevation: 5.0,
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Center(
+                            child: Text(
+                              "اظهار مجموعة",
                               style: TextStyle(
                                   fontSize: 19, fontWeight: FontWeight.bold),
                             ),
@@ -304,37 +259,6 @@ class _Home_ScreenState extends State<Home_Screen> {
                           .gotocheckgroups(true);
                     },
                   ),
-                  if (widget.myuser == user.center)
-                    ListTile(
-                      title: Padding(
-                        padding: const EdgeInsets.all(1.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 0.7,
-                            ),
-                          ),
-                          height: 40,
-                          child: Material(
-                            // elevation: 5.0,
-                            borderRadius: BorderRadius.circular(5.0),
-                            child: Center(
-                              child: Text(
-                                "اظهار المدرسين",
-                                style: TextStyle(
-                                    fontSize: 19, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      onTap: () {
-                        Provider.of<AppStateManager>(context, listen: false)
-                            .checkteachers(true);
-                      },
-                    ),
                   ListTile(
                     title: Padding(
                       padding: const EdgeInsets.all(1.0),
@@ -559,31 +483,16 @@ class HomeTopPage extends StatelessWidget {
 class StudentSearch extends SearchDelegate<String> {
   @override
   List<Widget> buildActions(BuildContext context) => [
-        Row(
-          children: [
-            IconButton(
-              icon: Icon(Icons.clear),
-              onPressed: () {
-                if (query.isEmpty) {
-                  close(context, '');
-                } else {
-                  query = '';
-                  showSuggestions(context);
-                }
-              },
-            ),
-            // IconButton(
-            //   icon: Icon(Icons.clear),
-            //   onPressed: () {
-            //     if (query.isEmpty) {
-            //       close(context, '');
-            //     } else {
-            //       query = '';
-            //       showSuggestions(context);
-            //     }
-            //   },
-            // ),
-          ],
+        IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () {
+            if (query.isEmpty) {
+              close(context, '');
+            } else {
+              query = '';
+              showSuggestions(context);
+            }
+          },
         )
       ];
 

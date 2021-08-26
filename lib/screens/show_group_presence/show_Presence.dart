@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
-import 'package:connectivity/connectivity.dart';
-import 'package:sqflite/sqflite.dart';
+// import 'package:connectivity/connectivity.dart';
+// import 'package:sqflite/sqflite.dart';
 import 'components/connectivity.dart';
 
 String path = '';
@@ -112,7 +112,7 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
 
   @override
   void dispose() {
-    _connectivity.disposeStream();
+    // _connectivity.disposeStream();
     super.dispose();
   }
 
@@ -180,8 +180,10 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
 
   //var yearController = TextEditingController();
   var degreeController = TextEditingController();
-  Map _source = {ConnectivityResult.none: false};
-  final MyConnectivity _connectivity = MyConnectivity.instance;
+  Map _source = {
+    // ConnectivityResult.none: false
+    };
+  //final MyConnectivity _connectivity = MyConnectivity.instance;
   String text_value = '';
 
   bool _isloading = true;
@@ -191,7 +193,7 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
   //   _isChecked[i]= false;
   // }
   void deleteAll() async {
-    await deleteDatabase(path);
+    // await deleteDatabase(path);
   }
 
   @override
@@ -199,11 +201,11 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
     super.initState();
     //deleteDatabase(path);
 
-    _connectivity.initialise();
+    // _connectivity.initialise();
 
-    _connectivity.myStream.listen((source) {
-      setState(() => _source = source);
-    });
+    // _connectivity.myStream.listen((source) {
+    //   setState(() => _source = source);
+    // });
     //if (ok == true) {
     _is_checked = List<bool>.filled(mysearch_list.length, false);
     print('ok my search_listtttttttttt');
@@ -282,8 +284,8 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
                           ? IconButton(
                               icon: Icon(Icons.refresh),
                               onPressed: () async {
-                                if (_ListItemState._connectionStatus ==
-                                    ConnectivityResult.none) {
+                                // if (_ListItemState._connectionStatus ==
+                                //     ConnectivityResult.none) {
                                   print("no connection again");
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -296,7 +298,7 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
                                       duration: Duration(seconds: 3),
                                     ),
                                   );
-                                } else {
+                                // } else {
                                   print("reconnected");
                                   for (var i = 0; i < degree_list.length; i++) {
                                     try {
@@ -361,7 +363,7 @@ class _Show_Group_PresenceState extends State<Show_Group_Presence> {
                                       );
                                     }
                                   }
-                                }
+                                // }
                               })
                           : SizedBox()
                     ]),
@@ -533,9 +535,9 @@ class ListItem extends StatefulWidget {
 }
 
 class _ListItemState extends State<ListItem> {
-  static late ConnectivityResult _connectionStatus;
-  Connectivity? connectivity;
-  StreamSubscription<ConnectivityResult>? subscription;
+  // static late ConnectivityResult _connectionStatus;
+  // Connectivity? connectivity;
+  // StreamSubscription<ConnectivityResult>? subscription;
 
   // FocusNode _usernameFocusNode = FocusNode();
   bool show_text = false;
@@ -607,10 +609,10 @@ class _ListItemState extends State<ListItem> {
   void _submit(Student__id, context) async {
     setState(() {
       _isLoading = true;
-      ConnectivityResult.wifi;
+      // ConnectivityResult.wifi;
     });
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.wifi) {
+    // var connectivityResult = await (Connectivity().checkConnectivity());
+    // if (connectivityResult == ConnectivityResult.wifi) {
       try {
         setState(() {
           Group_Id;
@@ -665,34 +667,34 @@ class _ListItemState extends State<ListItem> {
       setState(() {
         _isLoading = false;
       });
-    } else {
+    // } else {
       setState(() {
-        connectivityResult;
+        // connectivityResult;
       });
       print("no connection");
 
-      var databasesPath = await getDatabasesPath();
-      path = join(databasesPath, 'student.db');
+      // var databasesPath = await getDatabasesPath();
+      // path = join(databasesPath, 'student.db');
 
 //Delete the database
       //await deleteDatabase(path);
 
 // open the database
-      Database database = await openDatabase(path, version: 1,
-          onCreate: (Database db, int version) async {
-        // When creating the db, create the table
-        await db.execute(
-            'CREATE TABLE Test (id INTEGER PRIMARY KEY, degree TEXT, id_value TEXT)');
-      });
+      // Database database = await openDatabase(path, version: 1,
+      //     onCreate: (Database db, int version) async {
+      //   // When creating the db, create the table
+      //   await db.execute(
+      //       'CREATE TABLE Test (id INTEGER PRIMARY KEY, degree TEXT, id_value TEXT)');
+      // });
 
-      await database.transaction((txn) async {
-        int id1 = await txn.rawInsert(
-            'INSERT INTO Test(degree, id_value) VALUES($result, $Student__id)');
-        print('inserted1: $id1');
-        // count_deree + 1;
+      // await database.transaction((txn) async {
+      //   int id1 = await txn.rawInsert(
+      //       'INSERT INTO Test(degree, id_value) VALUES($result, $Student__id)');
+      //   print('inserted1: $id1');
+      //   // count_deree + 1;
 
-        //
-      });
+      //   //
+      // });
       // // Update some record
       // if (count_deree > 1) {
       //   int count = await database.rawUpdate(
@@ -702,18 +704,18 @@ class _ListItemState extends State<ListItem> {
       // }
 
       // Get the records
-      List<Map> list = await database.rawQuery('SELECT * FROM Test');
-      degree_list = await database.rawQuery('SELECT degree FROM Test');
-      id_list = await database.rawQuery('SELECT id_value FROM Test');
+      // List<Map> list = await database.rawQuery('SELECT * FROM Test');
+      // degree_list = await database.rawQuery('SELECT degree FROM Test');
+      // id_list = await database.rawQuery('SELECT id_value FROM Test');
 
       print('sqflite degree');
       print(degree_list[0]['degree']);
       print('sqflite list');
-      print(list);
+      // print(list);
 
       //for(true){}
-      print('_connectionStatus');
-      print(_connectionStatus.toString());
+      // print('_connectionStatus');
+      // print(_connectionStatus.toString());
       // setState(() {
       //   if (_connectionStatus == ConnectivityResult.none) {
       //     print("no connection again");
@@ -723,7 +725,7 @@ class _ListItemState extends State<ListItem> {
       // });
 
 // assert(const DeepCollectionEquality().equals(list, expectedList));
-    }
+    // }
   }
 
   @override
@@ -733,24 +735,24 @@ class _ListItemState extends State<ListItem> {
 
     // print('okkkk');
     // print(mysearch_list);
-    connectivity = new Connectivity();
-    subscription = connectivity!.onConnectivityChanged
-        .listen((ConnectivityResult myresult) {
-      _connectionStatus = myresult;
-      print('_connectionStatus');
-      print(_connectionStatus);
-      if (myresult == ConnectivityResult.wifi)
+    // connectivity = new Connectivity();
+    // subscription = connectivity!.onConnectivityChanged
+    //     .listen((ConnectivityResult myresult) {
+    //   _connectionStatus = myresult;
+    //   print('_connectionStatus');
+    //   print(_connectionStatus);
+    //   if (myresult == ConnectivityResult.wifi)
       // ||
       //     result == ConnectivityResult.mobile)
-      {
-        setState(() {});
-      }
-    });
+    //   {
+    //     setState(() {});
+    //   }
+    // });
   }
 
   @override
   void dispose() {
-    subscription!.cancel();
+    // subscription!.cancel();
     super.dispose();
   }
 
